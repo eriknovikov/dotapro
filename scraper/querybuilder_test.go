@@ -13,6 +13,6 @@ func TestQueryBuilder(t *testing.T) {
 		t.Fatalf("Failed to write query file: %v", err)
 	}
 	// dumb change
-
+	// change #2
 	t.Log("Query written to ./od.query.sql")
 }
