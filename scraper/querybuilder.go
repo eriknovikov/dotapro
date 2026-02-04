@@ -13,7 +13,11 @@ func (b *QueryBuilder) GetIds(last_fetched_match_id int64, limit int) string {
 		SELECT m.match_id
 		FROM matches m
 		LEFT JOIN leagues l ON m.leagueid = l.leagueid
-		WHERE l.tier IN ('premium', 'professional') AND m.match_id > %v
+		WHERE l.tier IN ('premium', 'professional') 
+			AND m.match_id > %v
+			AND m.series_id != 0
+			AND m.radiant_team_id IS NOT NULL 
+			AND m.dire_team_id IS NOT NULL
 		ORDER BY m.match_id ASC
 		LIMIT %d;
 	`, last_fetched_match_id, limit)
@@ -77,7 +81,7 @@ func (b *QueryBuilder) GetMatches(matchIds []int64) string {
 						'backpack_2', pm.backpack_2,
 						'net_worth', pm.net_worth,
 						'is_radiant', (pm.player_slot < 128),
-						'name', np.name,
+						'name', np.name, 
 						'facet', pm.hero_variant
 					)
 					ORDER BY pm.player_slot

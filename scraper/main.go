@@ -35,7 +35,7 @@ func initialize() {
 }
 func main() {
 	initialize()
-	if err := ensureDB(DB); err != nil {
+	if err := ensureDB(); err != nil {
 		log.Fatal().Err(fmt.Errorf("err creating or restarting db: %w", err)).Send()
 	}
 	defer DB.DB.Close()
@@ -53,7 +53,7 @@ func main() {
 
 }
 
-func ensureDB(DB *bun.DB) error {
+func ensureDB() error {
 	newDB, err := setupDB()
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func handler(ctx context.Context) error {
 	defer cancel()
 	if DB.PingContext(ctx) != nil {
 		log.Warn().Msg("DB connection lost, attemptying to reconnect...")
-		if err := ensureDB(DB); err != nil {
+		if err := ensureDB(); err != nil {
 			return fmt.Errorf("failed to reconnect to db: %w", err)
 		}
 	}
@@ -79,7 +79,7 @@ func handler(ctx context.Context) error {
 		return fmt.Errorf("err getting last_fetched_match_id: %w", err)
 	}
 	log.Debug().Int64("LFMD", lastFetchedMatchId).Send()
-	matchIds, err := fetchMatchIDs(lastFetchedMatchId)
+	matchIds, err := fetchMatchIDs(lastFetchedMatchId, 100)
 	if err != nil {
 		return fmt.Errorf("err fetching match ids < last_fetched_matched_id: %w", err)
 	}

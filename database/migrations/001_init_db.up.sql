@@ -12,7 +12,7 @@ CREATE TABLE teams (
 );
 
 CREATE TABLE players (
-	account_id BIGINT PRIMARY KEY,
+	player_id BIGINT PRIMARY KEY,
 	name TEXT,
 	profile_img TEXT
 );
@@ -53,8 +53,8 @@ CREATE TABLE matches (
 CREATE TABLE matches_metadata (
 	match_id BIGINT PRIMARY KEY REFERENCES matches(match_id) ON DELETE CASCADE,
 	series_id BIGINT REFERENCES series(series_id),
-	radiant_captain BIGINT REFERENCES players(account_id),
-	dire_captain BIGINT REFERENCES players(account_id),
+	radiant_captain BIGINT REFERENCES players(player_id),
+	dire_captain BIGINT REFERENCES players(player_id),
 	picks_bans JSONB,
 	players_data JSONB,
 	radiant_gold_adv INTEGER[],
