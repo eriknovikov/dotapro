@@ -99,5 +99,13 @@ func fetchLastID(db *bun.DB) (int64, error) {
 		return -1, err
 	}
 	return res, nil
+}
 
+func updateLastID(ctx context.Context, db *bun.DB, matchID int64) error {
+	_, err := db.NewUpdate().
+		Model(&ScraperMetadata{ID: 1}).
+		Set("last_fetched_match_id = ?", matchID).
+		Where("id = ?", 1).
+		Exec(ctx)
+	return err
 }

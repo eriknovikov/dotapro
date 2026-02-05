@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"scraper/config"
@@ -15,6 +16,7 @@ import (
 
 const DB_CREATION_TIMEOUT = time.Second * 5
 const SSM_TIMEOUT = time.Second * 5
+const SCRAPING_LIMIT = 1000 // 1 batches of 1000
 
 var DB *bun.DB
 
@@ -74,23 +76,15 @@ func handler(ctx context.Context) error {
 			return fmt.Errorf("failed to reconnect to db: %w", err)
 		}
 	}
-	lastFetchedMatchId, err := fetchLastID(DB)
+	err := ScrapeMatches(ctx, DB, SCRAPING_LIMIT)
 	if err != nil {
-		return fmt.Errorf("err getting last_fetched_match_id: %w", err)
+		if errors.Is(err, ErrNoNewMatches) {
+			log.Warn().Msg("no new matches have been inserted")
+			return nil
+		}
+		return err
 	}
-	log.Debug().Int64("LFMD", lastFetchedMatchId).Send()
-	matchIds, err := fetchMatchIDs(lastFetchedMatchId, 100)
-	if err != nil {
-		return fmt.Errorf("err fetching match ids < last_fetched_matched_id: %w", err)
-	}
-	/*
-		10K matches , first from opendota, then into rds.
-		array
-		repeat 100 times:
-			fetch 50 from OD (with retry)
-			fetch 50 from OD (with retry)
-			insert 100 into rds (with retry)
-	*/
-	return ScrapeMatches(matchIds, DB)
+
+	return nil
 
 }
