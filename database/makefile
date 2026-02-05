@@ -14,7 +14,7 @@ migrate-down:
 
 # Create a new migration file pair (usage: make migrate-new name=add_users_table)
 migrate-new:
-	migrate create -ext sql -dir $(MIGRATIONS_PATH) -seq $(name)
+	migrate create -ext sql -dir $(MIGRATIONS_PATH) -digits 3 -seq $(name)
 
 # Fix a "dirty" database state (usage: make migrate-force v=1)
 migrate-force:
