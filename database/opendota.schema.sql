@@ -1,33 +1,31 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE EXTENSION IF NOT EXISTS tsm_system_rows;
 
--- SHITTY (USELESS) FIELDS ARE COMMENTED
 CREATE TABLE IF NOT EXISTS matches (
-  match_id bigint PRIMARY KEY, 
-  --match_seq_num bigint,
+  match_id bigint PRIMARY KEY,
+  match_seq_num bigint,
   radiant_win boolean,
-  start_time integer,
+  start_time bigint,
   duration integer,
-  --tower_status_radiant integer,
-  --tower_status_dire integer,
-  --barracks_status_radiant integer,
-  --barracks_status_dire integer,
-  --cluster integer,
-  --first_blood_time integer,
-  --lobby_type integer,
-  --human_players integer,
+  tower_status_radiant integer,
+  tower_status_dire integer,
+  barracks_status_radiant integer,
+  barracks_status_dire integer,
+  cluster integer,
+  first_blood_time integer,
+  lobby_type integer,
+  human_players integer,
   leagueid integer,
-  --positive_votes integer,
-  --negative_votes integer,
-  --game_mode integer,
-  --engine integer,
+  positive_votes integer,
+  negative_votes integer,
+  game_mode integer,
+  engine integer,
   radiant_score integer,
   dire_score integer,
   picks_bans json[],
   radiant_team_id integer,
   dire_team_id integer,
-  radiant_team_name varchar(255),
-  dire_team_name varchar(255),
+  radiant_team_name text,
+  dire_team_name text,
   radiant_team_complete smallint,
   dire_team_complete smallint,
   radiant_captain bigint,
@@ -147,36 +145,40 @@ CREATE INDEX IF NOT EXISTS player_matches_hero_id_idx on player_matches(hero_id)
 
 CREATE TABLE IF NOT EXISTS players (
   account_id bigint PRIMARY KEY,
-  steamid varchar(32),
-  avatar varchar(255),
-  avatarmedium varchar(255),
-  avatarfull varchar(255),
-  profileurl varchar(255),
-  personaname varchar(255),
+  steamid text,
+  avatar text,
+  avatarmedium text,
+  avatarfull text,
+  profileurl text,
+  personaname text,
   plus boolean DEFAULT false,
   last_login timestamp with time zone,
   full_history_time timestamp with time zone,
   cheese integer DEFAULT 0,
   fh_unavailable boolean,
-  loccountrycode varchar(2),
-  last_match_time timestamp with time zone
-  /*
-    "communityvisibilitystate" : 3,
-    "lastlogoff" : 1426020853,
-    "loccityid" : 44807,
-    "locstatecode" : "16",
-    "personastate" : 0,
-    "personastateflags" : 0,
-    "primaryclanid" : "103582791433775490",
-    "profilestate" : 1,
-    "realname" : "Alper",
-    "timecreated" : 1332289262,
-  */
+  loccountrycode text,
+  last_match_time timestamp with time zone,
+  profile_time timestamp with time zone,
+  rank_tier_time timestamp with time zone
 );
+/*
+  "communityvisibilitystate" : 3,
+  "lastlogoff" : 1426020853,
+  "loccityid" : 44807,
+  "locstatecode" : "16",
+  "personastate" : 0,
+  "personastateflags" : 0,
+  "primaryclanid" : "103582791433775490",
+  "profilestate" : 1,
+  "realname" : "Alper",
+  "timecreated" : 1332289262,
+*/
 CREATE INDEX IF NOT EXISTS players_cheese_idx on players(cheese) WHERE cheese IS NOT NULL AND cheese > 0;
-CREATE INDEX IF NOT EXISTS players_personaname_idx_gin ON players USING GIN(personaname gin_trgm_ops);
+--only GIST indexes support ordering by similarity
 CREATE INDEX IF NOT EXISTS players_personaname_idx_gist ON players USING GIST(personaname gist_trgm_ops);
 CREATE INDEX IF NOT EXISTS players_full_history_time_idx ON players(full_history_time ASC NULLS FIRST);
+CREATE INDEX IF NOT EXISTS players_profile_time_idx ON players(profile_time ASC NULLS FIRST);
+CREATE INDEX IF NOT EXISTS players_rank_tier_time_idx ON players(rank_tier_time ASC NULLS FIRST);
 
 CREATE TABLE IF NOT EXISTS player_ratings (
   PRIMARY KEY(account_id, time),
@@ -190,7 +192,7 @@ CREATE TABLE IF NOT EXISTS player_ratings (
 CREATE TABLE IF NOT EXISTS subscriptions (
   PRIMARY KEY(customer_id),
   account_id bigint REFERENCES players(account_id) ON DELETE CASCADE,
-  customer_id varchar(255),
+  customer_id text,
   amount int,
   active_until date
 );
@@ -239,12 +241,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS user_usage_unique_idx on user_usage(account_id
 
 CREATE TABLE IF NOT EXISTS notable_players (
   account_id bigint PRIMARY KEY,
-  name varchar(255),
-  country_code varchar(2),
+  name text,
+  country_code text,
   fantasy_role int,
   team_id int,
-  team_name varchar(255),
-  team_tag varchar(255),
+  team_name text,
+  team_tag text,
   is_locked boolean,
   is_pro boolean,
   locked_until integer
@@ -261,16 +263,16 @@ CREATE TABLE IF NOT EXISTS picks_bans(
 
 CREATE TABLE IF NOT EXISTS leagues(
   leagueid bigint PRIMARY KEY,
-  ticket varchar(255),
-  banner varchar(255),
-  tier varchar(255),
-  name varchar(255)
+  ticket text,
+  banner text,
+  tier text,
+  name text
 );
 
 CREATE TABLE IF NOT EXISTS teams(
   team_id bigint PRIMARY KEY,
-  name varchar(255),
-  tag varchar(255),
+  name text,
+  tag text,
   logo_url text
 );
 
@@ -323,7 +325,7 @@ CREATE TABLE IF NOT EXISTS public_matches (
   match_id bigint PRIMARY KEY,
   match_seq_num bigint,
   radiant_win boolean,
-  start_time integer,
+  start_time bigint,
   duration integer,
   lobby_type integer,
   game_mode integer,
@@ -335,6 +337,8 @@ CREATE TABLE IF NOT EXISTS public_matches (
 );
 CREATE INDEX IF NOT EXISTS public_matches_start_time_idx on public_matches(start_time);
 CREATE INDEX IF NOT EXISTS public_matches_avg_rank_tier_idx on public_matches(avg_rank_tier) WHERE avg_rank_tier IS NOT NULL;
+CREATE INDEX IF NOT EXISTS public_matches_radiant_team_idx_gin ON public_matches USING GIN(radiant_team);
+CREATE INDEX IF NOT EXISTS public_matches_dire_team_idx_gin ON public_matches USING GIN(dire_team);
 
 CREATE TABLE IF NOT EXISTS team_rating (
   PRIMARY KEY(team_id),
@@ -342,7 +346,9 @@ CREATE TABLE IF NOT EXISTS team_rating (
   rating real,
   wins int,
   losses int,
-  last_match_time bigint
+  last_match_time bigint,
+  delta real,
+  match_id bigint
 );
 CREATE INDEX IF NOT EXISTS team_rating_rating_idx ON team_rating(rating);
 
@@ -362,7 +368,9 @@ CREATE TABLE IF NOT EXISTS queue (
   attempts int,
   data json,
   next_attempt_time timestamp with time zone,
-  priority int
+  priority int,
+  job_key text,
+  UNIQUE(job_key)
 );
 CREATE INDEX IF NOT EXISTS queue_type_priority_id_idx on queue(type, priority, id);
 
@@ -383,12 +391,18 @@ CREATE TABLE IF NOT EXISTS rank_tier (
   account_id bigint,
   rating int
 );
-CREATE INDEX IF NOT EXISTS rank_tier_rating_idx ON rank_tier(rating);
 
 CREATE TABLE IF NOT EXISTS leaderboard_rank (
   PRIMARY KEY (account_id),
   account_id bigint,
   rating int
+);
+
+CREATE TABLE IF NOT EXISTS rank_tier_history (
+  PRIMARY KEY(account_id, time),
+  account_id bigint,
+  time timestamp with time zone,
+  rank_tier int
 );
 
 CREATE TABLE IF NOT EXISTS scenarios (
@@ -413,17 +427,6 @@ CREATE TABLE IF NOT EXISTS team_scenarios (
   UNIQUE (scenario, is_radiant, region, epoch_week)
 );
 
-CREATE TABLE IF NOT EXISTS hero_search (
-  PRIMARY KEY (match_id),
-  match_id bigint,
-  teamA int[],
-  teamB int[],
-  teamAWin boolean,
-  start_time int
-);
-CREATE INDEX IF NOT EXISTS hero_search_teamA_idx_gin ON hero_search USING GIN(teamA);
-CREATE INDEX IF NOT EXISTS hero_search_teamB_idx_gin ON hero_search USING GIN(teamB);
-
 CREATE TABLE IF NOT EXISTS parsed_matches (
   PRIMARY KEY (match_id),
   match_id bigint,
@@ -434,13 +437,8 @@ CREATE INDEX IF NOT EXISTS parsed_matches_is_archived_idx ON parsed_matches(is_a
 CREATE TABLE IF NOT EXISTS subscriber (
   PRIMARY KEY (account_id),
   account_id bigint,
-  customer_id varchar(255),
-  status varchar(100)
-);
-
-CREATE TABLE IF NOT EXISTS last_seq_num (
-  PRIMARY KEY (match_seq_num),
-  match_seq_num bigint
+  customer_id text,
+  status text
 );
 
 --Stores matches that the user has played in but might be previously anonymous in API data
@@ -457,15 +455,48 @@ CREATE INDEX IF NOT EXISTS player_match_history_retries_idx ON player_match_hist
 CREATE TABLE IF NOT EXISTS player_computed_mmr(
   PRIMARY KEY(account_id),
   account_id bigint,
-  computed_mmr real
+  computed_mmr real,
+  delta real,
+  match_id bigint
 );
 CREATE INDEX IF NOT EXISTS player_computed_mmr_computed_mmr_idx ON player_computed_mmr(computed_mmr);
+
+CREATE TABLE IF NOT EXISTS player_computed_mmr_turbo(
+  PRIMARY KEY(account_id),
+  account_id bigint,
+  computed_mmr real,
+  delta real,
+  match_id bigint
+);
+CREATE INDEX IF NOT EXISTS player_computed_mmr_turbo_computed_mmr_idx ON player_computed_mmr_turbo(computed_mmr);
 
 CREATE TABLE IF NOT EXISTS rating_queue(
   PRIMARY KEY(match_seq_num),
   match_seq_num bigint,
   match_id bigint,
-  radiant_win boolean
+  radiant_win boolean,
+  game_mode int
+);
+
+CREATE TABLE IF NOT EXISTS insert_queue(
+  PRIMARY KEY(match_seq_num),
+  match_seq_num bigint,
+  data json,
+  processed boolean DEFAULT false
+);
+CREATE INDEX IF NOT EXISTS insert_queue_processed_match_seq_num_idx ON insert_queue(processed, match_seq_num);
+
+CREATE TABLE IF NOT EXISTS league_match(
+  PRIMARY KEY (leagueid, match_id),
+  leagueid int,
+  match_id bigint
+);
+
+CREATE TABLE IF NOT EXISTS aliases(
+  PRIMARY KEY(account_id, personaname),
+  account_id bigint,
+  personaname text,
+  name_since timestamp with time zone
 );
 
 DO $$

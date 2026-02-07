@@ -33,6 +33,65 @@ const (
 	TIMES_TO_RETRY = 3
 )
 
+// BatchProcessor holds reusable allocations to reduce memory pressure
+type BatchProcessor struct {
+	// Maps for related entities
+	leagues    map[int64]League
+	teams      map[int64]Team
+	players    map[int64]Player
+	seriesMap  map[int64]Series
+
+	// Slices for valid matches
+	validMatches     []Match
+	validMetadata    []MatchMetadata
+	validSeriesMatches []SeriesMatch
+
+	// Slice for parsed matches
+	odMatches []ODMatch
+
+	// Slice for match IDs
+	ids []int64
+}
+
+// NewBatchProcessor creates a new BatchProcessor with pre-allocated capacity
+func NewBatchProcessor() *BatchProcessor {
+	return &BatchProcessor{
+		leagues:          make(map[int64]League, BATCH_SIZE),
+		teams:            make(map[int64]Team, BATCH_SIZE*2),
+		players:          make(map[int64]Player, BATCH_SIZE*10),
+		seriesMap:        make(map[int64]Series, BATCH_SIZE),
+		validMatches:     make([]Match, 0, BATCH_SIZE),
+		validMetadata:    make([]MatchMetadata, 0, BATCH_SIZE),
+		validSeriesMatches: make([]SeriesMatch, 0, BATCH_SIZE),
+		odMatches:        make([]ODMatch, 0, BATCH_SIZE),
+		ids:              make([]int64, 0, BATCH_SIZE),
+	}
+}
+
+// clear resets all maps and slices for reuse
+func (bp *BatchProcessor) clear() {
+	// Clear maps
+	for k := range bp.leagues {
+		delete(bp.leagues, k)
+	}
+	for k := range bp.teams {
+		delete(bp.teams, k)
+	}
+	for k := range bp.players {
+		delete(bp.players, k)
+	}
+	for k := range bp.seriesMap {
+		delete(bp.seriesMap, k)
+	}
+
+	// Reset slices
+	bp.validMatches = bp.validMatches[:0]
+	bp.validMetadata = bp.validMetadata[:0]
+	bp.validSeriesMatches = bp.validSeriesMatches[:0]
+	bp.odMatches = bp.odMatches[:0]
+	bp.ids = bp.ids[:0]
+}
+
 func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 	var err error
 	lastFetchedMatchId, err := fetchLastID(DB)
@@ -47,24 +106,28 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 	if N == 0 {
 		return ErrNoNewMatches
 	}
+
+	processor := NewBatchProcessor()
+	defer func() {
+		processor.clear()
+	}()
+
 	currentBatchIDs := make([]int64, 0, BATCH_SIZE)
 	currentBatchMatches := make([]json.RawMessage, 0, BATCH_SIZE)
+
 	for i := 0; i < N; i += BATCH_SIZE {
-		log.Warn().Int("batchNum", i).Msg("processing batch")
+		log.Debug().Int("batchNum", i).Msg("processing batch")
 		end := minInt(i+BATCH_SIZE, N)
 		currentBatchIDs = matchIds[i:end]
 		currentBatchMatches, err = fetchMatchBatch(currentBatchIDs)
 		if err != nil {
 			return fmt.Errorf("error scraping matches batch: %w", err)
 		}
-		odMatches, err := parseRawMatches(currentBatchMatches)
-		if err != nil {
-			return fmt.Errorf("failed to parse raw matches: %w", err)
+
+		if err := processMatchBatch(currentBatchMatches, DB, processor); err != nil {
+			return fmt.Errorf("error processing matches batch: %w", err)
 		}
 
-		if err := insertMatchBatch(odMatches, DB); err != nil {
-			return fmt.Errorf("error inserting matches batch: %w", err)
-		}
 		if len(currentBatchIDs) == 0 {
 			log.Warn().Msg("DIDNT EXPECT CURRENT BATCH ID LENGTH TO BE 0. LOGICAL ERROR, AND SHOULD NOT HAPPEN")
 		}
@@ -75,7 +138,8 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 				return fmt.Errorf("error updating last fetched match id: %w", err)
 			}
 		}
-		log.Warn().Int("batchNum", i).Msg("finished processing batch")
+		processor.clear()
+		log.Debug().Int("batchNum", i).Msg("finished processing batch")
 	}
 	return nil
 }
@@ -143,8 +207,8 @@ func fetchMatchBatch(matchIDs []int64) ([]json.RawMessage, error) {
 	return opendotaMatchResp.Rows, nil
 }
 
-func parseRawMatches(rawBatch []json.RawMessage) ([]ODMatch, error) {
-	odMatches := make([]ODMatch, 0, len(rawBatch))
+func parseRawMatches(rawBatch []json.RawMessage, odMatches []ODMatch) ([]ODMatch, error) {
+	odMatches = odMatches[:0]
 	for _, raw := range rawBatch {
 		var m ODMatch
 		if err := json.Unmarshal(raw, &m); err != nil {
@@ -155,12 +219,7 @@ func parseRawMatches(rawBatch []json.RawMessage) ([]ODMatch, error) {
 	return odMatches, nil
 }
 
-func extractRelatedEntities(odMatches []ODMatch) (map[int64]League, map[int64]Team, map[int64]Player, map[int64]Series) {
-	leagues := make(map[int64]League)
-	teams := make(map[int64]Team)
-	players := make(map[int64]Player)
-	seriesMap := make(map[int64]Series)
-
+func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series) {
 	for _, m := range odMatches {
 		if m.League.ID > 0 {
 			leagues[m.League.ID] = League{
@@ -212,7 +271,7 @@ func extractRelatedEntities(odMatches []ODMatch) (map[int64]League, map[int64]Te
 		}
 
 		for _, p := range matchPlayers {
-			if p.PlayerID > 0 {
+			if p.PlayerID > 0 && p.Name != "" {
 				if _, exists := players[p.PlayerID]; !exists {
 					players[p.PlayerID] = Player{
 						PlayerID: p.PlayerID,
@@ -221,20 +280,7 @@ func extractRelatedEntities(odMatches []ODMatch) (map[int64]League, map[int64]Te
 				}
 			}
 		}
-
-		if m.RadiantTeam.Captain > 0 {
-			if _, exists := players[m.RadiantTeam.Captain]; !exists {
-				players[m.RadiantTeam.Captain] = Player{PlayerID: m.RadiantTeam.Captain}
-			}
-		}
-		if m.DireTeam.Captain > 0 {
-			if _, exists := players[m.DireTeam.Captain]; !exists {
-				players[m.DireTeam.Captain] = Player{PlayerID: m.DireTeam.Captain}
-			}
-		}
 	}
-
-	return leagues, teams, players, seriesMap
 }
 
 func validateMatch(om ODMatch) error {
@@ -278,7 +324,7 @@ func validateMatch(om ODMatch) error {
 	return nil
 }
 
-func buildMatchEntities(om ODMatch) (Match, MatchMetadata, SeriesMatch) {
+func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetadata, SeriesMatch) {
 	m := Match{
 		MatchID:    om.MatchID,
 		Duration:   om.Duration,
@@ -321,10 +367,14 @@ func buildMatchEntities(om ODMatch) (Match, MatchMetadata, SeriesMatch) {
 		md.SeriesID = om.SeriesID
 	}
 	if om.RadiantTeam.Captain > 0 {
-		md.RadiantCaptain = om.RadiantTeam.Captain
+		if _, exists := players[om.RadiantTeam.Captain]; exists {
+			md.RadiantCaptain = om.RadiantTeam.Captain
+		}
 	}
 	if om.DireTeam.Captain > 0 {
-		md.DireCaptain = om.DireTeam.Captain
+		if _, exists := players[om.DireTeam.Captain]; exists {
+			md.DireCaptain = om.DireTeam.Captain
+		}
 	}
 
 	var sm SeriesMatch
@@ -388,40 +438,45 @@ func insertMatches(ctx context.Context, tx bun.Tx, matches []Match, metadata []M
 	return nil
 }
 
-func insertMatchBatch(matches []ODMatch, db *bun.DB) error {
+func processMatchBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor) error {
 	ctx := context.Background()
 
-	leagues, teams, players, seriesMap := extractRelatedEntities(matches)
+	odMatches, err := parseRawMatches(rawBatch, bp.odMatches)
+	if err != nil {
+		return fmt.Errorf("failed to parse raw matches: %w", err)
+	}
 
-	var validMatches []Match
-	var validMetadata []MatchMetadata
-	var validSeriesMatches []SeriesMatch
+	extractRelatedEntities(odMatches, bp.leagues, bp.teams, bp.players, bp.seriesMap)
 
-	for _, om := range matches {
+	bp.validMatches = bp.validMatches[:0]
+	bp.validMetadata = bp.validMetadata[:0]
+	bp.validSeriesMatches = bp.validSeriesMatches[:0]
+
+	for _, om := range odMatches {
 		if err := validateMatch(om); err != nil {
 			log.Warn().Int64("match_id", om.MatchID).Err(err).Msg("Skipping match due to validation error")
 			continue
 		}
 
-		m, md, sm := buildMatchEntities(om)
-		validMatches = append(validMatches, m)
-		validMetadata = append(validMetadata, md)
+		m, md, sm := buildMatchEntities(om, bp.players)
+		bp.validMatches = append(bp.validMatches, m)
+		bp.validMetadata = append(bp.validMetadata, md)
 		if sm.SeriesID > 0 {
-			validSeriesMatches = append(validSeriesMatches, sm)
+			bp.validSeriesMatches = append(bp.validSeriesMatches, sm)
 		}
 	}
 
-	if len(validMatches) == 0 {
+	if len(bp.validMatches) == 0 {
 		log.Warn().Msg("No valid matches in batch, skipping insertion")
 		return nil
 	}
 
 	return db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
-		if err := insertRelatedEntities(ctx, tx, leagues, teams, players, seriesMap); err != nil {
+		if err := insertRelatedEntities(ctx, tx, bp.leagues, bp.teams, bp.players, bp.seriesMap); err != nil {
 			return err
 		}
 
-		return insertMatches(ctx, tx, validMatches, validMetadata, validSeriesMatches)
+		return insertMatches(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches)
 	})
 }
 

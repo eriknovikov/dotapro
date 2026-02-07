@@ -21,14 +21,13 @@ type Team struct {
 	TeamID        int64  `bun:"team_id,pk"`
 	Name          string `bun:"name"`
 	Tag           string `bun:"tag"`
-	LogoURL       string `bun:"logo_url"` // Empty string represents NULL
+	LogoURL       string `bun:"logo_url"`
 }
 
 type Player struct {
 	bun.BaseModel `bun:"table:players"`
 	PlayerID      int64  `bun:"player_id,pk"`
-	Name          string `bun:"name"`       // Empty string represents NULL
-	ProfileImg    string `bun:"profile_img"` // Empty string represents NULL
+	Name          string `bun:"name,notnull"`
 }
 
 type Series struct {
@@ -78,9 +77,9 @@ type SeriesMatch struct {
 }
 
 type ScraperMetadata struct {
-	bun.BaseModel        `bun:"table:scraper_metadata"`
-	ID                   int16  `bun:"id,pk"`
-	LastFetchedMatchID   int64  `bun:"last_fetched_match_id,notnull"`
+	bun.BaseModel      `bun:"table:scraper_metadata"`
+	ID                 int16 `bun:"id,pk"`
+	LastFetchedMatchID int64 `bun:"last_fetched_match_id,notnull"`
 }
 
 // --- Source Structs (OpenDota Mapping) ---
@@ -112,7 +111,7 @@ type ODTeam struct {
 	Tag     string `json:"tag"`
 	LogoURL string `json:"logo_url"` // Empty string represents NULL
 	Score   int    `json:"score"`
-	Captain int64  `json:"captain"`  // 0 represents NULL
+	Captain int64  `json:"captain"` // 0 represents NULL
 }
 
 type ODPlayerShort struct {

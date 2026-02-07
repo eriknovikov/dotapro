@@ -13,8 +13,7 @@ CREATE TABLE teams (
 
 CREATE TABLE players (
 	player_id BIGINT PRIMARY KEY,
-	name TEXT,
-	profile_img TEXT
+	name TEXT NOT NULL
 );
 
 
