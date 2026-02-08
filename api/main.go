@@ -17,8 +17,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const DB_CREATION_TIMEOUT = time.Second * 1
-const SSM_TIMEOUT = time.Second * 1
+const DB_CREATION_TIMEOUT = time.Second * 5
+const SSM_TIMEOUT = time.Second * 5
 
 type Request = events.APIGatewayV2HTTPRequest
 type Response = events.APIGatewayV2HTTPResponse

@@ -46,7 +46,8 @@ CREATE TABLE matches (
 	dire_players BIGINT[],
 	duration INTEGER NOT NULL,
 	start_time TIMESTAMP NOT NULL,
-	radiant_win BOOLEAN NOT NULL
+	radiant_win BOOLEAN NOT NULL,
+	patch TEXT
 );
 
 CREATE TABLE matches_metadata (
@@ -59,7 +60,8 @@ CREATE TABLE matches_metadata (
 	radiant_gold_adv INTEGER[],
 	radiant_xp_adv INTEGER[],
 	radiant_score INTEGER NOT NULL,
-	dire_score INTEGER NOT NULL
+	dire_score INTEGER NOT NULL,
+	version INTEGER
 );
 
 CREATE TABLE scraper_metadata (

@@ -330,6 +330,7 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 		Duration:   om.Duration,
 		StartTime:  time.Unix(om.StartTime, 0),
 		RadiantWin: om.RadiantWin,
+		Patch:      om.Patch,
 	}
 	if om.League.ID > 0 {
 		m.LeagueID = om.League.ID
@@ -362,6 +363,7 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 		RadiantXPAdv:   om.RadiantXPAdv,
 		RadiantScore:   om.RadiantTeam.Score,
 		DireScore:      om.DireTeam.Score,
+		Version:        om.Version,
 	}
 	if om.SeriesID > 0 {
 		md.SeriesID = om.SeriesID

@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"encoding/json"
@@ -6,8 +6,6 @@ import (
 
 	"github.com/uptrace/bun"
 )
-
-// --- DB Models ---
 
 type League struct {
 	bun.BaseModel `bun:"table:leagues"`
@@ -78,49 +76,38 @@ type SeriesMatch struct {
 	MatchID       int64 `bun:"match_id,pk"`
 }
 
-type ScraperMetadata struct {
-	bun.BaseModel      `bun:"table:scraper_metadata"`
-	ID                 int16 `bun:"id,pk"`
-	LastFetchedMatchID int64 `bun:"last_fetched_match_id,notnull"`
+type TeamInfo struct {
+	ID      int64  `json:"id" bun:"id"`
+	Name    string `json:"name" bun:"name"`
+	Tag     string `json:"tag" bun:"tag"`
+	LogoURL string `json:"logo_url" bun:"logo_url"`
+	Score   int    `json:"score" bun:"score"`
+	Captain int64  `json:"captain" bun:"captain"`
 }
 
-// --- Source Structs (OpenDota Mapping) ---
-
-type ODMatch struct {
-	MatchID        int64           `json:"match_id"`
-	RadiantWin     bool            `json:"radiant_win"`
-	StartTime      int64           `json:"start_time"`
-	Duration       int             `json:"duration"`
-	SeriesID       int64           `json:"series_id"`
-	RadiantGoldAdv []int32         `json:"radiant_gold_adv"`
-	RadiantXPAdv   []int32         `json:"radiant_xp_adv"`
-	Patch          string          `json:"patch"`
-	Version        int             `json:"version"`
-	League         ODLeague        `json:"league"`
-	RadiantTeam    ODTeam          `json:"radiant_team"`
-	DireTeam       ODTeam          `json:"dire_team"`
-	Players        json.RawMessage `json:"players"`
-	PicksBans      json.RawMessage `json:"picks_bans"`
+type LeagueInfo struct {
+	ID   int64  `json:"id" bun:"id"`
+	Name string `json:"name" bun:"name"`
+	Tier string `json:"tier" bun:"tier"`
 }
 
-type ODLeague struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Tier string `json:"tier"`
-}
-
-type ODTeam struct {
-	ID      int64  `json:"id"`
-	Name    string `json:"name"`
-	Tag     string `json:"tag"`
-	LogoURL string `json:"logo_url"` // Empty string represents NULL
-	Score   int    `json:"score"`
-	Captain int64  `json:"captain"` // 0 represents NULL
-}
-
-type ODPlayerShort struct {
-	PlayerID   int64  `json:"player_id"`
-	HeroID     int64  `json:"hero_id"`
-	PlayerSlot int    `json:"player_slot"`
-	Name       string `json:"name"` // Empty string represents NULL
+type MatchDetail struct {
+	MatchID        int64       `json:"match_id" bun:"match_id"`
+	StartTime      time.Time   `json:"start_time" bun:"start_time"`
+	Duration       int         `json:"duration" bun:"duration"`
+	RadiantWin     bool        `json:"radiant_win" bun:"radiant_win"`
+	Patch          string      `json:"patch" bun:"patch"`
+	Version        int         `json:"version" bun:"version"`
+	RadiantTeam    TeamInfo    `json:"radiant_team" bun:"radiant_team"`
+	DireTeam       TeamInfo    `json:"dire_team" bun:"dire_team"`
+	League         LeagueInfo  `json:"league" bun:"league"`
+	SeriesID       int64       `json:"series_id" bun:"series_id"`
+	PicksBans      json.RawMessage `json:"picks_bans" bun:"picks_bans"`
+	PlayersData    json.RawMessage `json:"players_data" bun:"players_data"`
+	RadiantGoldAdv []int32     `json:"radiant_gold_adv" bun:"radiant_gold_adv"`
+	RadiantXPAdv   []int32     `json:"radiant_xp_adv" bun:"radiant_xp_adv"`
+	RadiantHeroes  []int64     `json:"radiant_heroes" bun:"radiant_heroes"`
+	DireHeroes     []int64     `json:"dire_heroes" bun:"dire_heroes"`
+	RadiantPlayers []int64     `json:"radiant_players" bun:"radiant_players"`
+	DirePlayers    []int64     `json:"dire_players" bun:"dire_players"`
 }
