@@ -61,6 +61,7 @@ See api/docs.yaml for full API documentation.
 - Separate related functionalities into packages
 - Define types in dedicated types.go files
 - DONT Use pointer types for nullable DB fields (*int64, *string), instead, use the default 0 value to determine non-existence.
+  - **Exception**: Captain fields (radiant_captain, dire_captain) use `*int64` pointer types to allow NULL values when no captain is assigned
 - Separate OpenDota types (prefix OD) from DB models
 - Use struct tags for JSON and Bun ORM mapping
 - Always pass context.Context for cancellation

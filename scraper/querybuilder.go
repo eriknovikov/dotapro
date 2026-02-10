@@ -31,6 +31,8 @@ func (b *QueryBuilder) GetMatches(matchIds []int64) string {
 			m.radiant_win,
 			m.start_time AS start_time,
 			m.duration,
+			m.version,
+			mp.patch,
 			JSON_BUILD_OBJECT(
                 'id', m.leagueid,
                 'name', l.name,
@@ -81,7 +83,7 @@ func (b *QueryBuilder) GetMatches(matchIds []int64) string {
 						'backpack_2', pm.backpack_2,
 						'net_worth', pm.net_worth,
 						'is_radiant', (pm.player_slot < 128),
-						'name', np.name, 
+						'name', np.name,
 						'facet', pm.hero_variant
 					)
 					ORDER BY pm.player_slot

@@ -368,13 +368,13 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 	if om.SeriesID > 0 {
 		md.SeriesID = om.SeriesID
 	}
-	if om.RadiantTeam.Captain > 0 {
-		if _, exists := players[om.RadiantTeam.Captain]; exists {
+	if om.RadiantTeam.Captain != nil {
+		if _, exists := players[*om.RadiantTeam.Captain]; exists {
 			md.RadiantCaptain = om.RadiantTeam.Captain
 		}
 	}
-	if om.DireTeam.Captain > 0 {
-		if _, exists := players[om.DireTeam.Captain]; exists {
+	if om.DireTeam.Captain != nil {
+		if _, exists := players[*om.DireTeam.Captain]; exists {
 			md.DireCaptain = om.DireTeam.Captain
 		}
 	}

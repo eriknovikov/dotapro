@@ -61,8 +61,8 @@ type MatchMetadata struct {
 	bun.BaseModel  `bun:"table:matches_metadata"`
 	MatchID        int64           `bun:"match_id,pk"`
 	SeriesID       int64           `bun:"series_id,nullzero"`
-	RadiantCaptain int64           `bun:"radiant_captain,nullzero"`
-	DireCaptain    int64           `bun:"dire_captain,nullzero"`
+	RadiantCaptain *int64          `bun:"radiant_captain"`
+	DireCaptain    *int64          `bun:"dire_captain"`
 	PicksBans      json.RawMessage `bun:"picks_bans,type:jsonb"`
 	PlayersData    json.RawMessage `bun:"players_data,type:jsonb"`
 	RadiantGoldAdv []int32         `bun:"radiant_gold_adv,array"`
@@ -115,7 +115,7 @@ type ODTeam struct {
 	Tag     string `json:"tag"`
 	LogoURL string `json:"logo_url"` // Empty string represents NULL
 	Score   int    `json:"score"`
-	Captain int64  `json:"captain"` // 0 represents NULL
+	Captain *int64 `json:"captain"` // NULL represents no captain
 }
 
 type ODPlayerShort struct {
