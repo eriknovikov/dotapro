@@ -60,7 +60,6 @@ type Match struct {
 type MatchMetadata struct {
 	bun.BaseModel  `bun:"table:matches_metadata"`
 	MatchID        int64           `bun:"match_id,pk"`
-	SeriesID       int64           `bun:"series_id,nullzero"`
 	RadiantCaptain *int64          `bun:"radiant_captain"`
 	DireCaptain    *int64          `bun:"dire_captain"`
 	PicksBans      json.RawMessage `bun:"picks_bans,type:jsonb"`

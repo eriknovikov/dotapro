@@ -36,14 +36,14 @@ const (
 // BatchProcessor holds reusable allocations to reduce memory pressure
 type BatchProcessor struct {
 	// Maps for related entities
-	leagues    map[int64]League
-	teams      map[int64]Team
-	players    map[int64]Player
-	seriesMap  map[int64]Series
+	leagues   map[int64]League
+	teams     map[int64]Team
+	players   map[int64]Player
+	seriesMap map[int64]Series
 
 	// Slices for valid matches
-	validMatches     []Match
-	validMetadata    []MatchMetadata
+	validMatches       []Match
+	validMetadata      []MatchMetadata
 	validSeriesMatches []SeriesMatch
 
 	// Slice for parsed matches
@@ -56,15 +56,15 @@ type BatchProcessor struct {
 // NewBatchProcessor creates a new BatchProcessor with pre-allocated capacity
 func NewBatchProcessor() *BatchProcessor {
 	return &BatchProcessor{
-		leagues:          make(map[int64]League, BATCH_SIZE),
-		teams:            make(map[int64]Team, BATCH_SIZE*2),
-		players:          make(map[int64]Player, BATCH_SIZE*10),
-		seriesMap:        make(map[int64]Series, BATCH_SIZE),
-		validMatches:     make([]Match, 0, BATCH_SIZE),
-		validMetadata:    make([]MatchMetadata, 0, BATCH_SIZE),
+		leagues:            make(map[int64]League, BATCH_SIZE),
+		teams:              make(map[int64]Team, BATCH_SIZE*2),
+		players:            make(map[int64]Player, BATCH_SIZE*10),
+		seriesMap:          make(map[int64]Series, BATCH_SIZE),
+		validMatches:       make([]Match, 0, BATCH_SIZE),
+		validMetadata:      make([]MatchMetadata, 0, BATCH_SIZE),
 		validSeriesMatches: make([]SeriesMatch, 0, BATCH_SIZE),
-		odMatches:        make([]ODMatch, 0, BATCH_SIZE),
-		ids:              make([]int64, 0, BATCH_SIZE),
+		odMatches:          make([]ODMatch, 0, BATCH_SIZE),
+		ids:                make([]int64, 0, BATCH_SIZE),
 	}
 }
 
@@ -119,12 +119,12 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 		log.Debug().Int("batchNum", i).Msg("processing batch")
 		end := minInt(i+BATCH_SIZE, N)
 		currentBatchIDs = matchIds[i:end]
-		currentBatchMatches, err = fetchMatchBatch(currentBatchIDs)
+		currentBatchMatches, err = fetchODMatches(currentBatchIDs)
 		if err != nil {
 			return fmt.Errorf("error scraping matches batch: %w", err)
 		}
 
-		if err := processMatchBatch(currentBatchMatches, DB, processor); err != nil {
+		if err := processBatch(currentBatchMatches, DB, processor); err != nil {
 			return fmt.Errorf("error processing matches batch: %w", err)
 		}
 
@@ -191,7 +191,7 @@ func fetchMatchIDs(lastMatchID int64, limit int) ([]int64, error) {
 	return ids, nil
 }
 
-func fetchMatchBatch(matchIDs []int64) ([]json.RawMessage, error) {
+func fetchODMatches(matchIDs []int64) ([]json.RawMessage, error) {
 	log.Warn().Int("total ids in this batch", len(matchIDs)).Msg("fetching match ids")
 	resp, err := makeOpendotaRequestExplorer(queryBuilder.GetMatches(matchIDs))
 	if err != nil {
@@ -283,47 +283,6 @@ func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams
 	}
 }
 
-func validateMatch(om ODMatch) error {
-	var matchPlayers []ODPlayerShort
-	if err := json.Unmarshal(om.Players, &matchPlayers); err != nil {
-		return fmt.Errorf("failed to unmarshal players for match %d: %w", om.MatchID, err)
-	}
-
-	radiantHeroes := 0
-	direHeroes := 0
-	radiantPlayers := 0
-	direPlayers := 0
-
-	for _, p := range matchPlayers {
-		if p.PlayerSlot < 128 {
-			radiantHeroes++
-			if p.PlayerID > 0 {
-				radiantPlayers++
-			}
-		} else {
-			direHeroes++
-			if p.PlayerID > 0 {
-				direPlayers++
-			}
-		}
-	}
-
-	if radiantHeroes != 5 {
-		return fmt.Errorf("match %d: radiant team has %d heroes, expected 5", om.MatchID, radiantHeroes)
-	}
-	if direHeroes != 5 {
-		return fmt.Errorf("match %d: dire team has %d heroes, expected 5", om.MatchID, direHeroes)
-	}
-	if radiantPlayers != 5 {
-		return fmt.Errorf("match %d: radiant team has %d non-null players, expected 5", om.MatchID, radiantPlayers)
-	}
-	if direPlayers != 5 {
-		return fmt.Errorf("match %d: dire team has %d non-null players, expected 5", om.MatchID, direPlayers)
-	}
-
-	return nil
-}
-
 func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetadata, SeriesMatch) {
 	m := Match{
 		MatchID:    om.MatchID,
@@ -364,9 +323,6 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 		RadiantScore:   om.RadiantTeam.Score,
 		DireScore:      om.DireTeam.Score,
 		Version:        om.Version,
-	}
-	if om.SeriesID > 0 {
-		md.SeriesID = om.SeriesID
 	}
 	if om.RadiantTeam.Captain != nil {
 		if _, exists := players[*om.RadiantTeam.Captain]; exists {
@@ -422,7 +378,7 @@ func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]Lea
 	return nil
 }
 
-func insertMatches(ctx context.Context, tx bun.Tx, matches []Match, metadata []MatchMetadata, seriesMatches []SeriesMatch) error {
+func insertBatch(ctx context.Context, tx bun.Tx, matches []Match, metadata []MatchMetadata, seriesMatches []SeriesMatch) error {
 	if _, err := tx.NewInsert().Model(&matches).On("CONFLICT (match_id) DO NOTHING").Exec(ctx); err != nil {
 		return fmt.Errorf("failed to insert matches: %w", err)
 	}
@@ -440,7 +396,7 @@ func insertMatches(ctx context.Context, tx bun.Tx, matches []Match, metadata []M
 	return nil
 }
 
-func processMatchBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor) error {
+func processBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor) error {
 	ctx := context.Background()
 
 	odMatches, err := parseRawMatches(rawBatch, bp.odMatches)
@@ -455,10 +411,6 @@ func processMatchBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcesso
 	bp.validSeriesMatches = bp.validSeriesMatches[:0]
 
 	for _, om := range odMatches {
-		if err := validateMatch(om); err != nil {
-			log.Warn().Int64("match_id", om.MatchID).Err(err).Msg("Skipping match due to validation error")
-			continue
-		}
 
 		m, md, sm := buildMatchEntities(om, bp.players)
 		bp.validMatches = append(bp.validMatches, m)
@@ -478,7 +430,7 @@ func processMatchBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcesso
 			return err
 		}
 
-		return insertMatches(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches)
+		return insertBatch(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches)
 	})
 }
 

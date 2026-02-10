@@ -58,7 +58,6 @@ type Match struct {
 type MatchMetadata struct {
 	bun.BaseModel  `bun:"table:matches_metadata"`
 	MatchID        int64           `bun:"match_id,pk"`
-	SeriesID       int64           `bun:"series_id,nullzero"`
 	RadiantCaptain *int64          `bun:"radiant_captain"`
 	DireCaptain    *int64          `bun:"dire_captain"`
 	PicksBans      json.RawMessage `bun:"picks_bans,type:jsonb"`
@@ -147,19 +146,12 @@ type SeriesSummary struct {
 
 type SeriesMatchDetail struct {
 	MatchID        int64           `json:"match_id" bun:"match_id"`
-	StartTime      time.Time       `json:"start_time" bun:"start_time"`
 	Duration       int             `json:"duration" bun:"duration"`
 	RadiantWin     bool            `json:"radiant_win" bun:"radiant_win"`
-	Patch          string          `json:"patch" bun:"patch"`
-	Version        int             `json:"version" bun:"version"`
 	PicksBans      json.RawMessage `json:"picks_bans" bun:"picks_bans,type:jsonb"`
 	PlayersData    json.RawMessage `json:"players_data" bun:"players_data,type:jsonb"`
 	RadiantGoldAdv []int32         `json:"radiant_gold_adv" bun:"radiant_gold_adv,array"`
 	RadiantXPAdv   []int32         `json:"radiant_xp_adv" bun:"radiant_xp_adv,array"`
-	RadiantHeroes  []int64         `json:"radiant_heroes,omitempty" bun:"radiant_heroes,array"`
-	DireHeroes     []int64         `json:"dire_heroes,omitempty" bun:"dire_heroes,array"`
-	RadiantPlayers []int64         `json:"radiant_players,omitempty" bun:"radiant_players,array"`
-	DirePlayers    []int64         `json:"dire_players,omitempty" bun:"dire_players,array"`
 	RadiantScore   int             `json:"radiant_score" bun:"radiant_score"`
 	DireScore      int             `json:"dire_score" bun:"dire_score"`
 	RadiantCaptain *int64          `json:"radiant_captain" bun:"radiant_captain"`
@@ -167,13 +159,13 @@ type SeriesMatchDetail struct {
 }
 
 type SeriesDetail struct {
-	SeriesID   int64              `json:"series_id" bun:"series_id"`
-	StartTime  time.Time          `json:"start_time" bun:"start_time"`
-	TeamA      TeamInfo           `json:"team_a" bun:"team_a"`
-	TeamB      TeamInfo           `json:"team_b" bun:"team_b"`
-	League     LeagueInfo         `json:"league" bun:"league"`
-	TeamAScore int16              `json:"team_a_score" bun:"team_a_score"`
-	TeamBScore int16              `json:"team_b_score" bun:"team_b_score"`
+	SeriesID   int64               `json:"series_id" bun:"series_id"`
+	StartTime  time.Time           `json:"start_time" bun:"start_time"`
+	TeamA      TeamInfo            `json:"team_a" bun:"team_a"`
+	TeamB      TeamInfo            `json:"team_b" bun:"team_b"`
+	League     LeagueInfo          `json:"league" bun:"league"`
+	TeamAScore int16               `json:"team_a_score" bun:"team_a_score"`
+	TeamBScore int16               `json:"team_b_score" bun:"team_b_score"`
 	Matches    []SeriesMatchDetail `json:"matches" bun:"matches"`
 }
 

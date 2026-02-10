@@ -11,7 +11,7 @@ func TestQueryBuilder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("err fetching match ids < last_fetched_matched_id: %v", err)
 	}
-	b, err := fetchMatchBatch(matchIds)
+	b, err := fetchODMatches(matchIds)
 	if err != nil {
 		t.Fatal(err)
 	}

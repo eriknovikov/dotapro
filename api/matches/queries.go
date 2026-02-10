@@ -12,7 +12,7 @@ func (m *Model) buildQueryGetMany(filter types.GetMatchesFilter) *bun.SelectQuer
 		ColumnExpr("m.start_time").
 		ColumnExpr("m.duration").
 		ColumnExpr("m.radiant_win").
-		ColumnExpr("md.series_id").
+		ColumnExpr("sm.series_id").
 		ColumnExpr("m.radiant_team_id AS radiant_team__id").
 		ColumnExpr("m.dire_team_id AS dire_team__id").
 		ColumnExpr("m.league_id AS league__id").
@@ -28,6 +28,7 @@ func (m *Model) buildQueryGetMany(filter types.GetMatchesFilter) *bun.SelectQuer
 		ColumnExpr("m.dire_heroes").
 		TableExpr("matches AS m").
 		Join("LEFT JOIN matches_metadata AS md USING (match_id)").
+		Join("LEFT JOIN series_match AS sm USING (match_id)").
 		Join("LEFT JOIN leagues AS l USING (league_id)").
 		Join("LEFT JOIN teams AS radiant ON radiant.team_id = m.radiant_team_id").
 		Join("LEFT JOIN teams AS dire ON dire.team_id = m.dire_team_id")
@@ -73,7 +74,7 @@ func (m *Model) buildQueryGetOne(id int64) *bun.SelectQuery {
 		ColumnExpr("m.radiant_win").
 		ColumnExpr("m.patch").
 		ColumnExpr("md.version").
-		ColumnExpr("md.series_id").
+		ColumnExpr("sm.series_id").
 		ColumnExpr("md.picks_bans").
 		ColumnExpr("md.players_data").
 		ColumnExpr("md.radiant_gold_adv").
@@ -95,6 +96,7 @@ func (m *Model) buildQueryGetOne(id int64) *bun.SelectQuery {
 		ColumnExpr("l.tier AS league__tier").
 		TableExpr("matches AS m").
 		Join("LEFT JOIN matches_metadata AS md USING (match_id)").
+		Join("LEFT JOIN series_match AS sm USING (match_id)").
 		Join("LEFT JOIN leagues AS l USING (league_id)").
 		Join("LEFT JOIN teams AS radiant ON radiant.team_id = m.radiant_team_id").
 		Join("LEFT JOIN teams AS dire ON dire.team_id = m.dire_team_id").

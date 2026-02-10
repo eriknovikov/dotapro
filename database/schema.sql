@@ -74,7 +74,6 @@ CREATE TABLE matches (
 
 CREATE TABLE matches_metadata (
 	match_id BIGINT PRIMARY KEY REFERENCES matches(match_id) ON DELETE CASCADE,
-	series_id BIGINT REFERENCES series(series_id),
 	radiant_captain BIGINT REFERENCES players(account_id),
 	dire_captain BIGINT REFERENCES players(account_id),
 	duration INTEGER NOT NULL,
@@ -107,6 +106,7 @@ CREATE INDEX series_league_id_idx ON series USING btree (league_id);
 CREATE INDEX series_start_time_idx ON series USING btree (start_time);
 CREATE INDEX series_team_a_id_idx ON series USING btree (team_a_id);
 CREATE INDEX series_team_b_id_idx ON series USING btree (team_b_id);
+CREATE INDEX series_match_match_id_idx ON series_match USING btree (match_id);
 
 
 

@@ -52,7 +52,6 @@ CREATE TABLE matches (
 
 CREATE TABLE matches_metadata (
 	match_id BIGINT PRIMARY KEY REFERENCES matches(match_id) ON DELETE CASCADE,
-	series_id BIGINT REFERENCES series(series_id),
 	radiant_captain BIGINT REFERENCES players(player_id),
 	dire_captain BIGINT REFERENCES players(player_id),
 	picks_bans JSONB,
@@ -69,3 +68,5 @@ CREATE TABLE scraper_metadata (
 	last_fetched_match_id BIGINT NOT NULL,
 	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX series_match_match_id_idx ON series_match USING btree (match_id);

@@ -82,25 +82,19 @@ func (m *Model) buildQueryGetOne(id int64) *bun.SelectQuery {
 func (m *Model) buildQueryGetMatchesForSeries(seriesID int64) *bun.SelectQuery {
 	return m.DB.NewSelect().
 		ColumnExpr("m.match_id").
-		ColumnExpr("m.start_time").
 		ColumnExpr("m.duration").
 		ColumnExpr("m.radiant_win").
-		ColumnExpr("m.patch").
-		ColumnExpr("md.version").
 		ColumnExpr("md.picks_bans").
 		ColumnExpr("md.players_data").
 		ColumnExpr("md.radiant_gold_adv").
 		ColumnExpr("md.radiant_xp_adv").
-		ColumnExpr("m.radiant_heroes").
-		ColumnExpr("m.dire_heroes").
-		ColumnExpr("m.radiant_players").
-		ColumnExpr("m.dire_players").
 		ColumnExpr("md.radiant_score").
 		ColumnExpr("md.dire_score").
 		ColumnExpr("md.radiant_captain").
 		ColumnExpr("md.dire_captain").
 		TableExpr("matches AS m").
 		Join("LEFT JOIN matches_metadata AS md USING (match_id)").
-		Where("md.series_id = ?", seriesID).
+		Join("LEFT JOIN series_match AS sm USING (match_id)").
+		Where("sm.series_id = ?", seriesID).
 		Order("m.match_id ASC")
 }

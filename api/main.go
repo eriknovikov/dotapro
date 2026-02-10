@@ -7,6 +7,7 @@ import (
 	"dotapro-lambda-api/series"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -38,6 +39,7 @@ func init() {
 		log.Fatal().Err(err).Msg("err invalid config")
 	}
 	if config.IsLocal() {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 }

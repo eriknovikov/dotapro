@@ -33,4 +33,5 @@ LEFT JOIN matches_metadata md USING(match_id)
 LEFT JOIN leagues l USING(league_id)
 LEFT JOIN teams radiant ON (radiant.team_id = m.radiant_team_id)
 LEFT JOIN teams dire ON (dire.team_id = m.dire_team_id)
+LEFT JOIN series_matches USING (match_id)
 WHERE match_id = $match_id;
