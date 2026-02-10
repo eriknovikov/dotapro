@@ -52,6 +52,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger, middleware.Recoverer)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })
+	r.Get("/matches", matchController.GetMany)
 	r.Get("/matches/{id}", matchController.GetOne)
 	if config.IsLocal() {
 		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running api locally")

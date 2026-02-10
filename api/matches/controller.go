@@ -2,6 +2,7 @@ package matches
 
 import (
 	"dotapro-lambda-api/errs"
+	"dotapro-lambda-api/types"
 	"dotapro-lambda-api/utils"
 	"fmt"
 	"net/http"
@@ -16,6 +17,74 @@ type Controller struct {
 
 func NewController(model *Model) *Controller {
 	return &Controller{model}
+}
+
+func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
+	filter := types.GetMatchesFilter{}
+	params := r.URL.Query()
+
+	if leagueIDStr := params.Get("league"); leagueIDStr != "" {
+		leagueID, err := strconv.ParseInt(leagueIDStr, 10, 64)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid league_id: %v", err.Error()), http.StatusBadRequest)
+			return
+		}
+		filter.LeagueID = &leagueID
+	}
+
+	if teamIDStr := params.Get("team"); teamIDStr != "" {
+		teamID, err := strconv.ParseInt(teamIDStr, 10, 64)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid team_id: %v", err.Error()), http.StatusBadRequest)
+			return
+		}
+		filter.TeamID = &teamID
+	}
+
+	if playerIDStr := params.Get("player"); playerIDStr != "" {
+		playerID, err := strconv.ParseInt(playerIDStr, 10, 64)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid player_id: %v", err.Error()), http.StatusBadRequest)
+			return
+		}
+		filter.PlayerID = &playerID
+	}
+
+	if heroIDStr := params.Get("hero"); heroIDStr != "" {
+		heroID, err := strconv.ParseInt(heroIDStr, 10, 64)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid hero_id: %v", err.Error()), http.StatusBadRequest)
+			return
+		}
+		filter.HeroID = &heroID
+	}
+
+	filter.Sort = params.Get("sort")
+
+	if limitStr := params.Get("limit"); limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid limit: %v", err.Error()), http.StatusBadRequest)
+			return
+		}
+		filter.Limit = limit
+	}
+
+	if pageStr := params.Get("page"); pageStr != "" {
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid page: %v", err.Error()), http.StatusBadRequest)
+			return
+		}
+		filter.Page = page
+	}
+
+	matches, err := c.model.GetMany(r.Context(), filter)
+	if err != nil {
+		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	utils.WriteResponse(w, matches, http.StatusOK)
 }
 
 func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {
