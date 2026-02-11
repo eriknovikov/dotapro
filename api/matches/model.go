@@ -43,9 +43,11 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 		ColumnExpr("radiant.name AS radiant_team__name").
 		ColumnExpr("radiant.tag AS radiant_team__tag").
 		ColumnExpr("radiant.logo_url AS radiant_team__logo_url").
+		ColumnExpr("md.radiant_captain AS radiant_team__captain").
 		ColumnExpr("dire.name AS dire_team__name").
 		ColumnExpr("dire.tag AS dire_team__tag").
 		ColumnExpr("dire.logo_url AS dire_team__logo_url").
+		ColumnExpr("md.dire_captain AS dire_team__captain").
 		ColumnExpr("l.name AS league__name").
 		ColumnExpr("l.tier AS league__tier").
 		ColumnExpr("m.radiant_heroes").
