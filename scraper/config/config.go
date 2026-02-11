@@ -14,6 +14,7 @@ type Config struct {
 	LOCAL_DB_URL      string `env:"LOCAL_DB_URL" env-default:"postgres://postgres:admin@172.17.0.1:15432/dotapro"`
 	DB_URL_PARAM_NAME string `env:"DB_URL_PARAM_NAME"`
 	ENVIRON           string `env:"ENVIRON" env-default:"prod"`
+	SCRAPING_LIMIT    int    `env:"SCRAPING_LIMIT" env-default:"800"`
 }
 
 func LoadEnvs() error {

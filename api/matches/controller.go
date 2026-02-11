@@ -15,6 +15,11 @@ type Controller struct {
 	model *Model
 }
 
+type GetManyResp struct {
+	Matches    []types.MatchSummary `json:"matches"`
+	Pagination types.PaginationData `json:"pagination"`
+}
+
 func NewController(model *Model) *Controller {
 	return &Controller{model}
 }
@@ -79,12 +84,17 @@ func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 		filter.Page = page
 	}
 
-	matches, err := c.model.GetMany(r.Context(), filter)
+	matches, paginationData, err := c.model.GetMany(r.Context(), filter)
 	if err != nil {
 		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	utils.WriteResponse(w, matches, http.StatusOK)
+	if len(matches) == 0 {
+		utils.WriteError(w, errs.NOT_FOUND.Error(), http.StatusNotFound)
+		return
+	}
+	resp := GetManyResp{Matches: matches, Pagination: paginationData}
+	utils.WriteResponse(w, resp, http.StatusOK)
 }
 
 func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {

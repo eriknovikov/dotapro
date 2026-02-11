@@ -77,6 +77,12 @@ type SeriesMatch struct {
 	MatchID       int64 `bun:"match_id,pk"`
 }
 
+type SeriesScore struct {
+	SeriesID    int64
+	TeamAWins   int16
+	TeamBWins   int16
+}
+
 type ScraperMetadata struct {
 	bun.BaseModel      `bun:"table:scraper_metadata"`
 	ID                 int16 `bun:"id,pk"`

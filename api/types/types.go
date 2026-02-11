@@ -176,3 +176,9 @@ type GetSeriesFilter struct {
 	Limit    int    `json:"limit"`
 	Page     int    `json:"page"`
 }
+
+type PaginationData struct {
+	PageSize    int `json:"page_size"`
+	TotalPages  int `json:"total_pages"`
+	CurrentPage int `json:"current_page"`
+}

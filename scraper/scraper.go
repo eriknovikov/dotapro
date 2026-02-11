@@ -14,6 +14,17 @@ import (
 	"github.com/uptrace/bun"
 )
 
+// Global HTTP client with connection pooling and timeout
+var httpClient = &http.Client{
+	Timeout: 30 * time.Second,
+	Transport: &http.Transport{
+		MaxIdleConns:        10,
+		MaxIdleConnsPerHost: 10,
+		IdleConnTimeout:     30 * time.Second,
+		DisableKeepAlives:   false,
+	},
+}
+
 type ResponseMatch struct {
 	MatchID float64 `json:"match_id"`
 }
@@ -36,10 +47,11 @@ const (
 // BatchProcessor holds reusable allocations to reduce memory pressure
 type BatchProcessor struct {
 	// Maps for related entities
-	leagues   map[int64]League
-	teams     map[int64]Team
-	players   map[int64]Player
-	seriesMap map[int64]Series
+	leagues      map[int64]League
+	teams        map[int64]Team
+	players      map[int64]Player
+	seriesMap    map[int64]Series
+	seriesScores map[int64]SeriesScore
 
 	// Slices for valid matches
 	validMatches       []Match
@@ -60,6 +72,7 @@ func NewBatchProcessor() *BatchProcessor {
 		teams:              make(map[int64]Team, BATCH_SIZE*2),
 		players:            make(map[int64]Player, BATCH_SIZE*10),
 		seriesMap:          make(map[int64]Series, BATCH_SIZE),
+		seriesScores:       make(map[int64]SeriesScore, BATCH_SIZE),
 		validMatches:       make([]Match, 0, BATCH_SIZE),
 		validMetadata:      make([]MatchMetadata, 0, BATCH_SIZE),
 		validSeriesMatches: make([]SeriesMatch, 0, BATCH_SIZE),
@@ -83,6 +96,9 @@ func (bp *BatchProcessor) clear() {
 	for k := range bp.seriesMap {
 		delete(bp.seriesMap, k)
 	}
+	for k := range bp.seriesScores {
+		delete(bp.seriesScores, k)
+	}
 
 	// Reset slices
 	bp.validMatches = bp.validMatches[:0]
@@ -98,7 +114,7 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 	if err != nil {
 		return fmt.Errorf("err getting last_fetched_match_id: %w", err)
 	}
-	matchIds, err := fetchMatchIDs(lastFetchedMatchId, limit)
+	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, limit)
 	if err != nil {
 		return fmt.Errorf("err fetching match ids < last_fetched_matched_id: %w", err)
 	}
@@ -108,18 +124,16 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 	}
 
 	processor := NewBatchProcessor()
-	defer func() {
-		processor.clear()
-	}()
-
-	currentBatchIDs := make([]int64, 0, BATCH_SIZE)
-	currentBatchMatches := make([]json.RawMessage, 0, BATCH_SIZE)
+	defer processor.clear()
 
 	for i := 0; i < N; i += BATCH_SIZE {
-		log.Debug().Int("batchNum", i).Msg("processing batch")
+		log.Debug().Int("batchNum", i/BATCH_SIZE+1).Msg("processing batch")
 		end := minInt(i+BATCH_SIZE, N)
+
+		currentBatchIDs := make([]int64, end-i)
 		currentBatchIDs = matchIds[i:end]
-		currentBatchMatches, err = fetchODMatches(currentBatchIDs)
+
+		currentBatchMatches, err := fetchODMatches(ctx, currentBatchIDs)
 		if err != nil {
 			return fmt.Errorf("error scraping matches batch: %w", err)
 		}
@@ -139,7 +153,7 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 			}
 		}
 		processor.clear()
-		log.Debug().Int("batchNum", i).Msg("finished processing batch")
+		log.Debug().Int("batchNum", i/BATCH_SIZE+1).Msg("finished processing batch")
 	}
 	return nil
 }
@@ -158,10 +172,16 @@ func maxInt64(slice []int64) int64 {
 	return slices.Max(slice)
 }
 
-func makeOpendotaRequestExplorer(query string) (*http.Response, error) {
+func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Response, error) {
 	encodedQuery := url.PathEscape(query)
 	opendotaUrl := fmt.Sprintf("https://api.opendota.com/api/explorer?sql=%s", encodedQuery)
-	resp, err := http.Get(opendotaUrl)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", opendotaUrl, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make OpenDota explorer request: %w", err)
 	}
@@ -172,8 +192,8 @@ func makeOpendotaRequestExplorer(query string) (*http.Response, error) {
 	return resp, nil
 }
 
-func fetchMatchIDs(lastMatchID int64, limit int) ([]int64, error) {
-	resp, err := makeOpendotaRequestExplorer(queryBuilder.GetIds(lastMatchID, limit))
+func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, error) {
+	resp, err := makeOpendotaRequestExplorer(ctx, queryBuilder.GetIds(lastMatchID, limit))
 	if err != nil {
 		return nil, err
 	}
@@ -191,9 +211,8 @@ func fetchMatchIDs(lastMatchID int64, limit int) ([]int64, error) {
 	return ids, nil
 }
 
-func fetchODMatches(matchIDs []int64) ([]json.RawMessage, error) {
-	log.Warn().Int("total ids in this batch", len(matchIDs)).Msg("fetching match ids")
-	resp, err := makeOpendotaRequestExplorer(queryBuilder.GetMatches(matchIDs))
+func fetchODMatches(ctx context.Context, matchIDs []int64) ([]json.RawMessage, error) {
+	resp, err := makeOpendotaRequestExplorer(ctx, queryBuilder.GetMatches(matchIDs))
 	if err != nil {
 		return nil, err
 	}
@@ -396,6 +415,56 @@ func insertBatch(ctx context.Context, tx bun.Tx, matches []Match, metadata []Mat
 	return nil
 }
 
+func calculateSeriesScores(odMatches []ODMatch, scores map[int64]SeriesScore) {
+	for _, m := range odMatches {
+		if m.SeriesID == 0 {
+			continue
+		}
+
+		score, exists := scores[m.SeriesID]
+		if !exists {
+			score = SeriesScore{SeriesID: m.SeriesID}
+		}
+
+		var winningTeamID int64
+		if m.RadiantWin {
+			winningTeamID = m.RadiantTeam.ID
+		} else {
+			winningTeamID = m.DireTeam.ID
+		}
+
+		switch winningTeamID {
+		case m.RadiantTeam.ID:
+			score.TeamAWins++
+		case m.DireTeam.ID:
+			score.TeamBWins++
+		default:
+		}
+
+		scores[m.SeriesID] = score
+	}
+}
+
+func updateSeriesScores(ctx context.Context, tx bun.Tx, scores map[int64]SeriesScore) error {
+	if len(scores) == 0 {
+		return nil
+	}
+
+	for seriesID, score := range scores {
+		_, err := tx.NewUpdate().
+			Model(&Series{}).
+			Set("team_a_score = team_a_score + ?", score.TeamAWins).
+			Set("team_b_score = team_b_score + ?", score.TeamBWins).
+			Where("series_id = ?", seriesID).
+			Exec(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to update series score for series_id %d: %w", seriesID, err)
+		}
+	}
+
+	return nil
+}
+
 func processBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor) error {
 	ctx := context.Background()
 
@@ -425,13 +494,29 @@ func processBatch(rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor) er
 		return nil
 	}
 
-	return db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+	err = db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		if err := insertRelatedEntities(ctx, tx, bp.leagues, bp.teams, bp.players, bp.seriesMap); err != nil {
 			return err
 		}
 
-		return insertBatch(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches)
+		if err := insertBatch(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches); err != nil {
+			return err
+		}
+
+		calculateSeriesScores(odMatches, bp.seriesScores)
+		if err := updateSeriesScores(ctx, tx, bp.seriesScores); err != nil {
+			return err
+		}
+
+		return nil
 	})
+
+	// Clear series scores after processing to free memory
+	for k := range bp.seriesScores {
+		delete(bp.seriesScores, k)
+	}
+
+	return err
 }
 
 func mapsToSlice[K comparable, V any](m map[K]V) []V {

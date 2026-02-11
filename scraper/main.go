@@ -16,7 +16,7 @@ import (
 
 const DB_CREATION_TIMEOUT = time.Second * 5
 const SSM_TIMEOUT = time.Second * 5
-const SCRAPING_LIMIT = 1000 // 1 batches of 1000
+const SCRAPING_LIMIT = 800 // 1 batches of 800
 
 var DB *bun.DB
 
@@ -68,15 +68,15 @@ func ensureDB() error {
 }
 
 func handler(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	dbCtx, cancel := context.WithTimeout(ctx, DB_CREATION_TIMEOUT)
 	defer cancel()
-	if DB.PingContext(ctx) != nil {
+	if DB.PingContext(dbCtx) != nil {
 		log.Warn().Msg("DB connection lost, attemptying to reconnect...")
 		if err := ensureDB(); err != nil {
 			return fmt.Errorf("failed to reconnect to db: %w", err)
 		}
 	}
-	err := ScrapeMatches(ctx, DB, SCRAPING_LIMIT)
+	err := ScrapeMatches(ctx, DB, config.CONFIG.SCRAPING_LIMIT)
 	if err != nil {
 		if errors.Is(err, ErrNoNewMatches) {
 			log.Warn().Msg("no new matches have been inserted")
