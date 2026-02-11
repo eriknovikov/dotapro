@@ -4,8 +4,10 @@ import (
 	"context"
 	"dotapro-lambda-api/config"
 	"dotapro-lambda-api/matches"
+	"dotapro-lambda-api/series"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -17,15 +19,16 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const DB_CREATION_TIMEOUT = time.Second * 1
-const SSM_TIMEOUT = time.Second * 1
+const DB_CREATION_TIMEOUT = time.Second * 5
+const SSM_TIMEOUT = time.Second * 5
 
 type Request = events.APIGatewayV2HTTPRequest
 type Response = events.APIGatewayV2HTTPResponse
 
 var (
-	MATCH_MODEL *matches.Model
-	ADAPTER     *httpadapter.HandlerAdapterV2
+	MATCH_MODEL  *matches.Model
+	SERIES_MODEL *series.Model
+	ADAPTER      *httpadapter.HandlerAdapterV2
 )
 
 func init() {
@@ -36,6 +39,7 @@ func init() {
 		log.Fatal().Err(err).Msg("err invalid config")
 	}
 	if config.IsLocal() {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 }
@@ -48,11 +52,16 @@ func main() {
 	defer db.Close()
 	MATCH_MODEL = matches.NewModel(db)
 	matchController := matches.NewController(MATCH_MODEL)
+	SERIES_MODEL = series.NewModel(db)
+	seriesController := series.NewController(SERIES_MODEL)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger, middleware.Recoverer)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })
+	r.Get("/matches", matchController.GetMany)
 	r.Get("/matches/{id}", matchController.GetOne)
+	r.Get("/series", seriesController.GetMany)
+	r.Get("/series/{id}", seriesController.GetOne)
 	if config.IsLocal() {
 		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running api locally")
 		err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r)
@@ -77,6 +86,7 @@ func Handler(ctx context.Context, req Request) (Response, error) {
 		}
 		MATCH_MODEL.DB.Close()
 		MATCH_MODEL.DB = db
+		SERIES_MODEL.DB = db
 	}
 	return ADAPTER.ProxyWithContext(ctx, req)
 

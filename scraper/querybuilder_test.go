@@ -1,18 +1,23 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"os"
 	"testing"
 )
 
 func TestQueryBuilder(t *testing.T) {
-	testMatchesIds := []int64{8673330227}
-	q := queryBuilder.GetMatches(testMatchesIds)
-
-	if err := os.WriteFile("./od.query.sql", []byte(q), 0644); err != nil {
-		t.Fatalf("Failed to write query file: %v", err)
+	ctx := context.Background()
+	matchIds, err := fetchMatchIDs(ctx, 8673330227, 100)
+	if err != nil {
+		t.Fatalf("err fetching match ids < last_fetched_matched_id: %v", err)
 	}
-	// dumb change
-	// change #2
-	t.Log("Query written to ./od.query.sql")
+	b, err := fetchODMatches(ctx, matchIds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, _ := os.Create("batch.json")
+	defer f.Close()
+	json.NewEncoder(f).Encode(b)
 }

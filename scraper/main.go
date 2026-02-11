@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"scraper/config"
@@ -15,6 +16,7 @@ import (
 
 const DB_CREATION_TIMEOUT = time.Second * 5
 const SSM_TIMEOUT = time.Second * 5
+const SCRAPING_LIMIT = 800 // 1 batches of 800
 
 var DB *bun.DB
 
@@ -35,7 +37,7 @@ func initialize() {
 }
 func main() {
 	initialize()
-	if err := ensureDB(DB); err != nil {
+	if err := ensureDB(); err != nil {
 		log.Fatal().Err(fmt.Errorf("err creating or restarting db: %w", err)).Send()
 	}
 	defer DB.DB.Close()
@@ -53,7 +55,7 @@ func main() {
 
 }
 
-func ensureDB(DB *bun.DB) error {
+func ensureDB() error {
 	newDB, err := setupDB()
 	if err != nil {
 		return err
@@ -66,31 +68,23 @@ func ensureDB(DB *bun.DB) error {
 }
 
 func handler(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	dbCtx, cancel := context.WithTimeout(ctx, DB_CREATION_TIMEOUT)
 	defer cancel()
-	if DB.PingContext(ctx) != nil {
+	if DB.PingContext(dbCtx) != nil {
 		log.Warn().Msg("DB connection lost, attemptying to reconnect...")
-		if err := ensureDB(DB); err != nil {
+		if err := ensureDB(); err != nil {
 			return fmt.Errorf("failed to reconnect to db: %w", err)
 		}
 	}
-	lastFetchedMatchId, err := fetchLastID(DB)
+	err := ScrapeMatches(ctx, DB, config.CONFIG.SCRAPING_LIMIT)
 	if err != nil {
-		return fmt.Errorf("err getting last_fetched_match_id: %w", err)
+		if errors.Is(err, ErrNoNewMatches) {
+			log.Warn().Msg("no new matches have been inserted")
+			return nil
+		}
+		return err
 	}
-	log.Debug().Int64("LFMD", lastFetchedMatchId).Send()
-	matchIds, err := fetchMatchIDs(lastFetchedMatchId)
-	if err != nil {
-		return fmt.Errorf("err fetching match ids < last_fetched_matched_id: %w", err)
-	}
-	/*
-		10K matches , first from opendota, then into rds.
-		array
-		repeat 100 times:
-			fetch 50 from OD (with retry)
-			fetch 50 from OD (with retry)
-			insert 100 into rds (with retry)
-	*/
-	return ScrapeMatches(matchIds, DB)
+
+	return nil
 
 }
