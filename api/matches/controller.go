@@ -1,14 +1,17 @@
 package matches
 
 import (
+	"context"
 	"dotapro-lambda-api/errs"
 	"dotapro-lambda-api/types"
 	"dotapro-lambda-api/utils"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
 )
 
 type Controller struct {
@@ -25,6 +28,8 @@ func NewController(model *Model) *Controller {
 }
 
 func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
 	filter := types.GetMatchesFilter{}
 	params := r.URL.Query()
 
@@ -84,15 +89,22 @@ func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 		filter.Page = page
 	}
 
-	matches, paginationData, err := c.model.GetMany(r.Context(), filter)
+	matches, paginationData, err := c.model.GetMany(ctx, filter)
 	if err != nil {
+		if err == context.Canceled {
+			log.Debug().Msg("Request canceled by client")
+			return
+		}
+
+		if err == context.DeadlineExceeded {
+			log.Debug().Msg("Deadline exceeded ")
+			utils.WriteError(w, context.DeadlineExceeded.Error(), http.StatusGatewayTimeout)
+			return
+		}
 		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if len(matches) == 0 {
-		utils.WriteError(w, errs.NOT_FOUND.Error(), http.StatusNotFound)
-		return
-	}
+
 	resp := GetManyResp{Matches: matches, Pagination: paginationData}
 	utils.WriteResponse(w, resp, http.StatusOK)
 }
@@ -106,6 +118,11 @@ func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {
 	}
 	match, err := c.model.GetOne(r.Context(), id)
 	if err != nil {
+		// Handle context cancellation gracefully - client aborted the request
+		if err == context.Canceled || err == context.DeadlineExceeded {
+			log.Debug().Msg("Request canceled by client")
+			return
+		}
 		switch err {
 		case errs.NOT_FOUND:
 			utils.WriteError(w, err.Error(), http.StatusNotFound)

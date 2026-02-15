@@ -1,1 +1,241 @@
 @import "tailwindcss";
+
+/**
+ * Design System - Tailwind v4 Configuration
+ * 
+ * Dota 2 Inspired Dark Theme
+ * Primary: Rich Red (Dire faction)
+ * Accent: Golden Yellow (Radiant faction)
+ * Background: Deep Dark
+ */
+
+/**
+ * Design Tokens - Colors (HSL)
+ * Define custom color scales and semantic colors
+ */
+@theme {
+    /* Primary Colors - Rich Red (Dire) */
+    --color-primary-50: hsl(0, 100%, 97%);
+    --color-primary-100: hsl(0, 100%, 94%);
+    --color-primary-200: hsl(0, 100%, 89%);
+    --color-primary-300: hsl(0, 100%, 81%);
+    --color-primary-400: hsl(0, 100%, 70%);
+    --color-primary-500: hsl(0, 84%, 50%);
+    --color-primary-600: hsl(0, 72%, 51%);
+    --color-primary-700: hsl(0, 74%, 42%);
+    --color-primary-800: hsl(0, 70%, 35%);
+    --color-primary-900: hsl(0, 63%, 31%);
+    --color-primary-950: hsl(0, 60%, 15%);
+
+    /* Secondary Colors - Golden Yellow (Radiant) */
+    --color-secondary-50: hsl(48, 100%, 97%);
+    --color-secondary-100: hsl(48, 100%, 93%);
+    --color-secondary-200: hsl(48, 100%, 86%);
+    --color-secondary-300: hsl(48, 100%, 77%);
+    --color-secondary-400: hsl(48, 100%, 66%);
+    --color-secondary-500: hsl(38, 92%, 50%);
+    --color-secondary-600: hsl(38, 92%, 45%);
+    --color-secondary-700: hsl(38, 90%, 40%);
+    --color-secondary-800: hsl(38, 85%, 35%);
+    --color-secondary-900: hsl(38, 80%, 30%);
+    --color-secondary-950: hsl(38, 75%, 15%);
+
+    /* Semantic Colors - Dark Theme */
+    --color-background: hsl(0, 0%, 4%);
+    --color-background-muted: hsl(0, 0%, 7%);
+    --color-background-accent: hsl(0, 0%, 10%);
+    --color-background-card: hsl(0, 0%, 8%);
+    --color-foreground: hsl(0, 0%, 98%);
+    --color-foreground-muted: hsl(0, 0%, 64%);
+    --color-foreground-subtle: hsl(0, 0%, 45%);
+    --color-border: hsl(0, 0%, 18%);
+    --color-border-muted: hsl(0, 0%, 12%);
+    --color-border-accent: hsl(0, 0%, 25%);
+
+    /* Status Colors */
+    --color-success-50: hsl(142, 76%, 96%);
+    --color-success-100: hsl(142, 71%, 91%);
+    --color-success-200: hsl(142, 70%, 83%);
+    --color-success-300: hsl(142, 71%, 72%);
+    --color-success-400: hsl(142, 76%, 58%);
+    --color-success-500: hsl(142, 71%, 45%);
+    --color-success-600: hsl(142, 76%, 36%);
+    --color-success-700: hsl(142, 72%, 29%);
+    --color-success-800: hsl(142, 70%, 24%);
+    --color-success-900: hsl(142, 71%, 20%);
+
+    --color-warning-50: hsl(48, 100%, 97%);
+    --color-warning-100: hsl(48, 100%, 93%);
+    --color-warning-200: hsl(48, 100%, 86%);
+    --color-warning-300: hsl(48, 100%, 77%);
+    --color-warning-400: hsl(48, 100%, 66%);
+    --color-warning-500: hsl(38, 92%, 50%);
+    --color-warning-600: hsl(38, 92%, 45%);
+    --color-warning-700: hsl(38, 90%, 40%);
+    --color-warning-800: hsl(38, 85%, 35%);
+    --color-warning-900: hsl(38, 80%, 30%);
+
+    --color-error-50: hsl(0, 100%, 97%);
+    --color-error-100: hsl(0, 100%, 94%);
+    --color-error-200: hsl(0, 100%, 89%);
+    --color-error-300: hsl(0, 100%, 81%);
+    --color-error-400: hsl(0, 100%, 70%);
+    --color-error-500: hsl(0, 84%, 50%);
+    --color-error-600: hsl(0, 72%, 51%);
+    --color-error-700: hsl(0, 74%, 42%);
+    --color-error-800: hsl(0, 70%, 35%);
+    --color-error-900: hsl(0, 63%, 31%);
+
+    /* Spacing Tokens */
+    --spacing-18: 4.5rem;
+    --spacing-88: 22rem;
+    --spacing-128: 32rem;
+
+    /* Border Radius Tokens */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+
+    /* Shadow Tokens - Dark Theme Optimized */
+    --shadow-sm: 0 1px 2px 0 hsl(0, 0%, 0% / 0.3);
+    --shadow: 0 1px 3px 0 hsl(0, 0%, 0% / 0.4), 0 1px 2px -1px hsl(0, 0%, 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0, 0%, 0% / 0.4), 0 2px 4px -2px hsl(0, 0%, 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0, 0%, 0% / 0.4), 0 4px 6px -4px hsl(0, 0%, 0% / 0.3);
+    --shadow-xl: 0 20px 25px -5px hsl(0, 0%, 0% / 0.4), 0 8px 10px -6px hsl(0, 0%, 0% / 0.3);
+    --shadow-2xl: 0 25px 50px -12px hsl(0, 0%, 0% / 0.5);
+    --shadow-inner: inset 0 2px 4px 0 hsl(0, 0%, 0% / 0.3);
+    --shadow-none: 0 0 #0000;
+
+    /* Transition Tokens */
+    --duration-150: 150ms;
+    --duration-200: 200ms;
+    --duration-300: 300ms;
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Animation Keyframes */
+    --animate-spin: spin 1s linear infinite;
+
+    /* Font Size Tokens */
+    --font-size-xxs: 0.625rem;
+}
+
+/**
+ * Shadcn/ui Compatible CSS Variables
+ * Maps shadcn's expected variable names to our custom Dota2-themed colors
+ */
+:root {
+    /* Base Colors */
+    --background: hsl(0, 0%, 4%);
+    --foreground: hsl(0, 0%, 98%);
+
+    /* Card Colors */
+    --card: hsl(0, 0%, 8%);
+    --card-foreground: hsl(0, 0%, 98%);
+
+    /* Popover Colors */
+    --popover: hsl(0, 0%, 8%);
+    --popover-foreground: hsl(0, 0%, 98%);
+
+    /* Primary Colors - Rich Red (Dire) */
+    --primary: hsl(0, 84%, 50%);
+    --primary-foreground: hsl(0, 0%, 98%);
+
+    /* Secondary Colors - Golden Yellow (Radiant) */
+    --secondary: hsl(38, 92%, 50%);
+    --secondary-foreground: hsl(0, 0%, 4%);
+
+    /* Muted Colors */
+    --muted: hsl(0, 0%, 7%);
+    --muted-foreground: hsl(0, 0%, 64%);
+
+    /* Accent Colors */
+    --accent: hsl(0, 0%, 10%);
+    --accent-foreground: hsl(0, 0%, 98%);
+
+    /* Destructive Colors */
+    --destructive: hsl(0, 84%, 50%);
+    --destructive-foreground: hsl(0, 0%, 98%);
+
+    /* Border & Input */
+    --border: hsl(0, 0%, 18%);
+    --input: hsl(0, 0%, 18%);
+
+    /* Ring (Focus) */
+    --ring: hsl(0, 84%, 50%);
+
+    /* Radius */
+    --radius: 0.5rem;
+}
+
+/**
+ * Base styles
+ */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    color: hsl(0, 0%, 98%);
+    background-color: hsl(0, 0%, 4%);
+}
+
+/**
+ * Focus styles for accessibility
+ */
+*:focus-visible {
+    outline: 2px solid hsl(0, 84%, 50%);
+    outline-offset: 2px;
+}
+
+/**
+ * Custom scrollbar styles - Dark Theme
+ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: hsl(0, 0%, 7%);
+}
+
+::-webkit-scrollbar-thumb {
+    background: hsl(0, 0%, 25%);
+    border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: hsl(0, 0%, 35%);
+}
+
+/**
+ * Selection styles
+ */
+::selection {
+    background-color: hsl(0, 100%, 89%);
+    color: hsl(0, 63%, 31%);
+}
+
+/**
+ * Print styles
+ */
+@media print {
+    body {
+        background-color: white;
+        color: black;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
