@@ -1,63 +1,38 @@
-import type { Series } from "../api/api"
-import { Badge, Card, CardContent, EmptyState, ErrorState, Spinner } from "./ui/index"
+import type { Series, Pagination } from "../api/api"
+import { SeriesCard } from "./SeriesCard"
+import { EmptyState, ErrorState, Spinner, Button } from "./ui/index"
+import { useNavigate } from "@tanstack/react-router"
+import { useSearch } from "@tanstack/react-router"
 
 interface SeriesListProps {
     series: Series[]
     isLoading?: boolean
     error?: Error | null
+    pagination?: Pagination
 }
 
-// Helper function to format date
-function formatDate(dateString: string): string {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    })
-}
+export function SeriesList({ series, isLoading, error, pagination }: SeriesListProps) {
+    const navigate = useNavigate()
+    const search = useSearch({ strict: false })
 
-function SeriesCard({ series }: { series: Series }) {
-    return (
-        <Card className="hover:shadow-md transition-shadow duration-200">
-            <CardContent className="p-4">
-                {/* Teams and Score */}
-                <div className="flex items-center justify-between">
-                    {/* Team A */}
-                    <div className="flex items-center flex-1">
-                        {series.team_a.logo_url && (
-                            <img src={series.team_a.logo_url} alt={series.team_a.name} className="w-8 h-8 rounded" />
-                        )}
-                        <div className="flex flex-col">
-                            <span className="font-medium text-foreground text-lg">{series.team_a.name}</span>
-                        </div>
-                    </div>
+    const handleLoadMore = () => {
+        if (pagination?.nc) {
+            navigate({
+                to: ".",
+                search: { ...search, c: pagination.nc },
+            })
+        }
+    }
 
-                    {/* Score or VS*/}
-                    <div className="flex items-center">
-                        <span className="font-bold text-lg text-primary-600">{series.team_a_score}</span>
-                        <span className="mx-2 text-gray-400">-</span>
-                        <span className="font-bold text-lg text-primary-600">{series.team_b_score}</span>
-                    </div>
+    const handlePrevious = () => {
+        if (pagination?.pc) {
+            navigate({
+                to: ".",
+                search: { ...search, c: pagination.pc },
+            })
+        }
+    }
 
-                    {/* Team B */}
-                    <div className="flex items-center flex-1">
-                        <div className="flex flex-col items-end ">
-                            <span className="font-medium text-foreground text-lg">{series.team_b.name}</span>
-                        </div>
-                        {series.team_b.logo_url && (
-                            <img src={series.team_b.logo_url} alt={series.team_b.name} className="w-8 h-8 rounded" />
-                        )}
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
-export function SeriesList({ series, isLoading, error }: SeriesListProps) {
     if (error) {
         return <ErrorState error={error} title="Error loading series" />
     }
@@ -83,10 +58,26 @@ export function SeriesList({ series, isLoading, error }: SeriesListProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3  gap-4">
-            {series.map(s => (
-                <SeriesCard key={s.series_id} series={s} />
-            ))}
+        <div className="w-full">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(420px,1fr))] gap-6">
+                {series.map(s => (
+                    <SeriesCard key={s.series_id} series={s} />
+                ))}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-center gap-4 mt-6">
+                {pagination?.pc && (
+                    <Button onClick={handlePrevious} variant="outline" disabled={isLoading}>
+                        Previous
+                    </Button>
+                )}
+                {pagination?.has_more && (
+                    <Button onClick={handleLoadMore} disabled={isLoading}>
+                        Load More
+                    </Button>
+                )}
+            </div>
         </div>
     )
 }

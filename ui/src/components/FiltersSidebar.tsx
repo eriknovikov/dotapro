@@ -1,21 +1,17 @@
-import { useRef, useEffect, type KeyboardEvent } from "react"
+import { useRef, useEffect, useState, type KeyboardEvent } from "react"
 import type { Filters } from "../api/api"
 import { useNavigate } from "@tanstack/react-router"
 import { Button, Input } from "./ui/index"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "./ui/index"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/index"
 
 interface FiltersSidebarProps {
     initialFilters?: Filters
     isLoading: boolean
+    isMobileOpen?: boolean
+    onMobileClose?: () => void
 }
 
-export function FiltersSidebar({ initialFilters, isLoading }: FiltersSidebarProps) {
+export function FiltersSidebar({ initialFilters, isLoading, isMobileOpen, onMobileClose }: FiltersSidebarProps) {
     const navigate = useNavigate()
 
     const leagueInputRef = useRef<HTMLInputElement>(null)
@@ -48,6 +44,8 @@ export function FiltersSidebar({ initialFilters, isLoading }: FiltersSidebarProp
         if (sortSelectRef.current?.value) {
             filters.sort = sortSelectRef.current.value
         }
+        // Reset cursor when filters change
+        filters.c = undefined
 
         navigate({
             to: ".",
@@ -66,12 +64,47 @@ export function FiltersSidebar({ initialFilters, isLoading }: FiltersSidebarProp
         if (leagueInputRef.current) leagueInputRef.current.value = ""
         if (teamInputRef.current) teamInputRef.current.value = ""
         if (sortSelectRef.current) sortSelectRef.current.value = ""
-        navigate({ to: ".", search: {} })
+        navigate({ to: ".", search: { c: undefined } })
     }
 
     return (
-        <aside className="w-72 flex-shrink-0 bg-background border-r border-border p-6 min-h-screen">
-            <h2 className="text-lg font-semibold text-foreground mb-6">Filters</h2>
+        <aside
+            className={`
+                fixed top-16 left-0 z-40
+                w-64 min-h-[calc(100vh-4rem)]
+                bg-background border-r border-border p-6
+                shrink-0
+                transform transition-transform duration-300 ease-in-out
+                ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+            `}
+        >
+            {/* Mobile close button */}
+            <div className="flex items-center justify-between mb-6 md:hidden">
+                <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onMobileClose}
+                    aria-label="Close filters"
+                >
+                    <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </Button>
+            </div>
+
+            {/* Desktop title */}
+            <h2 className="hidden md:block text-lg font-semibold text-foreground mb-6">Filters</h2>
 
             <div className="space-y-6">
                 {/* League ID Filter */}

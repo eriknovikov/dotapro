@@ -25,11 +25,6 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 	if limit <= 0 {
 		limit = 20
 	}
-	page := filter.Page
-	if page <= 0 {
-		page = 1
-	}
-	offset := (page - 1) * limit
 
 	q := m.DB.NewSelect().
 		ColumnExpr("m.match_id").
@@ -75,33 +70,16 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 	switch filter.Sort {
 	case "oldest":
 		q = q.Order("m.match_id ASC")
+		if filter.Cursor != nil {
+			q = q.Where("m.match_id > ?", *filter.Cursor)
+		}
 	default:
 		q = q.Order("m.match_id DESC")
+		if filter.Cursor != nil {
+			q = q.Where("m.match_id < ?", *filter.Cursor)
+		}
 	}
-
-	q = q.Limit(limit).Offset(offset)
-
-	paginationQuery := m.DB.NewSelect().
-		ColumnExpr("COUNT(*)").
-		TableExpr("matches AS m").
-		Join("LEFT JOIN matches_metadata AS md USING (match_id)").
-		Join("LEFT JOIN series_match AS sm USING (match_id)").
-		Join("LEFT JOIN leagues AS l USING (league_id)").
-		Join("LEFT JOIN teams AS radiant ON radiant.team_id = m.radiant_team_id").
-		Join("LEFT JOIN teams AS dire ON dire.team_id = m.dire_team_id")
-
-	if filter.LeagueID != nil {
-		paginationQuery = paginationQuery.Where("m.league_id = ?", *filter.LeagueID)
-	}
-	if filter.TeamID != nil {
-		paginationQuery = paginationQuery.Where("m.radiant_team_id = ? OR m.dire_team_id = ?", *filter.TeamID, *filter.TeamID)
-	}
-	if filter.PlayerID != nil {
-		paginationQuery = paginationQuery.Where("m.radiant_players @> ? OR m.dire_players @> ?", []int64{*filter.PlayerID}, []int64{*filter.PlayerID})
-	}
-	if filter.HeroID != nil {
-		paginationQuery = paginationQuery.Where("m.radiant_heroes @> ? OR m.dire_heroes @> ?", []int64{*filter.HeroID}, []int64{*filter.HeroID})
-	}
+	q = q.Limit(limit + 1)
 
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -110,20 +88,27 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 		return nil, types.PaginationData{}, err
 	}
 
-	var totalCount int
-	if err := paginationQuery.Scan(ctx, &totalCount); err != nil {
-		return nil, types.PaginationData{}, err
+	var nextCursor *int64
+	var prevCursor *int64
+	hasMore := false
+
+	if len(res) > limit {
+		hasMore = true
+		res = res[:limit]
+		if len(res) > 0 {
+			lastID := res[len(res)-1].MatchID
+			nextCursor = &lastID
+		}
 	}
 
-	totalPages := totalCount / limit
-	if totalCount%limit != 0 {
-		totalPages++
+	if filter.Cursor != nil {
+		prevCursor = filter.Cursor
 	}
 
 	return res, types.PaginationData{
-		PageSize:    limit,
-		TotalPages:  totalPages,
-		CurrentPage: page,
+		NextCursor: nextCursor,
+		PrevCursor: prevCursor,
+		HasMore:    hasMore,
 	}, nil
 }
 

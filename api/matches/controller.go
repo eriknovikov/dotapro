@@ -80,13 +80,13 @@ func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 		filter.Limit = limit
 	}
 
-	if pageStr := params.Get("page"); pageStr != "" {
-		page, err := strconv.Atoi(pageStr)
+	if cursorStr := params.Get("c"); cursorStr != "" {
+		cursor, err := strconv.ParseInt(cursorStr, 10, 64)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid page: %v", err.Error()), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("invalid cursor: %v", err.Error()), http.StatusBadRequest)
 			return
 		}
-		filter.Page = page
+		filter.Cursor = &cursor
 	}
 
 	matches, paginationData, err := c.model.GetMany(ctx, filter)

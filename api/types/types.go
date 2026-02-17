@@ -131,7 +131,7 @@ type GetMatchesFilter struct {
 	HeroID   *int64 `json:"hero_id"`
 	Sort     string `json:"sort"` // "newest" or "oldest"
 	Limit    int    `json:"limit"`
-	Page     int    `json:"page"`
+	Cursor   *int64 `json:"c"` // match_id for cursor-based pagination
 }
 
 type SeriesSummary struct {
@@ -174,11 +174,11 @@ type GetSeriesFilter struct {
 	TeamID   *int64 `json:"team_id"`
 	Sort     string `json:"sort"` // "newest" or "oldest"
 	Limit    int    `json:"limit"`
-	Page     int    `json:"page"`
+	Cursor   *int64 `json:"c"` // series_id for cursor-based pagination
 }
 
 type PaginationData struct {
-	PageSize    int `json:"page_size"`
-	TotalPages  int `json:"total_pages"`
-	CurrentPage int `json:"current_page"`
+	NextCursor *int64 `json:"nc"` // series_id for next page
+	PrevCursor *int64 `json:"pc"` // series_id for previous page
+	HasMore    bool   `json:"has_more"`    // whether there are more results
 }

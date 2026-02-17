@@ -65,9 +65,9 @@ See database/ directory for schemas and queries.
 
 See api/docs.yaml for full API documentation.
 
-- GET /matches - List matches with filters (league, team, player, hero, sort by newest/oldest)
+- GET /matches - List matches with filters (league, team, player, hero, sort by newest/oldest, cursor-based pagination with `c` parameter)
 - GET /matches/:id - Match details (id, league, radiant, dire, etc)
-- GET /series - Series list by team, league (id, team1, team2, score, league, date)
+- GET /series - Series list by team, league (id, team1, team2, score, league, date, cursor-based pagination with `c` parameter)
 - GET /series/:id - Matches in a series
 
 ## Frontend Design System

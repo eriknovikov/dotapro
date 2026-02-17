@@ -1,0 +1,164 @@
+import * as React from "react"
+import type { Series } from "@/api/api"
+import { cn } from "@/lib/utils"
+import { Eye } from "lucide-react"
+import { useNavigate } from "@tanstack/react-router"
+import { Button } from "@/components/ui/button"
+
+/**
+ * SeriesCard - Modern Glassmorphism with Red Accent
+ *
+ * Contemporary glass-like card with red gradient sweep.
+ *
+ * Features:
+ * - No border, uses shadow-xl with backdrop blur
+ * - Background: bg-background-card/80 with subtle red gradient overlay
+ * - Gradient: linear-gradient(135deg, hsl(0,84%,50%,0.2), hsl(0,84%,30%,0.1))
+ * - Animation: clip-path sweep from top-left to bottom-right
+ * - 200ms ease-in-out timing
+ */
+
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+    <div
+        ref={ref}
+        className={cn(
+            "group relative rounded-xl bg-background-card/80 text-card-foreground shadow-xl transition-all duration-200 ease-in-out hover:shadow-2xl overflow-hidden backdrop-blur-sm",
+            className,
+        )}
+        {...props}
+    >
+        {/* Gradient sweep overlay - clip-path animation */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute inset-0 bg-linear-to-br from-primary-500/20 via-primary-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
+        </div>
+
+        {/* Subtle inner glow */}
+        <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-linear-to-t from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full">{props.children}</div>
+    </div>
+))
+Card.displayName = "Card"
+
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+    ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />,
+)
+CardContent.displayName = "CardContent"
+
+// Constants for time calculations (defined outside function for efficiency)
+const MS_PER_MINUTE = 60 * 1000
+const MS_PER_HOUR = 60 * MS_PER_MINUTE
+const MS_PER_DAY = 24 * MS_PER_HOUR
+const MS_PER_MONTH = 30.44 * MS_PER_DAY // Average month length
+const MS_PER_YEAR = 365.25 * MS_PER_DAY // Average year length
+
+// Unit labels (defined outside function for efficiency)
+const UNIT_LABELS = ["year", "month", "day", "hour", "minute"] as const
+
+// Helper function to format date as relative time (e.g., "5 days and 3 hours")
+function formatRelativeTime(dateString: string): string {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+
+    // Calculate each unit
+    const years = Math.floor(diffMs / MS_PER_YEAR)
+    const months = Math.floor((diffMs % MS_PER_YEAR) / MS_PER_MONTH)
+    const days = Math.floor((diffMs % MS_PER_MONTH) / MS_PER_DAY)
+    const hours = Math.floor((diffMs % MS_PER_DAY) / MS_PER_HOUR)
+    const minutes = Math.floor((diffMs % MS_PER_HOUR) / MS_PER_MINUTE)
+
+    // Find the biggest non-zero unit
+    const unitValues = [years, months, days, hours, minutes]
+    const firstUnitIndex = unitValues.findIndex(value => value > 0)
+
+    // If no units found, return "just now"
+    if (firstUnitIndex === -1) {
+        return "just now"
+    }
+
+    const firstValue = unitValues[firstUnitIndex]
+    const firstLabel = UNIT_LABELS[firstUnitIndex]
+    const firstPart = `${firstValue} ${firstLabel}${firstValue !== 1 ? "s" : ""}`
+
+    // Check if there's a second unit
+    const secondValue = unitValues[firstUnitIndex + 1]
+    if (!secondValue || secondValue === 0) {
+        return firstPart
+    }
+
+    const secondLabel = UNIT_LABELS[firstUnitIndex + 1]
+    const secondPart = `${secondValue} ${secondLabel}${secondValue !== 1 ? "s" : ""}`
+
+    return `${firstPart} and ${secondPart}`
+}
+
+export function SeriesCard({ series }: { series: Series }) {
+    const navigate = useNavigate()
+
+    return (
+        <Card>
+            <CardContent className="p-4 flex flex-col flex-1">
+                {/* Teams and Score */}
+                <div className="flex items-center justify-between gap-4 border-b border-border mb-3 pb-3">
+                    {/* Team A */}
+                    <div className="flex items-center min-w-0 flex-1">
+                        <div className="flex min-w-0 gap-1 items-center">
+                            {series.team_a.logo_url && (
+                                <img
+                                    src={series.team_a.logo_url}
+                                    className="h-7 w-auto max-w-11 rounded shrink-0 select-none"
+                                />
+                            )}
+                            <span className="font-bold text-foreground text-base sm:text-lg">{series.team_a.name}</span>
+                        </div>
+                    </div>
+
+                    {/* Score or VS*/}
+                    <div className="flex items-center justify-center shrink-0 select-none">
+                        <span className="font-bold text-sm text-foreground-muted">{series.team_a_score}</span>
+                        <span className="mx-2 text-gray-400">{"-"}</span>
+                        <span className="font-bold text-sm text-foreground-muted">{series.team_b_score}</span>
+                    </div>
+
+                    {/* Team B */}
+                    <div className="flex items-center justify-end min-w-0 flex-1">
+                        <div className="flex min-w-0 gap-1 items-center justify-end">
+                            <span className="font-bold text-foreground text-base sm:text-lg text-end">
+                                {series.team_b.name}
+                            </span>
+                            {series.team_b.logo_url && (
+                                <img
+                                    src={series.team_b.logo_url}
+                                    className="h-7 w-auto max-w-11 rounded shrink-0 select-none"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* League and Date */}
+                <div className="text-sm text-foreground-muted flex flex-col flex-1">
+                    <span>{series.league.name}</span>
+                    <span>~{formatRelativeTime(series.start_time)} ago</span>
+                </div>
+                <div className="flex justify-end items-center mt-auto">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-32 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer group/btn bg-inherit"
+                        onClick={() => navigate({ to: `/series/${series.series_id}` })}
+                    >
+                        View series
+                        <div className="flex justify-center items-center w-6 h-4">
+                            <Eye className="size-4 transition-all duration-300 group-hover/btn:size-6" />
+                        </div>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}

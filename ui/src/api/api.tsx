@@ -3,7 +3,7 @@ export type Filters = {
     team?: number
     sort?: string
     limit?: number
-    page?: number
+    c?: number
 }
 
 // @deprecated Use Filters instead
@@ -33,9 +33,9 @@ export type Series = {
 }
 
 export type Pagination = {
-    page_size: number
-    total_pages: number
-    current_page: number
+    nc?: number
+    pc?: number
+    has_more: boolean
 }
 
 export type GetSeriesResponse = {
@@ -62,8 +62,8 @@ export async function getSeries(params: Filters, signal: AbortSignal): Promise<G
     if (params.limit !== undefined) {
         url.searchParams.set("limit", String(params.limit))
     }
-    if (params.page !== undefined) {
-        url.searchParams.set("page", String(params.page))
+    if (params.c !== undefined) {
+        url.searchParams.set("c", String(params.c))
     }
     const res = await fetch(url.toString(), { signal })
     if (!res.ok) {

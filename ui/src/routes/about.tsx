@@ -7,12 +7,13 @@ export const Route = createFileRoute("/about")({
 
 function About() {
     return (
-        <div className="p-6">
+        <div className="p-6 min-h-[calc(100vh-4rem)]">
             <Card>
                 <CardContent>
                     <h1 className="text-2xl font-bold text-foreground mb-4">About</h1>
                     <p className="text-foreground-muted">
-                        Dota 2 match data aggregation system. Scrapes from OpenDota API, stores in PostgreSQL, provides REST API.
+                        Dota 2 match data aggregation system. Scrapes from OpenDota API, stores in PostgreSQL, provides
+                        REST API.
                     </p>
                 </CardContent>
             </Card>

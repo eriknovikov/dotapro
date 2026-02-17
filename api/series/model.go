@@ -24,12 +24,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]ty
 	if limit <= 0 {
 		limit = 20
 	}
-	page := filter.Page
-	if page <= 0 {
-		page = 1
-	}
-	offset := (page - 1) * limit
-	//build main query
+
 	q := m.DB.NewSelect().
 		ColumnExpr("s.series_id").
 		ColumnExpr("s.start_time").
@@ -61,25 +56,17 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]ty
 	switch filter.Sort {
 	case "oldest":
 		q = q.Order("s.series_id ASC")
+		if filter.Cursor != nil {
+			q = q.Where("s.series_id > ?", *filter.Cursor)
+		}
 	default:
 		q = q.Order("s.series_id DESC")
+		if filter.Cursor != nil {
+			q = q.Where("s.series_id < ?", *filter.Cursor)
+		}
 	}
-	q = q.Limit(limit).Offset(offset)
-	// build pagination query
-	paginationQuery := m.DB.NewSelect().
-		ColumnExpr("COUNT(*)").
-		TableExpr("series AS s").
-		Join("LEFT JOIN leagues AS l USING (league_id)").
-		Join("LEFT JOIN teams AS team_a ON team_a.team_id = s.team_a_id").
-		Join("LEFT JOIN teams AS team_b ON team_b.team_id = s.team_b_id")
-	if filter.LeagueID != nil {
-		paginationQuery = paginationQuery.Where("s.league_id = ?", *filter.LeagueID)
-	}
-	if filter.TeamID != nil {
-		paginationQuery = paginationQuery.Where("s.team_a_id = ? OR s.team_b_id = ?", *filter.TeamID, *filter.TeamID)
-	}
+	q = q.Limit(limit + 1)
 
-	//run the queries
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, types.PaginationData{}, errs.NOT_FOUND
@@ -87,20 +74,27 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]ty
 		return nil, types.PaginationData{}, err
 	}
 
-	var totalCount int
-	if err := paginationQuery.Scan(ctx, &totalCount); err != nil {
-		return nil, types.PaginationData{}, err
+	var nextCursor *int64
+	var prevCursor *int64
+	hasMore := false
+
+	if len(res) > limit {
+		hasMore = true
+		res = res[:limit]
+		if len(res) > 0 {
+			lastID := res[len(res)-1].SeriesID
+			nextCursor = &lastID
+		}
 	}
 
-	totalPages := totalCount / limit
-	if totalCount%limit != 0 {
-		totalPages++
+	if filter.Cursor != nil {
+		prevCursor = filter.Cursor
 	}
 
 	return res, types.PaginationData{
-		PageSize:    limit,
-		TotalPages:  totalPages,
-		CurrentPage: page,
+		NextCursor: nextCursor,
+		PrevCursor: prevCursor,
+		HasMore:    hasMore,
 	}, nil
 }
 
