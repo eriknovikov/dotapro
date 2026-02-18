@@ -59,7 +59,7 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
 
     return (
         <div className="w-full">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(420px,1fr))] gap-6">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-6">
                 {series.map(s => (
                     <SeriesCard key={s.series_id} series={s} />
                 ))}

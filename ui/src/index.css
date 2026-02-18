@@ -1,18 +1,24 @@
 @import "tailwindcss";
 
-/**
- * Design System - Tailwind v4 Configuration
- * 
- * Dota 2 Inspired Dark Theme
- * Primary: Rich Red (Dire faction)
- * Accent: Golden Yellow (Radiant faction)
- * Background: Deep Dark
- */
 
-/**
- * Design Tokens - Colors (HSL)
- * Define custom color scales and semantic colors
- */
+
+
+@font-face {
+    font-family: 'Shantell Sans';
+    src: url('@/assets/fonts/shantell-sans-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Shantell Sans';
+    src: url('@/assets/fonts/shantell-sans-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 @theme {
     /* Primary Colors - Rich Red (Dire) */
     --color-primary-50: hsl(0, 100%, 97%);
@@ -120,6 +126,7 @@
 
     /* Font Size Tokens */
     --font-size-xxs: 0.625rem;
+    --font-shantell: 'Shantell Sans', system-ui, sans-serif;
 }
 
 /**

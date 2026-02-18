@@ -5,19 +5,6 @@ import { Eye } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
 
-/**
- * SeriesCard - Modern Glassmorphism with Red Accent
- *
- * Contemporary glass-like card with red gradient sweep.
- *
- * Features:
- * - No border, uses shadow-xl with backdrop blur
- * - Background: bg-background-card/80 with subtle red gradient overlay
- * - Gradient: linear-gradient(135deg, hsl(0,84%,50%,0.2), hsl(0,84%,30%,0.1))
- * - Animation: clip-path sweep from top-left to bottom-right
- * - 200ms ease-in-out timing
- */
-
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
     <div
         ref={ref}
@@ -113,21 +100,23 @@ export function SeriesCard({ series }: { series: Series }) {
                                     className="h-7 w-auto max-w-11 rounded shrink-0 select-none"
                                 />
                             )}
-                            <span className="font-bold text-foreground text-base sm:text-lg">{series.team_a.name}</span>
+                            <span className="font-bold text-foreground text-md font-shantell">
+                                {series.team_a.name}
+                            </span>
                         </div>
                     </div>
 
                     {/* Score or VS*/}
                     <div className="flex items-center justify-center shrink-0 select-none">
-                        <span className="font-bold text-sm text-foreground-muted">{series.team_a_score}</span>
+                        <span className="font-bold text-xs text-foreground-muted">{series.team_a_score}</span>
                         <span className="mx-2 text-gray-400">{"-"}</span>
-                        <span className="font-bold text-sm text-foreground-muted">{series.team_b_score}</span>
+                        <span className="font-bold text-xs text-foreground-muted">{series.team_b_score}</span>
                     </div>
 
                     {/* Team B */}
                     <div className="flex items-center justify-end min-w-0 flex-1">
                         <div className="flex min-w-0 gap-1 items-center justify-end">
-                            <span className="font-bold text-foreground text-base sm:text-lg text-end">
+                            <span className="font-bold text-foreground text-md text-end font-shantell">
                                 {series.team_b.name}
                             </span>
                             {series.team_b.logo_url && (
@@ -141,7 +130,7 @@ export function SeriesCard({ series }: { series: Series }) {
                 </div>
 
                 {/* League and Date */}
-                <div className="text-sm text-foreground-muted flex flex-col flex-1">
+                <div className="text-xs text-foreground-muted flex flex-col flex-1">
                     <span>{series.league.name}</span>
                     <span>~{formatRelativeTime(series.start_time)} ago</span>
                 </div>
@@ -149,12 +138,12 @@ export function SeriesCard({ series }: { series: Series }) {
                     <Button
                         variant="outline"
                         size="sm"
-                        className="w-32 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer group/btn bg-inherit"
+                        className="w-32 border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer group/btn bg-inherit text-xs"
                         onClick={() => navigate({ to: `/series/${series.series_id}` })}
                     >
                         View series
                         <div className="flex justify-center items-center w-6 h-4">
-                            <Eye className="size-4 transition-all duration-300 group-hover/btn:size-6" />
+                            <Eye className="size-3 transition-all duration-300 group-hover/btn:size-5" />
                         </div>
                     </Button>
                 </div>

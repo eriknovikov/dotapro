@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"dotapro-lambda-api/config"
+	"dotapro-lambda-api/filtersmetadata"
 	"dotapro-lambda-api/matches"
 	"dotapro-lambda-api/series"
 	"fmt"
@@ -27,9 +28,10 @@ type Request = events.APIGatewayV2HTTPRequest
 type Response = events.APIGatewayV2HTTPResponse
 
 var (
-	MATCH_MODEL  *matches.Model
-	SERIES_MODEL *series.Model
-	ADAPTER      *httpadapter.HandlerAdapterV2
+	MATCH_MODEL           *matches.Model
+	SERIES_MODEL          *series.Model
+	FILTERS_METADATA_MODEL *filtersmetadata.Model
+	ADAPTER               *httpadapter.HandlerAdapterV2
 )
 
 func init() {
@@ -55,6 +57,8 @@ func main() {
 	matchController := matches.NewController(MATCH_MODEL)
 	SERIES_MODEL = series.NewModel(db)
 	seriesController := series.NewController(SERIES_MODEL)
+	FILTERS_METADATA_MODEL = filtersmetadata.NewModel(db)
+	filtersMetadataController := filtersmetadata.NewController(FILTERS_METADATA_MODEL)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger, middleware.Recoverer)
@@ -71,6 +75,8 @@ func main() {
 	r.Get("/matches/{id}", matchController.GetOne)
 	r.Get("/series", seriesController.GetMany)
 	r.Get("/series/{id}", seriesController.GetOne)
+	r.Get("/filtersmetadata/teams", filtersMetadataController.SearchTeams)
+	r.Get("/filtersmetadata/leagues", filtersMetadataController.SearchLeagues)
 	if config.IsLocal() {
 		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running api locally")
 		err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r)
@@ -96,6 +102,7 @@ func Handler(ctx context.Context, req Request) (Response, error) {
 		MATCH_MODEL.DB.Close()
 		MATCH_MODEL.DB = db
 		SERIES_MODEL.DB = db
+		FILTERS_METADATA_MODEL.DB = db
 	}
 	return ADAPTER.ProxyWithContext(ctx, req)
 

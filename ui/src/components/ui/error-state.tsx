@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils"
-import { Button } from "./button"
 import { AlertCircle } from "lucide-react"
 
 interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -15,23 +14,12 @@ const sizeClasses = {
     lg: "p-12",
 }
 
-export function ErrorState({
-    error,
-    title = "Error",
-    action,
-    size = "md",
-    className,
-    ...props
-}: ErrorStateProps) {
+export function ErrorState({ error, title = "Error", action, size = "md", className, ...props }: ErrorStateProps) {
     const errorMessage = typeof error === "string" ? error : error?.message || "An unexpected error occurred"
 
     return (
         <div
-            className={cn(
-                "flex flex-col items-center justify-center text-center",
-                sizeClasses[size],
-                className
-            )}
+            className={cn("flex flex-col items-center justify-center text-center", sizeClasses[size], className)}
             {...props}
         >
             <div className="mb-4 text-error-500">

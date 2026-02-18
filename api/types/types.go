@@ -84,10 +84,22 @@ type TeamInfo struct {
 	Captain *int64 `json:"captain" bun:"captain"`
 }
 
+type TeamSearchResult struct {
+	TeamID  int64  `json:"team_id" bun:"team_id"`
+	Name    string `json:"name" bun:"name"`
+	LogoURL string `json:"logo_url,omitempty" bun:"logo_url"`
+}
+
+type LeagueSearchResult struct {
+	LeagueID int64  `json:"league_id" bun:"league_id"`
+	Name     string `json:"name" bun:"name"`
+}
+
 type LeagueInfo struct {
-	ID   int64  `json:"id" bun:"id"`
-	Name string `json:"name" bun:"name"`
-	Tier string `json:"tier" bun:"tier"`
+	ID      int64  `json:"id" bun:"id"`
+	Name    string `json:"name" bun:"name"`
+	Tier    string `json:"tier" bun:"tier"`
+	LogoURL string `json:"logo_url,omitempty" bun:"logo_url"`
 }
 
 type MatchSummary struct {
@@ -178,7 +190,7 @@ type GetSeriesFilter struct {
 }
 
 type PaginationData struct {
-	NextCursor *int64 `json:"nc"` // series_id for next page
-	PrevCursor *int64 `json:"pc"` // series_id for previous page
-	HasMore    bool   `json:"has_more"`    // whether there are more results
+	NextCursor *int64 `json:"nc"`       // series_id for next page
+	PrevCursor *int64 `json:"pc"`       // series_id for previous page
+	HasMore    bool   `json:"has_more"` // whether there are more results
 }

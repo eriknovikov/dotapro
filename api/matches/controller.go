@@ -92,7 +92,6 @@ func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 	matches, paginationData, err := c.model.GetMany(ctx, filter)
 	if err != nil {
 		if err == context.Canceled {
-			log.Debug().Msg("Request canceled by client")
 			return
 		}
 

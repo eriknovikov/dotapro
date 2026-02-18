@@ -73,8 +73,7 @@ function Series() {
             <div className="flex relative min-h-[calc(100vh-4rem)]">
                 {/* Sidebar - Filters */}
                 <FiltersSidebar
-                    initialFilters={search}
-                    isLoading={isLoading}
+                    filters={search}
                     isMobileOpen={isMobileFiltersOpen}
                     onMobileClose={() => setIsMobileFiltersOpen(false)}
                 />

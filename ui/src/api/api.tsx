@@ -43,11 +43,6 @@ export type GetSeriesResponse = {
     pagination: Pagination
 }
 
-export async function getSeriesMOCK(params: Filters, signal: AbortSignal): Promise<GetSeriesResponse> {
-    const seriesResponseMock = await import("../../../res.json")
-    return seriesResponseMock as GetSeriesResponse
-}
-
 export async function getSeries(params: Filters, signal: AbortSignal): Promise<GetSeriesResponse> {
     const url = new URL("http://localhost:8080/series")
     if (params.league !== undefined) {

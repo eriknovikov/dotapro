@@ -1,0 +1,50 @@
+{
+    "popular_teams": [
+        {
+            "id": 2163,
+            "name": "Team Liquid"
+        },
+        {
+            "id": 9247354,
+            "name": "Team Falcons"
+        },
+        {
+            "id": 7119388,
+            "name": "Team Spirit"
+        },
+        {
+            "id": 8291895,
+            "name": "Tundra"
+        },
+        {
+            "id": 7554697,
+            "name": "Nigma Galaxy"
+        },
+        {
+            "id": 8255888,
+            "name": "BetBoom Team"
+        }
+    ],
+    "popular_leagues": [
+        {
+            "id": 18324,
+            "name": "The International 2025"
+        },
+        {
+            "id": 18111,
+            "name": "DreamLeague Season 26"
+        },
+        {
+            "id": 17891,
+            "name": "PGL Wallachia 2025 Season 3"
+        },
+        {
+            "id": 18375,
+            "name": "Esports World Cup 2025"
+        },
+        {
+            "id": 17414,
+            "name": "BLAST SLAM I"
+        }
+    ]
+}
