@@ -1,5 +1,6 @@
 import type { Filters } from "../api/api"
 import { useNavigate } from "@tanstack/react-router"
+import { Funnel } from "lucide-react"
 import { Button } from "./ui/index"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/index"
 import { LeagueSelector } from "./LeagueSelector"
@@ -36,81 +37,103 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
     }
 
     const handleClear = () => {
-        navigate({ to: ".", search: { c: undefined } })
+        navigate({ to: ".", search: { league: undefined, team: undefined, sort: undefined, c: undefined } })
     }
 
     return (
         <aside
             className={`
                 fixed top-16 left-0 z-40
-                w-64 min-h-[calc(100vh-4rem)]
-                bg-background border-r border-border p-6
+                w-72 h-[calc(100vh-4rem)]
+                bg-background border-r border-border
                 shrink-0
                 transform transition-transform duration-300 ease-in-out
                 ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}
         >
-            {/* Mobile close button */}
-            <div className="flex items-center justify-between mb-6 md:hidden">
-                <h2 className="text-lg font-semibold text-foreground">Filters</h2>
-                <Button variant="ghost" size="icon" onClick={onMobileClose} aria-label="Close filters">
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </Button>
-            </div>
-
-            {/* Desktop title */}
-            <h2 className="hidden md:block text-lg font-semibold text-foreground mb-6">Filters</h2>
-
-            <div className="space-y-6">
-                {/* League Filter */}
-                <div>
-                    <label htmlFor="league-select" className="block text-sm font-medium text-foreground mb-2">
-                        League
-                    </label>
-                    <LeagueSelector
-                        id="league-select"
-                        onSelect={handleLeagueChange}
-                        initialValue={filters.league}
-                        aria-label="League filter"
-                    />
-                </div>
-
-                {/* Team Filter */}
-                <div>
-                    <label htmlFor="team-select" className="block text-sm font-medium text-foreground mb-2">
-                        Team
-                    </label>
-                    <TeamSelector
-                        id="team-select"
-                        onSelect={handleTeamChange}
-                        initialValue={filters.team}
-                        aria-label="Team filter"
-                    />
-                </div>
-
-                {/* Sort By Filter */}
-                <div>
-                    <label htmlFor="sort-by" className="block text-sm font-medium text-foreground mb-2">
-                        Sort By
-                    </label>
-                    <Select value={filters.sort || "newest"} onValueChange={handleSortChange}>
-                        <SelectTrigger id="sort-by" aria-label="Sort by filter">
-                            <SelectValue placeholder="Default" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="newest" disabled={!filters.sort || filters.sort === "newest"}>Newest</SelectItem>
-                            <SelectItem value="oldest" disabled={filters.sort === "oldest"}>Oldest</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                    <Button onClick={handleClear} variant="secondary" className="w-full" aria-label="Clear filters">
-                        Clear Filters
+            <div className="h-full overflow-y-auto p-6">
+                {/* Mobile close button */}
+                <div className="flex items-center justify-between mb-6 md:hidden">
+                    <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+                    <Button variant="ghost" size="icon" onClick={onMobileClose} aria-label="Close filters">
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
                     </Button>
+                </div>
+
+                {/* Desktop title */}
+                <div className="hidden md:flex items-center gap-2 mb-6">
+                    <Funnel className="h-5 w-5 text-foreground" />
+                    <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+                </div>
+
+                <div className="space-y-12">
+                    {/* League Filter */}
+                    <div>
+                        <label htmlFor="league-select" className="block text-sm font-medium text-foreground mb-2">
+                            League
+                        </label>
+                        <LeagueSelector
+                            id="league-select"
+                            onSelect={handleLeagueChange}
+                            initialValue={filters.league}
+                            aria-label="League filter"
+                            inputClassName="text-sm"
+                        />
+                    </div>
+
+                    {/* Team Filter */}
+                    <div>
+                        <label htmlFor="team-select" className="block text-sm font-medium text-foreground mb-2">
+                            Team
+                        </label>
+                        <TeamSelector
+                            id="team-select"
+                            onSelect={handleTeamChange}
+                            initialValue={filters.team}
+                            aria-label="Team filter"
+                            inputClassName="text-sm"
+                        />
+                    </div>
+
+                    {/* Sort By Filter */}
+                    <div>
+                        <label htmlFor="sort-by" className="block text-sm font-medium text-foreground mb-2">
+                            Sort by
+                        </label>
+                        <Select value={filters.sort || "newest"} onValueChange={handleSortChange}>
+                            <SelectTrigger id="sort-by" aria-label="Sort by filter" className="text-sm">
+                                <SelectValue placeholder="Default" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="newest" disabled={!filters.sort || filters.sort === "newest"}>
+                                    Newest
+                                </SelectItem>
+                                <SelectItem value="oldest" disabled={filters.sort === "oldest"}>
+                                    Oldest
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end">
+                        <Button
+                            onClick={handleClear}
+                            variant="outline"
+                            size="sm"
+                            className="border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer bg-inherit text-sm"
+                            aria-label="Reset defaults"
+                        >
+                            Reset defaults
+                        </Button>
+                    </div>
                 </div>
             </div>
         </aside>

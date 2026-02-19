@@ -79,7 +79,7 @@ function Series() {
                 />
 
                 {/* Main Content - Results */}
-                <main className="flex-1 p-6 ml-64 overflow-y-auto">
+                <main className="flex-1 p-6 ml-72 overflow-y-auto">
                     <SeriesList
                         series={data?.series || []}
                         isLoading={isLoading}

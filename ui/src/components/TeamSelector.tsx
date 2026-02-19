@@ -1,187 +1,513 @@
-import { useCombobox } from "downshift"
-import { useRef, useState, useEffect, useCallback } from "react"
-import popularData from "../assets/static_data.json"
+import { useQuery } from "@tanstack/react-query"
+import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react"
+import { searchTeams, type TeamSearchResult } from "../api/api"
+import { useDebounce } from "../hooks/useDebounce"
 import { cn } from "../lib/utils"
 import { Spinner } from "./ui/spinner"
+import popularData from "../assets/static_data.json"
 
-interface Team {
-    id: number
-    name: string
-}
+// ============================================================================
+// Types
+// ============================================================================
 
 interface TeamSelectorProps {
     onSelect: (teamId: number | undefined) => void
     initialValue?: number
-    placeholder?: string
     className?: string
     id?: string
     "aria-label"?: string
+    inputClassName?: string
 }
 
-export function TeamSelector({ onSelect, initialValue, placeholder = "Search teams...", className, id, "aria-label": ariaLabel }: TeamSelectorProps) {
-    const [inputItems, setInputItems] = useState<Team[]>(popularData.popular_teams)
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const abortControllerRef = useRef<AbortController | null>(null)
+interface Team {
+    id: number
+    name: string
+    logo_url?: string
+}
 
-    // Find initial team name if initialValue is provided
-    const initialTeam = initialValue
-        ? popularData.popular_teams.find((t) => t.id === initialValue) || { id: initialValue, name: String(initialValue) }
-        : null
+// ============================================================================
+// Constants
+// ============================================================================
+
+const DEBOUNCE_MS = 250
+const STALE_TIME_MS = 5000
+const NAVIGATION_KEYS = ["ArrowDown", "ArrowUp", "Enter"] as const
+
+// ============================================================================
+// Icons
+// ============================================================================
+
+const ClearIcon = () => (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+)
+
+const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
+    <svg
+        className={cn("h-4 w-4 text-foreground-muted transition-transform duration-300", isOpen && "rotate-180")}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+    >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+)
+
+// ============================================================================
+// Component
+// ============================================================================
+
+export function TeamSelector({
+    onSelect,
+    initialValue,
+    className,
+    id,
+    "aria-label": ariaLabel,
+    inputClassName,
+}: TeamSelectorProps) {
+    // ---------------------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------------------
+
+    const [isOpen, setIsOpen] = useState(false)
+    const [inputValue, setInputValue] = useState("")
+    const [highlightedIndex, setHighlightedIndex] = useState(-1)
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 })
+
+    // ---------------------------------------------------------------------------
+    // Refs
+    // ---------------------------------------------------------------------------
+
+    const containerRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLDivElement>(null)
+    const listRef = useRef<HTMLUListElement>(null)
+    const itemRefs = useRef<(HTMLLIElement | null)[]>([])
+    const isSelectingRef = useRef(false)
+    const isExternalUpdateRef = useRef(false)
+    const hasSetInitialValueRef = useRef(false)
+    const selectedTeamIdRef = useRef<number | undefined>(undefined)
+    const selectedTeamNameRef = useRef<string | undefined>(undefined)
+
+    // ---------------------------------------------------------------------------
+    // Data fetching
+    // ---------------------------------------------------------------------------
+
+    const debouncedQuery = useDebounce(inputValue, DEBOUNCE_MS)
 
     const {
-        isOpen,
-        getMenuProps,
-        getInputProps,
-        highlightedIndex,
-        getItemProps,
-        selectedItem,
-        setInputValue,
-    } = useCombobox({
-        items: inputItems,
-        initialInputValue: initialTeam?.name || "",
-        initialSelectedItem: initialTeam || null,
-        onInputValueChange: async ({ inputValue }) => {
-            if (!inputValue || inputValue.trim() === "") {
-                setInputItems(popularData.popular_teams)
-                setError(null)
+        data: searchResults = [],
+        isLoading,
+        isFetching,
+    } = useQuery({
+        queryKey: ["teams", "search", debouncedQuery],
+        queryFn: async ({ signal }) => {
+            if (!debouncedQuery.trim()) return []
+            return searchTeams(debouncedQuery, signal)
+        },
+        enabled: debouncedQuery.trim().length > 0,
+        staleTime: STALE_TIME_MS,
+    })
+
+    // ---------------------------------------------------------------------------
+    // Computed values
+    // ---------------------------------------------------------------------------
+
+    const items = useMemo(() => {
+        if (debouncedQuery.trim().length === 0) {
+            return popularData.popular_teams.map(t => ({ id: t.id, name: t.name, logo_url: t.logo_url }))
+        }
+        return (searchResults || []).map(t => ({ id: t.team_id, name: t.name, logo_url: t.logo_url }))
+    }, [debouncedQuery, searchResults])
+
+    const listboxId = `${id}-listbox`
+    const hasQuery = debouncedQuery.trim().length > 0
+    const showSpinner = isFetching && hasQuery
+    const showClearButton = inputValue && !showSpinner
+    const showEmptyState = items.length === 0 && !isLoading && !isFetching
+
+    // ---------------------------------------------------------------------------
+    // Helper functions
+    // ---------------------------------------------------------------------------
+
+    const clearSelectedTeam = useCallback(() => {
+        if (selectedTeamIdRef.current !== undefined) {
+            isExternalUpdateRef.current = true
+            setInputValue("")
+            onSelect(undefined)
+            selectedTeamIdRef.current = undefined
+            selectedTeamNameRef.current = undefined
+        }
+    }, [onSelect])
+
+    const shouldClearTeamOnClose = useCallback(() => {
+        if (selectedTeamIdRef.current === undefined) {
+            return false
+        }
+        // Clear if input is empty OR if input differs from the originally selected team name
+        return inputValue.trim() === "" || inputValue !== selectedTeamNameRef.current
+    }, [inputValue])
+
+    const closeDropdown = useCallback(() => {
+        setIsOpen(false)
+        if (shouldClearTeamOnClose()) {
+            clearSelectedTeam()
+        }
+    }, [shouldClearTeamOnClose, clearSelectedTeam])
+
+    // ---------------------------------------------------------------------------
+    // Effects
+    // ---------------------------------------------------------------------------
+
+    // Set initial value when component mounts or initialValue changes
+    useEffect(() => {
+        if (initialValue !== undefined && !hasSetInitialValueRef.current) {
+            const initialItem = items.find(t => t.id === initialValue)
+            if (initialItem) {
+                isExternalUpdateRef.current = true
+                setInputValue(initialItem.name)
+                hasSetInitialValueRef.current = true
+                selectedTeamIdRef.current = initialValue
+                selectedTeamNameRef.current = initialItem.name
+            }
+        } else if (initialValue === undefined && selectedTeamIdRef.current !== undefined) {
+            // Clear the input when initialValue becomes undefined
+            isExternalUpdateRef.current = true
+            setInputValue("")
+            selectedTeamIdRef.current = undefined
+            selectedTeamNameRef.current = undefined
+        }
+    }, [initialValue, items])
+
+    // Reset hasSetInitialValueRef when initialValue changes
+    useEffect(() => {
+        hasSetInitialValueRef.current = false
+    }, [initialValue])
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                closeDropdown()
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [closeDropdown])
+
+    // Reset highlighted index when items change
+    useEffect(() => {
+        setHighlightedIndex(-1)
+        // Only reset itemRefs if the length changed significantly to avoid disrupting scroll-into-view
+        if (itemRefs.current.length !== items.length) {
+            itemRefs.current = new Array(items.length).fill(null)
+        }
+    }, [items])
+
+    // Calculate dropdown position when it opens
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            const rect = inputRef.current.getBoundingClientRect()
+            setDropdownPosition({
+                top: rect.bottom + 6, // 6px margin (mt-1.5)
+                left: rect.left,
+                width: rect.width,
+            })
+        }
+    }, [isOpen])
+
+    // Scroll highlighted item into view
+    useEffect(() => {
+        if (highlightedIndex >= 0 && itemRefs.current[highlightedIndex]) {
+            itemRefs.current[highlightedIndex]?.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+            })
+        }
+    }, [highlightedIndex])
+
+    // Sync div content with inputValue when it changes externally (e.g., from selection)
+    useLayoutEffect(() => {
+        if (inputRef.current) {
+            // Always clear the div content when inputValue is empty to ensure placeholder shows
+            if (inputValue === "") {
+                inputRef.current.textContent = ""
+                isExternalUpdateRef.current = false
+                return
+            }
+            
+            if (isExternalUpdateRef.current) {
+                inputRef.current.textContent = inputValue
+                // Only manipulate selection range if there's content to select
+                // This prevents unwanted focus when clearing the input
+                if (inputValue.length > 0) {
+                    const range = document.createRange()
+                    const sel = window.getSelection()
+                    if (inputRef.current.childNodes.length > 0) {
+                        range.selectNodeContents(inputRef.current)
+                        range.collapse(false) // false = collapse to end
+                    } else {
+                        range.setStart(inputRef.current, 0)
+                        range.setEnd(inputRef.current, 0)
+                    }
+                    sel?.removeAllRanges()
+                    sel?.addRange(range)
+                }
+                isExternalUpdateRef.current = false
+            }
+        }
+    }, [inputValue])
+
+    // ---------------------------------------------------------------------------
+    // Event handlers
+    // ---------------------------------------------------------------------------
+
+    const handleSelect = useCallback(
+        (team: Team) => {
+            isExternalUpdateRef.current = true
+            setInputValue(team.name)
+            setIsOpen(false)
+            onSelect(team.id)
+            selectedTeamIdRef.current = team.id
+            selectedTeamNameRef.current = team.name
+            isSelectingRef.current = true
+            inputRef.current?.focus()
+            setTimeout(() => {
+                isSelectingRef.current = false
+            }, 0)
+        },
+        [onSelect],
+    )
+
+    const handleClear = useCallback(() => {
+        isExternalUpdateRef.current = true
+        setInputValue("")
+        onSelect(undefined)
+        selectedTeamIdRef.current = undefined
+        selectedTeamNameRef.current = undefined
+        inputRef.current?.focus()
+    }, [onSelect])
+
+    const handleInputFocus = useCallback(() => {
+        if (!isSelectingRef.current && !isOpen && !isExternalUpdateRef.current) {
+            setIsOpen(true)
+        }
+    }, [isOpen])
+
+    const handleInputChange = useCallback(
+        (e: React.FormEvent<HTMLDivElement>) => {
+            const text = e.currentTarget.textContent || ""
+            setInputValue(text)
+            if (!isExternalUpdateRef.current) {
+                setIsOpen(true)
+            }
+        },
+        [],
+    )
+
+    const handleInputPaste = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        const text = e.clipboardData.getData("text/plain")
+        document.execCommand("insertText", false, text)
+    }, [])
+
+    const handleInputBlur = useCallback(() => {
+        // Ensure inputValue is in sync with div content on blur
+        if (inputRef.current) {
+            const text = inputRef.current.textContent || ""
+            // Only update state if value actually changed to avoid unnecessary re-renders
+            if (text !== inputValue) {
+                setInputValue(text)
+            }
+        }
+    }, [inputValue])
+
+    const handleItemMouseEnter = useCallback((index: number) => {
+        setHighlightedIndex(index)
+    }, [])
+
+    const handleItemClick = useCallback(
+        (e: React.MouseEvent, team: Team) => {
+            e.preventDefault()
+            e.stopPropagation()
+            handleSelect(team)
+        },
+        [handleSelect],
+    )
+
+    // ---------------------------------------------------------------------------
+    // Keyboard navigation
+    // ---------------------------------------------------------------------------
+
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            // Open dropdown on navigation keys when closed
+            if (!isOpen) {
+                if (NAVIGATION_KEYS.includes(e.key as any)) {
+                    // Prevent newline insertion when pressing Enter to open dropdown
+                    if (e.key === "Enter") {
+                        e.preventDefault()
+                    }
+                    setIsOpen(true)
+                }
                 return
             }
 
-            // Cancel previous request
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort()
-            }
-
-            setIsLoading(true)
-            setError(null)
-            const controller = new AbortController()
-            abortControllerRef.current = controller
-
-            try {
-                const res = await fetch(`http://localhost:8080/filtersmetadata/teams?q=${encodeURIComponent(inputValue)}`, {
-                    signal: controller.signal,
-                })
-                if (!res.ok) {
-                    throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)
-                }
-                const data = await res.json()
-                setInputItems(data)
-            } catch (err) {
-                if (err instanceof Error && err.name !== "AbortError") {
-                    setError(err.message)
-                }
-            } finally {
-                setIsLoading(false)
+            switch (e.key) {
+                case "ArrowDown":
+                    e.preventDefault()
+                    setHighlightedIndex(prev => (prev < items.length - 1 ? prev + 1 : prev))
+                    break
+                case "ArrowUp":
+                    e.preventDefault()
+                    setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0))
+                    break
+                case "Enter":
+                    e.preventDefault()
+                    if (highlightedIndex >= 0 && items[highlightedIndex]) {
+                        handleSelect(items[highlightedIndex])
+                    }
+                    break
+                case "Escape":
+                    closeDropdown()
+                    inputRef.current?.focus()
+                    break
+                case "Tab":
+                    closeDropdown()
+                    break
             }
         },
-        onSelectedItemChange: ({ selectedItem }) => {
-            onSelect(selectedItem?.id)
-        },
-        itemToString: (item) => item?.name || "",
-    })
+        [isOpen, items, highlightedIndex, handleSelect, closeDropdown],
+    )
 
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort()
-            }
-        }
-    }, [])
+    // ---------------------------------------------------------------------------
+    // Render helpers
+    // ---------------------------------------------------------------------------
 
-    const handleClear = useCallback(() => {
-        setInputValue("")
-        setInputItems(popularData.popular_teams)
-        onSelect(undefined)
-    }, [setInputValue, onSelect])
+    const renderInput = () => (
+        <div className="relative">
+            {inputValue === "" && (
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground-muted pointer-events-none select-none">
+                    Type to search teams...
+                </span>
+            )}
+            <div
+                ref={inputRef}
+                id={id}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={handleInputChange}
+                onPaste={handleInputPaste}
+                onBlur={handleInputBlur}
+                onFocus={handleInputFocus}
+                onKeyDown={handleKeyDown}
+                tabIndex={0}
+                aria-label={ariaLabel || "Search teams"}
+                aria-autocomplete="list"
+                aria-controls={listboxId}
+                aria-expanded={isOpen}
+                aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
+                role="combobox"
+                className={cn(
+                    "min-h-10 w-full rounded-lg border px-3 py-2 text-sm pr-10",
+                    "bg-background border-border text-foreground",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-800/50",
+                    "transition-all duration-200 ease-in-out",
+                    "whitespace-pre-wrap break-words",
+                    inputClassName,
+                )}
+            />
+        </div>
+    )
+
+    const renderInputSuffix = () => (
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {showSpinner && <Spinner size="sm" aria-label="Loading teams" />}
+            {showClearButton && (
+                <button
+                    type="button"
+                    onClick={handleClear}
+                    className="text-foreground-muted hover:text-foreground transition-colors"
+                    aria-label="Clear search"
+                >
+                    <ClearIcon />
+                </button>
+            )}
+            {!showSpinner && !showClearButton && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        setIsOpen(!isOpen)
+                        inputRef.current?.focus()
+                    }}
+                    className="text-foreground-muted hover:text-foreground transition-colors"
+                    aria-label={isOpen ? "Close dropdown" : "Open dropdown"}
+                    aria-expanded={isOpen}
+                >
+                    <ChevronIcon isOpen={isOpen} />
+                </button>
+            )}
+        </div>
+    )
+
+    const renderEmptyState = () => (
+        <li role="option" aria-selected="false" className="px-4 py-3 text-sm text-foreground-muted">
+            No teams found
+        </li>
+    )
+
+    const renderTeamItem = (team: Team, index: number) => (
+        <li
+            key={team.id}
+            ref={el => {
+                itemRefs.current[index] = el
+            }}
+            id={`${listboxId}-option-${index}`}
+            role="option"
+            aria-selected={highlightedIndex === index}
+            onClick={e => handleItemClick(e, team)}
+            onMouseEnter={() => handleItemMouseEnter(index)}
+            className={cn(
+                "cursor-pointer px-4 py-3 text-sm flex items-center gap-3",
+                highlightedIndex === index && "bg-red-800/20",
+            )}
+        >
+            {team.logo_url && (
+                <img
+                    src={team.logo_url}
+                    alt={team.name}
+                    className="w-6 h-6 object-contain flex-shrink-0"
+                    loading="lazy"
+                />
+            )}
+            <span className="truncate">{team.name}</span>
+        </li>
+    )
+
+    const renderDropdown = () => (
+        <ul
+            ref={listRef}
+            id={listboxId}
+            role="listbox"
+            aria-label={ariaLabel || "Teams"}
+            className="absolute z-50 max-h-72 overflow-auto rounded-lg border border-border-accent bg-background-card shadow-xl w-full top-full mt-1"
+        >
+            {showEmptyState ? renderEmptyState() : items.map(renderTeamItem)}
+        </ul>
+    )
+
+    // ---------------------------------------------------------------------------
+    // Render
+    // ---------------------------------------------------------------------------
 
     return (
-        <div className={cn("relative w-full", className)}>
+        <div ref={containerRef} className={cn("relative w-full", className)}>
             <div className="relative">
-                <input
-                    {...getInputProps({ id, "aria-label": ariaLabel })}
-                    placeholder={placeholder}
-                    className={cn(
-                        "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors",
-                        "placeholder:text-muted-foreground",
-                        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        "disabled:cursor-not-allowed disabled:opacity-50",
-                        "md:text-sm",
-                        "pr-8"
-                    )}
-                />
-                {selectedItem && (
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label="Clear selection"
-                    >
-                        <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                )}
+                {renderInput()}
+                {renderInputSuffix()}
+                {isOpen && renderDropdown()}
             </div>
-
-            <ul
-                {...getMenuProps()}
-                className={cn(
-                    "absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md",
-                    "data-[state=open]:animate-in data-[state=closed]:animate-out",
-                    "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-                    "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-                    !isOpen && "hidden"
-                )}
-            >
-                {isOpen && (
-                    <>
-                        {isLoading && (
-                            <li className="flex items-center justify-center py-4 px-3 text-sm text-muted-foreground">
-                                <Spinner size="sm" className="mr-2" />
-                                Loading...
-                            </li>
-                        )}
-
-                        {error && (
-                            <li className="py-4 px-3 text-sm text-destructive">
-                                {error}
-                            </li>
-                        )}
-
-                        {!isLoading && !error && inputItems.length === 0 && (
-                            <li className="py-4 px-3 text-sm text-muted-foreground">
-                                No teams found
-                            </li>
-                        )}
-
-                        {!isLoading && !error && inputItems.map((item, index) => (
-                            <li
-                                {...getItemProps({ item, index })}
-                                key={`${item.id}-${index}`}
-                                className={cn(
-                                    "relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none",
-                                    highlightedIndex === index && "bg-accent text-accent-foreground",
-                                    selectedItem?.id === item.id && "bg-accent/50"
-                                )}
-                            >
-                                <span className="truncate">{item.name}</span>
-                            </li>
-                        ))}
-                    </>
-                )}
-            </ul>
         </div>
     )
 }

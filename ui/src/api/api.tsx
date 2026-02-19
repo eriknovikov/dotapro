@@ -22,6 +22,11 @@ export type LeagueInfo = {
     tier: string
 }
 
+export type LeagueSearchResult = {
+    league_id: number
+    name: string
+}
+
 export type Series = {
     series_id: number
     start_time: string
@@ -63,6 +68,34 @@ export async function getSeries(params: Filters, signal: AbortSignal): Promise<G
     const res = await fetch(url.toString(), { signal })
     if (!res.ok) {
         throw new Error(`Failed to fetch series: ${res.status} ${res.statusText}`)
+    }
+    const data = await res.json()!
+    return data
+}
+
+export async function searchLeagues(query: string, signal: AbortSignal): Promise<LeagueSearchResult[]> {
+    const url = new URL("http://localhost:8080/filtersmetadata/leagues")
+    url.searchParams.set("q", query)
+    const res = await fetch(url.toString(), { signal })
+    if (!res.ok) {
+        throw new Error(`Failed to search leagues: ${res.status} ${res.statusText}`)
+    }
+    const data = await res.json()!
+    return data
+}
+
+export type TeamSearchResult = {
+    team_id: number
+    name: string
+    logo_url?: string
+}
+
+export async function searchTeams(query: string, signal: AbortSignal): Promise<TeamSearchResult[]> {
+    const url = new URL("http://localhost:8080/filtersmetadata/teams")
+    url.searchParams.set("q", query)
+    const res = await fetch(url.toString(), { signal })
+    if (!res.ok) {
+        throw new Error(`Failed to search teams: ${res.status} ${res.statusText}`)
     }
     const data = await res.json()!
     return data
