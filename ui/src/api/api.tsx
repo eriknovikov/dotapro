@@ -49,6 +49,7 @@ export type GetSeriesResponse = {
 }
 
 export async function getSeries(params: Filters, signal: AbortSignal): Promise<GetSeriesResponse> {
+    await new Promise(res => setTimeout(res, 2000))
     const url = new URL("http://localhost:8080/series")
     if (params.league !== undefined) {
         url.searchParams.set("league", String(params.league))

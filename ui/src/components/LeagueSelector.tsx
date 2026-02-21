@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react"
-import { searchLeagues, type LeagueSearchResult } from "../api/api"
+import { searchLeagues } from "../api/api"
 import { useDebounce } from "../hooks/useDebounce"
 import { cn } from "../lib/utils"
-import { Spinner } from "./ui/spinner"
+import { Spinner } from "./Spinner"
 import popularData from "../assets/static_data.json"
 
 // ============================================================================
@@ -73,7 +73,6 @@ export function LeagueSelector({
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState("")
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
-    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 })
 
     // ---------------------------------------------------------------------------
     // Refs
@@ -204,18 +203,6 @@ export function LeagueSelector({
         }
     }, [items])
 
-    // Calculate dropdown position when it opens
-    useEffect(() => {
-        if (isOpen && inputRef.current) {
-            const rect = inputRef.current.getBoundingClientRect()
-            setDropdownPosition({
-                top: rect.bottom + 6, // 6px margin (mt-1.5)
-                left: rect.left,
-                width: rect.width,
-            })
-        }
-    }, [isOpen])
-
     // Scroll highlighted item into view
     useEffect(() => {
         if (highlightedIndex >= 0 && itemRefs.current[highlightedIndex]) {
@@ -238,21 +225,8 @@ export function LeagueSelector({
             
             if (isExternalUpdateRef.current) {
                 inputRef.current.textContent = inputValue
-                // Only manipulate selection range if there's content to select
-                // This prevents unwanted focus when clearing the input
-                if (inputValue.length > 0) {
-                    const range = document.createRange()
-                    const sel = window.getSelection()
-                    if (inputRef.current.childNodes.length > 0) {
-                        range.selectNodeContents(inputRef.current)
-                        range.collapse(false) // false = collapse to end
-                    } else {
-                        range.setStart(inputRef.current, 0)
-                        range.setEnd(inputRef.current, 0)
-                    }
-                    sel?.removeAllRanges()
-                    sel?.addRange(range)
-                }
+                // Don't manipulate selection range to avoid unwanted focus
+                // The cursor will be placed naturally when user interacts with the input
                 isExternalUpdateRef.current = false
             }
         }

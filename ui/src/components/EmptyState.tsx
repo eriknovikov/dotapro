@@ -28,9 +28,11 @@ export function EmptyState({
             className={cn("flex flex-col items-center justify-center text-center", sizeClasses[size], className)}
             {...props}
         >
-            {icon && <div className="mb-4 text-foreground-muted">{icon}</div>}
-            <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-            {description && <p className="text-foreground-muted max-w-sm mb-4">{description}</p>}
+            <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+                {icon && <span className="text-foreground-muted">{icon}</span>}
+            </div>
+            {description && <p className="text-foreground-muted max-w-sm mb-4 whitespace-nowrap">{description}</p>}
             {action}
         </div>
     )

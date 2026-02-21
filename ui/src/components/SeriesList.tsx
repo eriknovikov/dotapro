@@ -1,6 +1,10 @@
 import type { Series, Pagination } from "../api/api"
 import { SeriesCard } from "./SeriesCard"
-import { EmptyState, ErrorState, Spinner, Button } from "./ui/index"
+import { EmptyState } from "./EmptyState"
+import { ErrorState } from "./ErrorState"
+import { Spinner } from "./Spinner"
+import { SeriesCardSkeleton } from "./Skeleton"
+import { Button } from "./ui/button"
 import { useNavigate } from "@tanstack/react-router"
 import { useSearch } from "@tanstack/react-router"
 
@@ -39,10 +43,20 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-64 bg-background-muted border border-border rounded-lg">
-                <div className="flex items-center space-x-2">
-                    <Spinner />
-                    <span className="text-foreground-muted">Loading series...</span>
+            <div className="w-full">
+                {/* Loading header with spinner */}
+                <div className="flex items-center justify-center h-16 mb-6">
+                    <div className="flex items-center space-x-2">
+                        <Spinner size="lg" />
+                        <span className="text-foreground-muted">Loading series...</span>
+                    </div>
+                </div>
+
+                {/* Skeleton cards matching the grid layout */}
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-6">
+                    {Array.from({ length: 15 }).map((_, i) => (
+                        <SeriesCardSkeleton key={i} />
+                    ))}
                 </div>
             </div>
         )
@@ -51,6 +65,7 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
     if (!series || series.length === 0) {
         return (
             <EmptyState
+                icon="🤕"
                 title="No series found"
                 description="Try adjusting your filters to find what you're looking for."
             />

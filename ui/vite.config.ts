@@ -5,10 +5,12 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import path from "path"
 // https://vite.dev/config/
 export default defineConfig({
-    server: {
-        fs: {
-            // Allow serving files from one level up to the project root
-            allow: ["../../"],
+    build: {
+        // Ensure proper handling for SPA routing
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+            },
         },
     },
     plugins: [
@@ -18,6 +20,7 @@ export default defineConfig({
             autoCodeSplitting: true,
         }),
         react({
+            //reactcompiler is only compatible with babel for now
             babel: {
                 plugins: [["babel-plugin-react-compiler"]],
             },

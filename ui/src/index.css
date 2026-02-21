@@ -1,11 +1,10 @@
+
 @import "tailwindcss";
-
-
 
 
 @font-face {
     font-family: 'Shantell Sans';
-    src: url('@/assets/fonts/shantell-sans-regular.woff2') format('woff2');
+    src: url('/fonts/shantell-sans-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -13,8 +12,16 @@
 
 @font-face {
     font-family: 'Shantell Sans';
-    src: url('@/assets/fonts/shantell-sans-700.woff2') format('woff2');
+    src: url('/fonts/shantell-sans-700.woff2') format('woff2');
     font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/teko-v23-latin-regular.woff2') format('woff2');
+    font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
@@ -127,6 +134,13 @@
     /* Font Size Tokens */
     --font-size-xxs: 0.625rem;
     --font-shantell: 'Shantell Sans', system-ui, sans-serif;
+    
+    /* Logo Font Families */
+    --font-orbitron: 'Orbitron', sans-serif;
+    --font-russo-one: 'Russo One', sans-serif;
+    --font-exo-2: 'Exo 2', sans-serif;
+    --font-teko: 'Teko', sans-serif;
+    --font-chakra-petch: 'Chakra Petch', sans-serif;
 }
 
 /**
@@ -245,4 +259,20 @@ body {
     .no-print {
         display: none !important;
     }
+}
+
+/**
+ * Spinner gradient animation - Golden to Red gradient
+ * Uses border colors with animation
+ */
+@keyframes spinner-gradient {
+    0% { border-top-color: hsl(38, 92%, 50%); transform: rotate(0deg); }
+    25% { border-top-color: hsl(0, 84%, 50%); transform: rotate(90deg); }
+    50% { border-top-color: hsl(38, 92%, 50%); transform: rotate(180deg); }
+    75% { border-top-color: hsl(0, 84%, 50%); transform: rotate(270deg); }
+    100% { border-top-color: hsl(38, 92%, 50%); transform: rotate(360deg); }
+}
+
+.spinner-gradient {
+    animation: spinner-gradient 1s linear infinite;
 }

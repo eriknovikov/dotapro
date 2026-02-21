@@ -8,18 +8,27 @@ export function Navbar() {
     const navLinks = [
         { to: "/", label: "home" },
         { to: "/series", label: "series" },
-        { to: "/matches", label: "matches" },
+        /* { to: "/matches", label: "matches" }, */
         { to: "/about", label: "about" },
+        { to: "/guide", label: "guide" },
     ]
 
     return (
-        <nav className="sticky top-0 z-50 bg-background border-b border-border">
+        <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-lg shadow-primary-500/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo/Brand */}
-                    <div className="shrink-0">
-                        <Link to="/" className="text-xl font-bold text-foreground">
-                            Dotapro
+                    <div className="flex-shrink-0 flex items-center gap-2">
+                        <picture>
+                            <source srcSet="/logo-48.webp" media="(min-width: 768px)" />
+                            <img src="/logo-32x32.webp" alt="Dotapro logo" className="h-8 md:h-12 w-auto" />
+                        </picture>
+
+                        <Link
+                            to="/"
+                            className="text-3xl font-teko bg-gradient-to-r from-foreground to-foreground bg-clip-text text-transparent hover:from-[hsl(38,92%,50%)] hover:to-[hsl(0,84%,50%)]"
+                        >
+                            dotapro.com
                         </Link>
                     </div>
 
@@ -74,7 +83,7 @@ export function Navbar() {
 
             {/* Mobile menu */}
             {isMobileMenuOpen && (
-                <div className="md:hidden bg-background border-t border-border">
+                <div className="md:hidden bg-background/95 backdrop-blur-md border-t border-border/50">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                         {navLinks.map(link => (
                             <Link
@@ -82,7 +91,7 @@ export function Navbar() {
                                 to={link.to}
                                 className="text-foreground-muted hover:text-foreground block px-3 py-2 text-base font-medium transition-colors relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary-500 after:scale-x-0 after:transition-transform after:duration-200 after:origin-center"
                                 activeProps={{
-                                    className: "text-foreground after:scale-x-100",
+                                    className: "after:scale-x-100",
                                 }}
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
