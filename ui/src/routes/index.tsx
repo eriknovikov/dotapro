@@ -34,7 +34,7 @@ function Index() {
 
             {/* Hero Image with Linear-style 3D effect - Full width outside container */}
             <div className="flex items-center justify-center py-12 perspective:[2000px]">
-                <div className="relative transition-all duration-1000 ease-in-out transform-[rotateX(-25deg)_rotateY(10deg)_rotateZ(-1deg)] hover:transform-[rotateX(-15deg)_rotateY(7deg)_rotateZ(0deg)]">
+                <div className="relative transition-shadow duration-300 ease-in-out transform-[rotateX(-25deg)_rotateY(10deg)_rotateZ(-1deg)] hover:shadow-[0_0_0_1px_rgba(0,0,0,.06),0_16px_24px_rgba(0,0,0,.08),0_40px_60px_rgba(0,0,0,.06),0_80px_100px_rgba(0,0,0,.06),0_160px_200px_rgba(0,0,0,.04),0_400px_320px_rgba(0,0,0,.04)]">
                     {/* Ambient Glow (Light Bleed) */}
                     <div className="absolute -inset-4 bg-primary-500/10 blur-3xl opacity-30" aria-hidden="true" />
 
