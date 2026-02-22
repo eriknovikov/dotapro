@@ -121,6 +121,9 @@
     --shadow-2xl: 0 25px 50px -12px hsl(0, 0%, 0% / 0.5);
     --shadow-inner: inset 0 2px 4px 0 hsl(0, 0%, 0% / 0.3);
     --shadow-none: 0 0 #0000;
+    
+    /* Linear-style layered shadow for hero image */
+    --shadow-linear: 0 0 0 1px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.04), 0 10px 15px rgba(0,0,0,.03), 0 20px 25px rgba(0,0,0,.03), 0 40px 50px rgba(0,0,0,.02), 0 100px 80px rgba(0,0,0,.02);
 
     /* Transition Tokens */
     --duration-150: 150ms;

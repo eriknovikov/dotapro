@@ -191,6 +191,5 @@ type GetSeriesFilter struct {
 
 type PaginationData struct {
 	NextCursor *int64 `json:"nc"`       // series_id for next page
-	PrevCursor *int64 `json:"pc"`       // series_id for previous page
 	HasMore    bool   `json:"has_more"` // whether there are more results
 }

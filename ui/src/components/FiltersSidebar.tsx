@@ -36,8 +36,18 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
         })
     }
 
+    const handleLimitChange = (limit: string) => {
+        navigate({
+            to: ".",
+            search: { ...filters, limit: limit === "20" ? undefined : Number(limit), c: undefined },
+        })
+    }
+
     const handleClear = () => {
-        navigate({ to: ".", search: { league: undefined, team: undefined, sort: undefined, c: undefined } })
+        navigate({
+            to: ".",
+            search: { league: undefined, team: undefined, sort: undefined, limit: undefined, c: undefined },
+        })
     }
 
     return (
@@ -117,6 +127,29 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                                 </SelectItem>
                                 <SelectItem value="oldest" disabled={filters.sort === "oldest"}>
                                     Oldest
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Limit Filter */}
+                    <div>
+                        <label htmlFor="limit" className="block text-sm font-medium text-foreground mb-2">
+                            Series per page
+                        </label>
+                        <Select value={String(filters.limit || 20)} onValueChange={handleLimitChange}>
+                            <SelectTrigger id="limit" aria-label="Results per page filter" className="text-sm">
+                                <SelectValue placeholder="20" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="20" disabled={!filters.limit || filters.limit === 20}>
+                                    20
+                                </SelectItem>
+                                <SelectItem value="40" disabled={filters.limit === 40}>
+                                    40
+                                </SelectItem>
+                                <SelectItem value="60" disabled={filters.limit === 60}>
+                                    60
                                 </SelectItem>
                             </SelectContent>
                         </Select>

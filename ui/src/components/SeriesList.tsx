@@ -5,7 +5,7 @@ import { ErrorState } from "./ErrorState"
 import { Spinner } from "./Spinner"
 import { SeriesCardSkeleton } from "./Skeleton"
 import { Button } from "./ui/button"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useRouter } from "@tanstack/react-router"
 import { useSearch } from "@tanstack/react-router"
 
 interface SeriesListProps {
@@ -17,6 +17,7 @@ interface SeriesListProps {
 
 export function SeriesList({ series, isLoading, error, pagination }: SeriesListProps) {
     const navigate = useNavigate()
+    const router = useRouter()
     const search = useSearch({ strict: false })
 
     const handleLoadMore = () => {
@@ -29,12 +30,7 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
     }
 
     const handlePrevious = () => {
-        if (pagination?.pc) {
-            navigate({
-                to: ".",
-                search: { ...search, c: pagination.pc },
-            })
-        }
+        router.history.back()
     }
 
     if (error) {
@@ -82,16 +78,22 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
 
             {/* Pagination Controls */}
             <div className="flex items-center justify-center gap-4 mt-6">
-                {pagination?.pc && (
-                    <Button onClick={handlePrevious} variant="outline" disabled={isLoading}>
-                        Previous
-                    </Button>
-                )}
-                {pagination?.has_more && (
-                    <Button onClick={handleLoadMore} disabled={isLoading}>
-                        Load More
-                    </Button>
-                )}
+                <Button
+                    onClick={handlePrevious}
+                    variant="outline"
+                    disabled={isLoading || !search.c}
+                    className="border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer bg-inherit"
+                >
+                    Previous
+                </Button>
+                <Button
+                    onClick={handleLoadMore}
+                    variant="outline"
+                    disabled={isLoading || !pagination?.nc || !pagination?.has_more}
+                    className="border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer bg-inherit"
+                >
+                    Next
+                </Button>
             </div>
         </div>
     )

@@ -8,12 +8,17 @@ import { Button } from "../components/ui/index"
 
 export const Route = createFileRoute("/series")({
     component: Series,
-    validateSearch: (search: Record<string, unknown>): Filters => ({
-        league: search.league !== undefined ? Number(search.league) : undefined,
-        team: search.team !== undefined ? Number(search.team) : undefined,
-        sort: typeof search.sort === "string" ? search.sort : undefined,
-        c: search.c !== undefined ? Number(search.c) : undefined,
-    }),
+    validateSearch: (search: Record<string, unknown>): Filters => {
+        const validLimits = [20, 40, 60]
+        const limit = search.limit !== undefined ? Number(search.limit) : undefined
+        return {
+            league: search.league !== undefined ? Number(search.league) : undefined,
+            team: search.team !== undefined ? Number(search.team) : undefined,
+            sort: typeof search.sort === "string" ? search.sort : undefined,
+            limit: limit !== undefined && validLimits.includes(limit) ? limit : undefined,
+            c: search.c !== undefined ? Number(search.c) : undefined,
+        }
+    },
 })
 
 function Series() {
@@ -27,6 +32,7 @@ function Series() {
                 league: search.league !== undefined ? Number(search.league) : undefined,
                 team: search.team !== undefined ? Number(search.team) : undefined,
                 sort: search.sort as Filters["sort"],
+                limit: search.limit,
                 c: search.c,
             }
             return getSeries(filters, signal)
@@ -44,12 +50,7 @@ function Series() {
                     className="shadow-lg"
                     aria-label="Open filters"
                 >
-                    <svg
-                        className="h-5 w-5 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
+                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

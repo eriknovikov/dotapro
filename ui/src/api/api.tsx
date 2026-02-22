@@ -39,7 +39,6 @@ export type Series = {
 
 export type Pagination = {
     nc?: number
-    pc?: number
     has_more: boolean
 }
 

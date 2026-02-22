@@ -89,7 +89,6 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 	}
 
 	var nextCursor *int64
-	var prevCursor *int64
 	hasMore := false
 
 	if len(res) > limit {
@@ -101,13 +100,8 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 		}
 	}
 
-	if filter.Cursor != nil {
-		prevCursor = filter.Cursor
-	}
-
 	return res, types.PaginationData{
 		NextCursor: nextCursor,
-		PrevCursor: prevCursor,
 		HasMore:    hasMore,
 	}, nil
 }

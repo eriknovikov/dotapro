@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { Button } from "@/components/ui/button"
 
 export const Route = createFileRoute("/")({
     component: Index,
@@ -6,66 +7,48 @@ export const Route = createFileRoute("/")({
 
 function Index() {
     return (
-        <main className="flex-1 p-6 min-h-[calc(100vh-4rem)]">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[calc(100vh-8rem)]">
-                    {/* Matches Card */}
-                    <Link
-                        to="/matches"
-                        className="group relative overflow-hidden rounded-xl border border-border bg-background-card hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/10"
-                    >
-                        <div className="absolute inset-0 bg-linear-to-br from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="relative h-full flex flex-col items-center justify-center p-12">
-                            <div className="mb-6">
-                                <svg
-                                    className="h-24 w-24 text-foreground-muted group-hover:text-primary-500 transition-colors duration-300"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                                    />
-                                </svg>
-                            </div>
-                            <h2 className="text-4xl font-bold text-foreground mb-2 group-hover:text-primary-500 transition-colors duration-300">
-                                matches
-                            </h2>
-                            <p className="text-foreground-muted text-lg">Browse and explore Dota 2 matches</p>
-                        </div>
-                    </Link>
+        <main className="flex-1 min-h-[calc(100vh-4rem)]">
+            <div className="max-w-7xl mx-auto px-6 py-12">
+                {/* Hero Section */}
+                <div className="flex flex-col items-center text-center mb-16">
+                    <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6">
+                        Dota Pro Analytics
+                    </h1>
+                    <p className="text-xl text-foreground-muted max-w-2xl mb-10">
+                        Explore professional Dota 2 matches and series with powerful filtering and detailed statistics.
+                    </p>
+                    
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Button asChild size="lg" className="text-base px-8">
+                            <Link to="/series">View Series</Link>
+                        </Button>
+                        <Button asChild size="lg" variant="outline" className="text-base px-8">
+                            <Link to="/about">Read Guide</Link>
+                        </Button>
+                    </div>
+                </div>
 
-                    {/* Series Card */}
-                    <Link
-                        to="/series"
-                        className="group relative overflow-hidden rounded-xl border border-border bg-background-card hover:border-secondary-500 transition-all duration-300 hover:shadow-lg hover:shadow-secondary-500/10"
-                    >
-                        <div className="absolute inset-0 bg-linear-to-br from-secondary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="relative h-full flex flex-col items-center justify-center p-12">
-                            <div className="mb-6">
-                                <svg
-                                    className="h-24 w-24 text-foreground-muted group-hover:text-secondary-500 transition-colors duration-300"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                                    />
-                                </svg>
-                            </div>
-                            <h2 className="text-4xl font-bold text-foreground mb-2 group-hover:text-secondary-500 transition-colors duration-300">
-                                series
-                            </h2>
-                            <p className="text-foreground-muted text-lg">View series and tournament results</p>
+                {/* Hero Image with Linear-style 3D effect */}
+                <div className="flex items-center justify-center py-12 [perspective:2000px]">
+                    <div className="relative transition-all duration-700 ease-out [transform:rotateX(25deg)_rotateY(-10deg)_rotateZ(1deg)] hover:[transform:rotateX(15deg)_rotateY(-5deg)_rotateZ(0deg)]">
+                        
+                        {/* Ambient Glow (Light Bleed) */}
+                        <div className="absolute -inset-4 bg-primary-500/20 blur-3xl opacity-50" aria-hidden="true" />
+
+                        {/* Main Image Container */}
+                        <div className="relative rounded-xl border border-white/10 bg-background-card shadow-linear overflow-hidden">
+                            
+                            {/* Top Edge Highlight (Simulates overhead light) */}
+                            <div className="absolute inset-0 border-t border-white/20 pointer-events-none" />
+                            
+                            <img 
+                                src="/scrsh.png" 
+                                alt="Series Screenshot" 
+                                className="block w-full max-w-5xl h-auto"
+                            />
                         </div>
-                    </Link>
+                    </div>
                 </div>
             </div>
         </main>
