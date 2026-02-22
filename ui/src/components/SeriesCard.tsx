@@ -136,9 +136,9 @@ export function SeriesCard({ series }: { series: Series }) {
                 </div>
                 <div className="flex justify-end items-center mt-auto">
                     <Button
-                        variant="outline"
+                        variant="cool-outline"
                         size="sm"
-                        className="w-32 border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer group/btn bg-inherit text-xs"
+                        className="w-32 group/btn text-xs"
                         onClick={() => navigate({ to: `/series/${series.series_id}` })}
                     >
                         View series

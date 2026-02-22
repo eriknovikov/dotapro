@@ -159,9 +159,9 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                     <div className="flex justify-end">
                         <Button
                             onClick={handleClear}
-                            variant="outline"
+                            variant="cool-outline"
                             size="sm"
-                            className="border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer bg-inherit text-sm"
+                            className="text-sm"
                             aria-label="Reset defaults"
                         >
                             Reset defaults

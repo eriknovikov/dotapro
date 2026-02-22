@@ -21,7 +21,7 @@ export function Navbar() {
                     <div className="flex-shrink-0 flex items-center gap-2">
                         <picture>
                             <source srcSet="/logo-48.webp" media="(min-width: 768px)" />
-                            <img src="/logo-32x32.webp" alt="Dotapro logo" className="h-8 md:h-12 w-auto" />
+                            <img src="/logo-32x32.webp" alt="" className="h-8 md:h-12 w-auto" />
                         </picture>
 
                         <Link
