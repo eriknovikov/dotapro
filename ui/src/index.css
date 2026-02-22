@@ -1,7 +1,6 @@
 
 @import "tailwindcss";
 
-
 @font-face {
     font-family: 'Shantell Sans';
     src: url('/fonts/shantell-sans-regular.woff2') format('woff2');
@@ -27,7 +26,6 @@
 }
 
 @theme {
-    /* Primary Colors - Rich Red (Dire) */
     --color-primary-50: hsl(0, 100%, 97%);
     --color-primary-100: hsl(0, 100%, 94%);
     --color-primary-200: hsl(0, 100%, 89%);
@@ -40,7 +38,6 @@
     --color-primary-900: hsl(0, 63%, 31%);
     --color-primary-950: hsl(0, 60%, 15%);
 
-    /* Secondary Colors - Golden Yellow (Radiant) */
     --color-secondary-50: hsl(48, 100%, 97%);
     --color-secondary-100: hsl(48, 100%, 93%);
     --color-secondary-200: hsl(48, 100%, 86%);
@@ -53,7 +50,6 @@
     --color-secondary-900: hsl(38, 80%, 30%);
     --color-secondary-950: hsl(38, 75%, 15%);
 
-    /* Semantic Colors - Dark Theme */
     --color-background: hsl(0, 0%, 4%);
     --color-background-muted: hsl(0, 0%, 7%);
     --color-background-accent: hsl(0, 0%, 10%);
@@ -65,7 +61,6 @@
     --color-border-muted: hsl(0, 0%, 12%);
     --color-border-accent: hsl(0, 0%, 25%);
 
-    /* Status Colors */
     --color-success-50: hsl(142, 76%, 96%);
     --color-success-100: hsl(142, 71%, 91%);
     --color-success-200: hsl(142, 70%, 83%);
@@ -99,12 +94,10 @@
     --color-error-800: hsl(0, 70%, 35%);
     --color-error-900: hsl(0, 63%, 31%);
 
-    /* Spacing Tokens */
     --spacing-18: 4.5rem;
     --spacing-88: 22rem;
     --spacing-128: 32rem;
 
-    /* Border Radius Tokens */
     --radius-sm: 0.25rem;
     --radius-md: 0.375rem;
     --radius-lg: 0.5rem;
@@ -112,7 +105,6 @@
     --radius-2xl: 1rem;
     --radius-3xl: 1.5rem;
 
-    /* Shadow Tokens - Dark Theme Optimized */
     --shadow-sm: 0 1px 2px 0 hsl(0, 0%, 0% / 0.3);
     --shadow: 0 1px 3px 0 hsl(0, 0%, 0% / 0.4), 0 1px 2px -1px hsl(0, 0%, 0% / 0.3);
     --shadow-md: 0 4px 6px -1px hsl(0, 0%, 0% / 0.4), 0 2px 4px -2px hsl(0, 0%, 0% / 0.3);
@@ -121,24 +113,17 @@
     --shadow-2xl: 0 25px 50px -12px hsl(0, 0%, 0% / 0.5);
     --shadow-inner: inset 0 2px 4px 0 hsl(0, 0%, 0% / 0.3);
     --shadow-none: 0 0 #0000;
-    
-    /* Linear-style layered shadow for hero image */
     --shadow-linear: 0 0 0 1px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.04), 0 10px 15px rgba(0,0,0,.03), 0 20px 25px rgba(0,0,0,.03), 0 40px 50px rgba(0,0,0,.02), 0 100px 80px rgba(0,0,0,.02);
 
-    /* Transition Tokens */
     --duration-150: 150ms;
     --duration-200: 200ms;
     --duration-300: 300ms;
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Animation Keyframes */
     --animate-spin: spin 1s linear infinite;
 
-    /* Font Size Tokens */
     --font-size-xxs: 0.625rem;
     --font-shantell: 'Shantell Sans', system-ui, sans-serif;
-    
-    /* Logo Font Families */
     --font-orbitron: 'Orbitron', sans-serif;
     --font-russo-one: 'Russo One', sans-serif;
     --font-exo-2: 'Exo 2', sans-serif;
@@ -146,57 +131,29 @@
     --font-chakra-petch: 'Chakra Petch', sans-serif;
 }
 
-/**
- * Shadcn/ui Compatible CSS Variables
- * Maps shadcn's expected variable names to our custom Dota2-themed colors
- */
 :root {
-    /* Base Colors */
     --background: hsl(0, 0%, 4%);
     --foreground: hsl(0, 0%, 98%);
-
-    /* Card Colors */
     --card: hsl(0, 0%, 8%);
     --card-foreground: hsl(0, 0%, 98%);
-
-    /* Popover Colors */
     --popover: hsl(0, 0%, 8%);
     --popover-foreground: hsl(0, 0%, 98%);
-
-    /* Primary Colors - Rich Red (Dire) */
     --primary: hsl(0, 84%, 50%);
     --primary-foreground: hsl(0, 0%, 98%);
-
-    /* Secondary Colors - Golden Yellow (Radiant) */
     --secondary: hsl(38, 92%, 50%);
     --secondary-foreground: hsl(0, 0%, 4%);
-
-    /* Muted Colors */
     --muted: hsl(0, 0%, 7%);
     --muted-foreground: hsl(0, 0%, 64%);
-
-    /* Accent Colors */
     --accent: hsl(0, 0%, 10%);
     --accent-foreground: hsl(0, 0%, 98%);
-
-    /* Destructive Colors */
     --destructive: hsl(0, 84%, 50%);
     --destructive-foreground: hsl(0, 0%, 98%);
-
-    /* Border & Input */
     --border: hsl(0, 0%, 18%);
     --input: hsl(0, 0%, 18%);
-
-    /* Ring (Focus) */
     --ring: hsl(0, 84%, 50%);
-
-    /* Radius */
     --radius: 0.5rem;
 }
 
-/**
- * Base styles
- */
 * {
     box-sizing: border-box;
 }
@@ -213,17 +170,11 @@ body {
     background-color: hsl(0, 0%, 4%);
 }
 
-/**
- * Focus styles for accessibility
- */
 *:focus-visible {
     outline: 2px solid hsl(0, 84%, 50%);
     outline-offset: 2px;
 }
 
-/**
- * Custom scrollbar styles - Dark Theme
- */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -242,17 +193,11 @@ body {
     background: hsl(0, 0%, 35%);
 }
 
-/**
- * Selection styles
- */
 ::selection {
     background-color: hsl(0, 100%, 89%);
     color: hsl(0, 63%, 31%);
 }
 
-/**
- * Print styles
- */
 @media print {
     body {
         background-color: white;
@@ -264,10 +209,6 @@ body {
     }
 }
 
-/**
- * Spinner gradient animation - Golden to Red gradient
- * Uses border colors with animation
- */
 @keyframes spinner-gradient {
     0% { border-top-color: hsl(38, 92%, 50%); transform: rotate(0deg); }
     25% { border-top-color: hsl(0, 84%, 50%); transform: rotate(90deg); }

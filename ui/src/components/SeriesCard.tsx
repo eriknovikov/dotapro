@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { Series } from "@/api/api"
-import { cn } from "@/lib/utils"
+import { cn, formatRelativeTime } from "@/lib/utils"
 import { Eye } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
@@ -14,17 +14,14 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
         )}
         {...props}
     >
-        {/* Gradient sweep overlay - clip-path animation */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute inset-0 bg-linear-to-br from-primary-500/20 via-primary-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
         </div>
 
-        {/* Subtle inner glow */}
         <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 bg-linear-to-t from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
         </div>
 
-        {/* Content */}
         <div className="relative z-10 flex flex-col h-full">{props.children}</div>
     </div>
 ))
@@ -34,54 +31,6 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />,
 )
 CardContent.displayName = "CardContent"
-
-// Constants for time calculations (defined outside function for efficiency)
-const MS_PER_MINUTE = 60 * 1000
-const MS_PER_HOUR = 60 * MS_PER_MINUTE
-const MS_PER_DAY = 24 * MS_PER_HOUR
-const MS_PER_MONTH = 30.44 * MS_PER_DAY // Average month length
-const MS_PER_YEAR = 365.25 * MS_PER_DAY // Average year length
-
-// Unit labels (defined outside function for efficiency)
-const UNIT_LABELS = ["year", "month", "day", "hour", "minute"] as const
-
-// Helper function to format date as relative time (e.g., "5 days and 3 hours")
-function formatRelativeTime(dateString: string): string {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-
-    // Calculate each unit
-    const years = Math.floor(diffMs / MS_PER_YEAR)
-    const months = Math.floor((diffMs % MS_PER_YEAR) / MS_PER_MONTH)
-    const days = Math.floor((diffMs % MS_PER_MONTH) / MS_PER_DAY)
-    const hours = Math.floor((diffMs % MS_PER_DAY) / MS_PER_HOUR)
-    const minutes = Math.floor((diffMs % MS_PER_HOUR) / MS_PER_MINUTE)
-
-    // Find the biggest non-zero unit
-    const unitValues = [years, months, days, hours, minutes]
-    const firstUnitIndex = unitValues.findIndex(value => value > 0)
-
-    // If no units found, return "just now"
-    if (firstUnitIndex === -1) {
-        return "just now"
-    }
-
-    const firstValue = unitValues[firstUnitIndex]
-    const firstLabel = UNIT_LABELS[firstUnitIndex]
-    const firstPart = `${firstValue} ${firstLabel}${firstValue !== 1 ? "s" : ""}`
-
-    // Check if there's a second unit
-    const secondValue = unitValues[firstUnitIndex + 1]
-    if (!secondValue || secondValue === 0) {
-        return firstPart
-    }
-
-    const secondLabel = UNIT_LABELS[firstUnitIndex + 1]
-    const secondPart = `${secondValue} ${secondLabel}${secondValue !== 1 ? "s" : ""}`
-
-    return `${firstPart} and ${secondPart}`
-}
 
 export function SeriesCard({ series }: { series: Series }) {
     const navigate = useNavigate()

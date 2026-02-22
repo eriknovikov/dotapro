@@ -1,3 +1,5 @@
+const API_BASE_URL = "http://localhost:8080"
+
 export type Filters = {
     league?: number
     team?: number
@@ -6,7 +8,6 @@ export type Filters = {
     c?: number
 }
 
-// @deprecated Use Filters instead
 export type Params = Filters
 
 export type TeamInfo = {
@@ -47,56 +48,42 @@ export type GetSeriesResponse = {
     pagination: Pagination
 }
 
-export async function getSeries(params: Filters, signal: AbortSignal): Promise<GetSeriesResponse> {
-    await new Promise(res => setTimeout(res, 2000))
-    const url = new URL("http://localhost:8080/series")
-    if (params.league !== undefined) {
-        url.searchParams.set("league", String(params.league))
-    }
-    if (params.team !== undefined) {
-        url.searchParams.set("team", String(params.team))
-    }
-    if (params.sort !== undefined) {
-        url.searchParams.set("sort", params.sort)
-    }
-    if (params.limit !== undefined) {
-        url.searchParams.set("limit", String(params.limit))
-    }
-    if (params.c !== undefined) {
-        url.searchParams.set("c", String(params.c))
-    }
-    const res = await fetch(url.toString(), { signal })
-    if (!res.ok) {
-        throw new Error(`Failed to fetch series: ${res.status} ${res.statusText}`)
-    }
-    const data = await res.json()!
-    return data
-}
-
-export async function searchLeagues(query: string, signal: AbortSignal): Promise<LeagueSearchResult[]> {
-    const url = new URL("http://localhost:8080/filtersmetadata/leagues")
-    url.searchParams.set("q", query)
-    const res = await fetch(url.toString(), { signal })
-    if (!res.ok) {
-        throw new Error(`Failed to search leagues: ${res.status} ${res.statusText}`)
-    }
-    const data = await res.json()!
-    return data
-}
-
 export type TeamSearchResult = {
     team_id: number
     name: string
     logo_url?: string
 }
 
-export async function searchTeams(query: string, signal: AbortSignal): Promise<TeamSearchResult[]> {
-    const url = new URL("http://localhost:8080/filtersmetadata/teams")
-    url.searchParams.set("q", query)
+function buildUrl(path: string, params: Record<string, string | number | undefined>): URL {
+    const url = new URL(`${API_BASE_URL}${path}`)
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+            url.searchParams.set(key, String(value))
+        }
+    })
+    return url
+}
+
+async function fetchApi<T>(url: URL, signal: AbortSignal, errorMessage: string): Promise<T> {
     const res = await fetch(url.toString(), { signal })
     if (!res.ok) {
-        throw new Error(`Failed to search teams: ${res.status} ${res.statusText}`)
+        throw new Error(`${errorMessage}: ${res.status} ${res.statusText}`)
     }
-    const data = await res.json()!
-    return data
+    return res.json()
+}
+
+export async function getSeries(params: Filters, signal: AbortSignal): Promise<GetSeriesResponse> {
+    await new Promise(res => setTimeout(res, 2000))
+    const url = buildUrl("/series", params)
+    return fetchApi(url, signal, "Failed to fetch series")
+}
+
+export async function searchLeagues(query: string, signal: AbortSignal): Promise<LeagueSearchResult[]> {
+    const url = buildUrl("/filtersmetadata/leagues", { q: query })
+    return fetchApi(url, signal, "Failed to search leagues")
+}
+
+export async function searchTeams(query: string, signal: AbortSignal): Promise<TeamSearchResult[]> {
+    const url = buildUrl("/filtersmetadata/teams", { q: query })
+    return fetchApi(url, signal, "Failed to search teams")
 }

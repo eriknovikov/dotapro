@@ -76,21 +76,18 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
                 ))}
             </div>
 
-            {/* Pagination Controls */}
             <div className="flex items-center justify-center gap-4 mt-6">
                 <Button
                     onClick={handlePrevious}
-                    variant="outline"
+                    variant="cool-outline"
                     disabled={isLoading || !search.c}
-                    className="border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer bg-inherit"
                 >
                     Previous
                 </Button>
                 <Button
                     onClick={handleLoadMore}
-                    variant="outline"
+                    variant="cool-outline"
                     disabled={isLoading || !pagination?.nc || !pagination?.has_more}
-                    className="border-foreground-muted/50 hover:border-primary-500 hover:text-primary-foreground hover:bg-linear-to-r hover:from-primary-500 hover:to-primary-950 hover:text-white cursor-pointer bg-inherit"
                 >
                     Next
                 </Button>
