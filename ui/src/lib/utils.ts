@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { getHeroById, getItemById } from "./dotautils"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -44,4 +45,42 @@ export function formatRelativeTime(dateString: string): string {
     const secondPart = `${secondValue} ${secondLabel}${secondValue !== 1 ? "s" : ""}`
 
     return `${firstPart} and ${secondPart}`
+}
+
+export function formatDuration(seconds: number): string {
+    const minutes = Math.floor(seconds / 60)
+    return `${minutes} minutes`
+}
+
+export async function copyToClipboard(text: string): Promise<boolean> {
+    try {
+        await navigator.clipboard.writeText(text)
+        return true
+    } catch (err) {
+        console.error("Failed to copy:", err)
+        return false
+    }
+}
+
+// Hero and item image URLs from OpenDota CDN
+// Uses hero_id/item_id to name mapping from dota-data.ts
+
+export function getHeroImageUrl(heroId: number): string {
+    const hero = getHeroById(heroId)
+    if (!hero) {
+        // Fallback to a placeholder if hero not found
+        return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/antimage.png`
+    }
+    // OpenDota CDN pattern: https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/{hero_name}.png
+    return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${hero.name}.png`
+}
+
+export function getItemImageUrl(itemId: number): string {
+    const item = getItemById(itemId)
+    if (!item || itemId === 0) {
+        // Return empty string for empty slots or unknown items
+        return ""
+    }
+    // OpenDota CDN pattern: https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/{item_name}.png
+    return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png`
 }

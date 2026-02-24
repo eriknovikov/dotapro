@@ -1,9 +1,9 @@
 import * as React from "react"
 import type { Series } from "@/api/api"
-import { cn, formatRelativeTime } from "@/lib/utils"
+import { cn, formatRelativeTime } from "@/lib"
 import { Eye } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui"
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
     <div

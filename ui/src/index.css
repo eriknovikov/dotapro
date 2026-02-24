@@ -60,6 +60,11 @@
     --color-border: hsl(0, 0%, 18%);
     --color-border-muted: hsl(0, 0%, 12%);
     --color-border-accent: hsl(0, 0%, 25%);
+    --color-tab-inactive: hsl(0, 0%, 14%);
+    --color-tab-inactive-foreground: hsl(0, 0%, 64%);
+    --color-tab-active: hsl(0, 84%, 50%);
+    --color-tab-active-foreground: hsl(0, 0%, 98%);
+    --color-tab-hover: hsl(0, 0%, 18%);
 
     --color-success-50: hsl(142, 76%, 96%);
     --color-success-100: hsl(142, 71%, 91%);

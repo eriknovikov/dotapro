@@ -1,7 +1,7 @@
 import type { Filters } from "../api/api"
 import { useNavigate } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
-import { Button } from "./ui/index"
+import { Button } from "./ui"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/index"
 import { LeagueSelector } from "./LeagueSelector"
 import { TeamSelector } from "./TeamSelector"

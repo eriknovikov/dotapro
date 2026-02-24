@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib"
 import { AlertCircle } from "lucide-react"
 
 interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {

@@ -4,7 +4,7 @@ import { EmptyState } from "./EmptyState"
 import { ErrorState } from "./ErrorState"
 import { Spinner } from "./Spinner"
 import { SeriesCardSkeleton } from "./Skeleton"
-import { Button } from "./ui/button"
+import { Button } from "./ui"
 import { useNavigate, useRouter } from "@tanstack/react-router"
 import { useSearch } from "@tanstack/react-router"
 

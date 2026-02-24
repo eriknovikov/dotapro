@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react"
 import { searchTeams } from "../api/api"
-import { useDebounce } from "../hooks/useDebounce"
-import { cn } from "../lib/utils"
+import { useDebounce } from "../hooks"
+import { cn, getPopularData } from "../lib"
 import { Spinner } from "./Spinner"
-import popularData from "../assets/static_data.json"
 
 // ============================================================================
 // Types
@@ -115,7 +114,7 @@ export function TeamSelector({
 
     const items = useMemo(() => {
         if (debouncedQuery.trim().length === 0) {
-            return popularData.popular_teams.map(t => ({ id: t.id, name: t.name, logo_url: t.logo_url }))
+            return getPopularData().popular_teams.map(t => ({ id: t.id, name: t.name, logo_url: t.logo_url }))
         }
         return (searchResults || []).map(t => ({ id: t.team_id, name: t.name, logo_url: t.logo_url }))
     }, [debouncedQuery, searchResults])

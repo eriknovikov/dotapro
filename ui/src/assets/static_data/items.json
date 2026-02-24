@@ -1,0 +1,2417 @@
+{
+  "0": {
+    "id": 0,
+    "name": "item_empty",
+    "displayName": "Empty"
+  },
+  "1": {
+    "id": 1,
+    "name": "blink",
+    "displayName": "Blink Dagger"
+  },
+  "2": {
+    "id": 2,
+    "name": "blades_of_attack",
+    "displayName": "Blades of Attack"
+  },
+  "3": {
+    "id": 3,
+    "name": "broadsword",
+    "displayName": "Broadsword"
+  },
+  "4": {
+    "id": 4,
+    "name": "chainmail",
+    "displayName": "Chainmail"
+  },
+  "5": {
+    "id": 5,
+    "name": "claymore",
+    "displayName": "Claymore"
+  },
+  "6": {
+    "id": 6,
+    "name": "helm_of_iron_will",
+    "displayName": "Helm of Iron Will"
+  },
+  "7": {
+    "id": 7,
+    "name": "javelin",
+    "displayName": "Javelin"
+  },
+  "8": {
+    "id": 8,
+    "name": "mithril_hammer",
+    "displayName": "Mithril Hammer"
+  },
+  "9": {
+    "id": 9,
+    "name": "platemail",
+    "displayName": "Platemail"
+  },
+  "10": {
+    "id": 10,
+    "name": "quarterstaff",
+    "displayName": "Quarterstaff"
+  },
+  "11": {
+    "id": 11,
+    "name": "quelling_blade",
+    "displayName": "Quelling Blade"
+  },
+  "12": {
+    "id": 12,
+    "name": "ring_of_protection",
+    "displayName": "Ring of Protection"
+  },
+  "13": {
+    "id": 13,
+    "name": "gauntlets",
+    "displayName": "Gauntlets of Strength"
+  },
+  "14": {
+    "id": 14,
+    "name": "slippers",
+    "displayName": "Slippers of Agility"
+  },
+  "15": {
+    "id": 15,
+    "name": "mantle",
+    "displayName": "Mantle of Intelligence"
+  },
+  "16": {
+    "id": 16,
+    "name": "branches",
+    "displayName": "Iron Branch"
+  },
+  "17": {
+    "id": 17,
+    "name": "belt_of_strength",
+    "displayName": "Belt of Strength"
+  },
+  "18": {
+    "id": 18,
+    "name": "boots_of_elves",
+    "displayName": "Band of Elvenskin"
+  },
+  "19": {
+    "id": 19,
+    "name": "robe",
+    "displayName": "Robe of the Magi"
+  },
+  "20": {
+    "id": 20,
+    "name": "circlet",
+    "displayName": "Circlet"
+  },
+  "21": {
+    "id": 21,
+    "name": "ogre_axe",
+    "displayName": "Ogre Axe"
+  },
+  "22": {
+    "id": 22,
+    "name": "blade_of_alacrity",
+    "displayName": "Blade of Alacrity"
+  },
+  "23": {
+    "id": 23,
+    "name": "staff_of_wizardry",
+    "displayName": "Staff of Wizardry"
+  },
+  "24": {
+    "id": 24,
+    "name": "ultimate_orb",
+    "displayName": "Ultimate Orb"
+  },
+  "25": {
+    "id": 25,
+    "name": "gloves",
+    "displayName": "Gloves of Haste"
+  },
+  "26": {
+    "id": 26,
+    "name": "lifesteal",
+    "displayName": "Morbid Mask"
+  },
+  "27": {
+    "id": 27,
+    "name": "ring_of_regen",
+    "displayName": "Ring of Regen"
+  },
+  "28": {
+    "id": 28,
+    "name": "sobi_mask",
+    "displayName": "Sage's Mask"
+  },
+  "29": {
+    "id": 29,
+    "name": "boots",
+    "displayName": "Boots of Speed"
+  },
+  "30": {
+    "id": 30,
+    "name": "gem",
+    "displayName": "Gem of True Sight"
+  },
+  "31": {
+    "id": 31,
+    "name": "cloak",
+    "displayName": "Cloak"
+  },
+  "32": {
+    "id": 32,
+    "name": "talisman_of_evasion",
+    "displayName": "Talisman of Evasion"
+  },
+  "33": {
+    "id": 33,
+    "name": "cheese",
+    "displayName": "Cheese"
+  },
+  "34": {
+    "id": 34,
+    "name": "magic_stick",
+    "displayName": "Magic Stick"
+  },
+  "35": {
+    "id": 35,
+    "name": "recipe_magic_wand",
+    "displayName": "Magic Wand Recipe"
+  },
+  "36": {
+    "id": 36,
+    "name": "magic_wand",
+    "displayName": "Magic Wand"
+  },
+  "37": {
+    "id": 37,
+    "name": "ghost",
+    "displayName": "Ghost Scepter"
+  },
+  "38": {
+    "id": 38,
+    "name": "clarity",
+    "displayName": "Clarity"
+  },
+  "39": {
+    "id": 39,
+    "name": "flask",
+    "displayName": "Healing Salve"
+  },
+  "40": {
+    "id": 40,
+    "name": "dust",
+    "displayName": "Dust of Appearance"
+  },
+  "41": {
+    "id": 41,
+    "name": "bottle",
+    "displayName": "Bottle"
+  },
+  "42": {
+    "id": 42,
+    "name": "ward_observer",
+    "displayName": "Observer Ward"
+  },
+  "43": {
+    "id": 43,
+    "name": "ward_sentry",
+    "displayName": "Sentry Ward"
+  },
+  "44": {
+    "id": 44,
+    "name": "tango",
+    "displayName": "Tango"
+  },
+  "45": {
+    "id": 45,
+    "name": "courier",
+    "displayName": "Animal Courier"
+  },
+  "46": {
+    "id": 46,
+    "name": "tpscroll",
+    "displayName": "Town Portal Scroll"
+  },
+  "47": {
+    "id": 47,
+    "name": "recipe_travel_boots",
+    "displayName": "Boots of Travel Recipe"
+  },
+  "48": {
+    "id": 48,
+    "name": "travel_boots",
+    "displayName": "Boots of Travel"
+  },
+  "50": {
+    "id": 50,
+    "name": "phase_boots",
+    "displayName": "Phase Boots"
+  },
+  "51": {
+    "id": 51,
+    "name": "demon_edge",
+    "displayName": "Demon Edge"
+  },
+  "52": {
+    "id": 52,
+    "name": "eagle",
+    "displayName": "Eaglesong"
+  },
+  "53": {
+    "id": 53,
+    "name": "reaver",
+    "displayName": "Reaver"
+  },
+  "54": {
+    "id": 54,
+    "name": "relic",
+    "displayName": "Sacred Relic"
+  },
+  "55": {
+    "id": 55,
+    "name": "hyperstone",
+    "displayName": "Hyperstone"
+  },
+  "56": {
+    "id": 56,
+    "name": "ring_of_health",
+    "displayName": "Ring of Health"
+  },
+  "57": {
+    "id": 57,
+    "name": "void_stone",
+    "displayName": "Void Stone"
+  },
+  "58": {
+    "id": 58,
+    "name": "mystic_staff",
+    "displayName": "Mystic Staff"
+  },
+  "59": {
+    "id": 59,
+    "name": "energy_booster",
+    "displayName": "Energy Booster"
+  },
+  "60": {
+    "id": 60,
+    "name": "point_booster",
+    "displayName": "Point Booster"
+  },
+  "61": {
+    "id": 61,
+    "name": "vitality_booster",
+    "displayName": "Vitality Booster"
+  },
+  "63": {
+    "id": 63,
+    "name": "power_treads",
+    "displayName": "Power Treads"
+  },
+  "64": {
+    "id": 64,
+    "name": "recipe_hand_of_midas",
+    "displayName": "Hand of Midas Recipe"
+  },
+  "65": {
+    "id": 65,
+    "name": "hand_of_midas",
+    "displayName": "Hand of Midas"
+  },
+  "67": {
+    "id": 67,
+    "name": "oblivion_staff",
+    "displayName": "Oblivion Staff"
+  },
+  "69": {
+    "id": 69,
+    "name": "pers",
+    "displayName": "Perseverance"
+  },
+  "72": {
+    "id": 72,
+    "name": "recipe_bracer",
+    "displayName": "Bracer Recipe"
+  },
+  "73": {
+    "id": 73,
+    "name": "bracer",
+    "displayName": "Bracer"
+  },
+  "74": {
+    "id": 74,
+    "name": "recipe_wraith_band",
+    "displayName": "Wraith Band Recipe"
+  },
+  "75": {
+    "id": 75,
+    "name": "wraith_band",
+    "displayName": "Wraith Band"
+  },
+  "76": {
+    "id": 76,
+    "name": "recipe_null_talisman",
+    "displayName": "Null Talisman Recipe"
+  },
+  "77": {
+    "id": 77,
+    "name": "null_talisman",
+    "displayName": "Null Talisman"
+  },
+  "78": {
+    "id": 78,
+    "name": "recipe_mekansm",
+    "displayName": "Mekansm Recipe"
+  },
+  "79": {
+    "id": 79,
+    "name": "mekansm",
+    "displayName": "Mekansm"
+  },
+  "81": {
+    "id": 81,
+    "name": "vladmir",
+    "displayName": "Vladmir's Offering"
+  },
+  "85": {
+    "id": 85,
+    "name": "recipe_buckler",
+    "displayName": "Buckler Recipe"
+  },
+  "86": {
+    "id": 86,
+    "name": "buckler",
+    "displayName": "Buckler"
+  },
+  "87": {
+    "id": 87,
+    "name": "recipe_ring_of_basilius",
+    "displayName": "Ring of Basilius Recipe"
+  },
+  "88": {
+    "id": 88,
+    "name": "ring_of_basilius",
+    "displayName": "Ring of Basilius"
+  },
+  "89": {
+    "id": 89,
+    "name": "recipe_pipe",
+    "displayName": "Pipe of Insight Recipe"
+  },
+  "90": {
+    "id": 90,
+    "name": "pipe",
+    "displayName": "Pipe of Insight"
+  },
+  "91": {
+    "id": 91,
+    "name": "recipe_urn_of_shadows",
+    "displayName": "Urn of Shadows Recipe"
+  },
+  "92": {
+    "id": 92,
+    "name": "urn_of_shadows",
+    "displayName": "Urn of Shadows"
+  },
+  "93": {
+    "id": 93,
+    "name": "recipe_headdress",
+    "displayName": "Headdress Recipe"
+  },
+  "94": {
+    "id": 94,
+    "name": "headdress",
+    "displayName": "Headdress"
+  },
+  "95": {
+    "id": 95,
+    "name": "recipe_sheepstick",
+    "displayName": "Scythe of Vyse Recipe"
+  },
+  "96": {
+    "id": 96,
+    "name": "sheepstick",
+    "displayName": "Scythe of Vyse"
+  },
+  "97": {
+    "id": 97,
+    "name": "recipe_orchid",
+    "displayName": "Orchid Malevolence Recipe"
+  },
+  "98": {
+    "id": 98,
+    "name": "orchid",
+    "displayName": "Orchid Malevolence"
+  },
+  "99": {
+    "id": 99,
+    "name": "recipe_cyclone",
+    "displayName": "Eul's Scepter Recipe"
+  },
+  "100": {
+    "id": 100,
+    "name": "cyclone",
+    "displayName": "Eul's Scepter of Divinity"
+  },
+  "101": {
+    "id": 101,
+    "name": "recipe_force_staff",
+    "displayName": "Force Staff Recipe"
+  },
+  "102": {
+    "id": 102,
+    "name": "force_staff",
+    "displayName": "Force Staff"
+  },
+  "103": {
+    "id": 103,
+    "name": "recipe_dagon",
+    "displayName": "Dagon Recipe"
+  },
+  "104": {
+    "id": 104,
+    "name": "dagon",
+    "displayName": "Dagon"
+  },
+  "105": {
+    "id": 105,
+    "name": "recipe_necronomicon",
+    "displayName": "Necronomicon Recipe"
+  },
+  "106": {
+    "id": 106,
+    "name": "necronomicon",
+    "displayName": "Necronomicon"
+  },
+  "108": {
+    "id": 108,
+    "name": "ultimate_scepter",
+    "displayName": "Aghanim's Scepter"
+  },
+  "109": {
+    "id": 109,
+    "name": "recipe_refresher",
+    "displayName": "Refresher Orb Recipe"
+  },
+  "110": {
+    "id": 110,
+    "name": "refresher",
+    "displayName": "Refresher Orb"
+  },
+  "111": {
+    "id": 111,
+    "name": "recipe_assault",
+    "displayName": "Assault Cuirass Recipe"
+  },
+  "112": {
+    "id": 112,
+    "name": "assault",
+    "displayName": "Assault Cuirass"
+  },
+  "113": {
+    "id": 113,
+    "name": "recipe_heart",
+    "displayName": "Heart of Tarrasque Recipe"
+  },
+  "114": {
+    "id": 114,
+    "name": "heart",
+    "displayName": "Heart of Tarrasque"
+  },
+  "115": {
+    "id": 115,
+    "name": "recipe_black_king_bar",
+    "displayName": "Black King Bar Recipe"
+  },
+  "116": {
+    "id": 116,
+    "name": "black_king_bar",
+    "displayName": "Black King Bar"
+  },
+  "117": {
+    "id": 117,
+    "name": "aegis",
+    "displayName": "Aegis of the Immortal"
+  },
+  "118": {
+    "id": 118,
+    "name": "recipe_shivas_guard",
+    "displayName": "Shiva's Guard Recipe"
+  },
+  "119": {
+    "id": 119,
+    "name": "shivas_guard",
+    "displayName": "Shiva's Guard"
+  },
+  "121": {
+    "id": 121,
+    "name": "bloodstone",
+    "displayName": "Bloodstone"
+  },
+  "122": {
+    "id": 122,
+    "name": "recipe_sphere",
+    "displayName": "Linken's Sphere Recipe"
+  },
+  "123": {
+    "id": 123,
+    "name": "sphere",
+    "displayName": "Linken's Sphere"
+  },
+  "125": {
+    "id": 125,
+    "name": "vanguard",
+    "displayName": "Vanguard"
+  },
+  "126": {
+    "id": 126,
+    "name": "recipe_blade_mail",
+    "displayName": "Blade Mail Recipe"
+  },
+  "127": {
+    "id": 127,
+    "name": "blade_mail",
+    "displayName": "Blade Mail"
+  },
+  "129": {
+    "id": 129,
+    "name": "soul_booster",
+    "displayName": "Soul Booster"
+  },
+  "131": {
+    "id": 131,
+    "name": "hood_of_defiance",
+    "displayName": "Hood of Defiance"
+  },
+  "133": {
+    "id": 133,
+    "name": "rapier",
+    "displayName": "Divine Rapier"
+  },
+  "134": {
+    "id": 134,
+    "name": "recipe_monkey_king_bar",
+    "displayName": "Monkey King Bar Recipe"
+  },
+  "135": {
+    "id": 135,
+    "name": "monkey_king_bar",
+    "displayName": "Monkey King Bar"
+  },
+  "137": {
+    "id": 137,
+    "name": "radiance",
+    "displayName": "Radiance"
+  },
+  "139": {
+    "id": 139,
+    "name": "butterfly",
+    "displayName": "Butterfly"
+  },
+  "140": {
+    "id": 140,
+    "name": "recipe_greater_crit",
+    "displayName": "Daedalus Recipe"
+  },
+  "141": {
+    "id": 141,
+    "name": "greater_crit",
+    "displayName": "Daedalus"
+  },
+  "142": {
+    "id": 142,
+    "name": "recipe_basher",
+    "displayName": "Skull Basher Recipe"
+  },
+  "143": {
+    "id": 143,
+    "name": "basher",
+    "displayName": "Skull Basher"
+  },
+  "144": {
+    "id": 144,
+    "name": "recipe_bfury",
+    "displayName": "Battle Fury Recipe"
+  },
+  "145": {
+    "id": 145,
+    "name": "bfury",
+    "displayName": "Battle Fury"
+  },
+  "146": {
+    "id": 146,
+    "name": "recipe_manta",
+    "displayName": "Manta Style Recipe"
+  },
+  "147": {
+    "id": 147,
+    "name": "manta",
+    "displayName": "Manta Style"
+  },
+  "148": {
+    "id": 148,
+    "name": "recipe_lesser_crit",
+    "displayName": "Crystalys Recipe"
+  },
+  "149": {
+    "id": 149,
+    "name": "lesser_crit",
+    "displayName": "Crystalys"
+  },
+  "150": {
+    "id": 150,
+    "name": "recipe_armlet",
+    "displayName": "Armlet of Mordiggian Recipe"
+  },
+  "151": {
+    "id": 151,
+    "name": "armlet",
+    "displayName": "Armlet of Mordiggian"
+  },
+  "152": {
+    "id": 152,
+    "name": "invis_sword",
+    "displayName": "Shadow Blade"
+  },
+  "154": {
+    "id": 154,
+    "name": "sange_and_yasha",
+    "displayName": "Sange and Yasha"
+  },
+  "156": {
+    "id": 156,
+    "name": "satanic",
+    "displayName": "Satanic"
+  },
+  "157": {
+    "id": 157,
+    "name": "recipe_mjollnir",
+    "displayName": "Mjollnir Recipe"
+  },
+  "158": {
+    "id": 158,
+    "name": "mjollnir",
+    "displayName": "Mjollnir"
+  },
+  "160": {
+    "id": 160,
+    "name": "skadi",
+    "displayName": "Eye of Skadi"
+  },
+  "161": {
+    "id": 161,
+    "name": "recipe_sange",
+    "displayName": "Sange Recipe"
+  },
+  "162": {
+    "id": 162,
+    "name": "sange",
+    "displayName": "Sange"
+  },
+  "163": {
+    "id": 163,
+    "name": "recipe_helm_of_the_dominator",
+    "displayName": "Helm of the Dominator Recipe"
+  },
+  "164": {
+    "id": 164,
+    "name": "helm_of_the_dominator",
+    "displayName": "Helm of the Dominator"
+  },
+  "166": {
+    "id": 166,
+    "name": "maelstrom",
+    "displayName": "Maelstrom"
+  },
+  "168": {
+    "id": 168,
+    "name": "desolator",
+    "displayName": "Desolator"
+  },
+  "169": {
+    "id": 169,
+    "name": "recipe_yasha",
+    "displayName": "Yasha Recipe"
+  },
+  "170": {
+    "id": 170,
+    "name": "yasha",
+    "displayName": "Yasha"
+  },
+  "172": {
+    "id": 172,
+    "name": "mask_of_madness",
+    "displayName": "Mask of Madness"
+  },
+  "173": {
+    "id": 173,
+    "name": "recipe_diffusal_blade",
+    "displayName": "Diffusal Blade Recipe"
+  },
+  "174": {
+    "id": 174,
+    "name": "diffusal_blade",
+    "displayName": "Diffusal Blade"
+  },
+  "175": {
+    "id": 175,
+    "name": "recipe_ethereal_blade",
+    "displayName": "Ethereal Blade Recipe"
+  },
+  "176": {
+    "id": 176,
+    "name": "ethereal_blade",
+    "displayName": "Ethereal Blade"
+  },
+  "177": {
+    "id": 177,
+    "name": "recipe_soul_ring",
+    "displayName": "Soul Ring Recipe"
+  },
+  "178": {
+    "id": 178,
+    "name": "soul_ring",
+    "displayName": "Soul Ring"
+  },
+  "179": {
+    "id": 179,
+    "name": "recipe_arcane_boots",
+    "displayName": "Arcane Boots Recipe"
+  },
+  "180": {
+    "id": 180,
+    "name": "arcane_boots",
+    "displayName": "Arcane Boots"
+  },
+  "181": {
+    "id": 181,
+    "name": "orb_of_venom",
+    "displayName": "Orb of Venom"
+  },
+  "182": {
+    "id": 182,
+    "name": "stout_shield",
+    "displayName": "Stout Shield"
+  },
+  "184": {
+    "id": 184,
+    "name": "recipe_ancient_janggo",
+    "displayName": "Drum of Endurance Recipe"
+  },
+  "185": {
+    "id": 185,
+    "name": "ancient_janggo",
+    "displayName": "Drum of Endurance"
+  },
+  "187": {
+    "id": 187,
+    "name": "medallion_of_courage",
+    "displayName": "Medallion of Courage"
+  },
+  "188": {
+    "id": 188,
+    "name": "smoke_of_deceit",
+    "displayName": "Smoke of Deceit"
+  },
+  "189": {
+    "id": 189,
+    "name": "recipe_veil_of_discord",
+    "displayName": "Veil of Discord Recipe"
+  },
+  "190": {
+    "id": 190,
+    "name": "veil_of_discord",
+    "displayName": "Veil of Discord"
+  },
+  "193": {
+    "id": 193,
+    "name": "necronomicon_2",
+    "displayName": "Necronomicon"
+  },
+  "194": {
+    "id": 194,
+    "name": "necronomicon_3",
+    "displayName": "Necronomicon"
+  },
+  "196": {
+    "id": 196,
+    "name": "diffusal_blade_2",
+    "displayName": "Diffusal Blade"
+  },
+  "201": {
+    "id": 201,
+    "name": "dagon_2",
+    "displayName": "Dagon"
+  },
+  "202": {
+    "id": 202,
+    "name": "dagon_3",
+    "displayName": "Dagon"
+  },
+  "203": {
+    "id": 203,
+    "name": "dagon_4",
+    "displayName": "Dagon"
+  },
+  "204": {
+    "id": 204,
+    "name": "dagon_5",
+    "displayName": "Dagon"
+  },
+  "205": {
+    "id": 205,
+    "name": "recipe_rod_of_atos",
+    "displayName": "Rod of Atos Recipe"
+  },
+  "206": {
+    "id": 206,
+    "name": "rod_of_atos",
+    "displayName": "Rod of Atos"
+  },
+  "207": {
+    "id": 207,
+    "name": "recipe_abyssal_blade",
+    "displayName": "Abyssal Blade Recipe"
+  },
+  "208": {
+    "id": 208,
+    "name": "abyssal_blade",
+    "displayName": "Abyssal Blade"
+  },
+  "209": {
+    "id": 209,
+    "name": "recipe_heavens_halberd",
+    "displayName": "Heaven's Halberd Recipe"
+  },
+  "210": {
+    "id": 210,
+    "name": "heavens_halberd",
+    "displayName": "Heaven's Halberd"
+  },
+  "212": {
+    "id": 212,
+    "name": "ring_of_aquila",
+    "displayName": "Ring of Aquila"
+  },
+  "214": {
+    "id": 214,
+    "name": "tranquil_boots",
+    "displayName": "Tranquil Boots"
+  },
+  "215": {
+    "id": 215,
+    "name": "shadow_amulet",
+    "displayName": "Shadow Amulet"
+  },
+  "216": {
+    "id": 216,
+    "name": "enchanted_mango",
+    "displayName": "Enchanted Mango"
+  },
+  "218": {
+    "id": 218,
+    "name": "ward_dispenser",
+    "displayName": "Observer and Sentry Wards"
+  },
+  "220": {
+    "id": 220,
+    "name": "travel_boots_2",
+    "displayName": "Boots of Travel 2"
+  },
+  "221": {
+    "id": 221,
+    "name": "recipe_lotus_orb",
+    "displayName": "Lotus Orb Recipe"
+  },
+  "222": {
+    "id": 222,
+    "name": "recipe_meteor_hammer",
+    "displayName": "Meteor Hammer Recipe"
+  },
+  "223": {
+    "id": 223,
+    "name": "meteor_hammer",
+    "displayName": "Meteor Hammer"
+  },
+  "225": {
+    "id": 225,
+    "name": "nullifier",
+    "displayName": "Nullifier"
+  },
+  "226": {
+    "id": 226,
+    "name": "lotus_orb",
+    "displayName": "Lotus Orb"
+  },
+  "227": {
+    "id": 227,
+    "name": "recipe_solar_crest",
+    "displayName": "Solar Crest Recipe"
+  },
+  "228": {
+    "id": 228,
+    "name": "recipe_octarine_core",
+    "displayName": "Octarine Core Recipe"
+  },
+  "229": {
+    "id": 229,
+    "name": "solar_crest",
+    "displayName": "Solar Crest"
+  },
+  "230": {
+    "id": 230,
+    "name": "recipe_guardian_greaves",
+    "displayName": "Guardian Greaves Recipe"
+  },
+  "231": {
+    "id": 231,
+    "name": "guardian_greaves",
+    "displayName": "Guardian Greaves"
+  },
+  "232": {
+    "id": 232,
+    "name": "aether_lens",
+    "displayName": "Aether Lens"
+  },
+  "233": {
+    "id": 233,
+    "name": "recipe_aether_lens",
+    "displayName": "Aether Lens Recipe"
+  },
+  "234": {
+    "id": 234,
+    "name": "recipe_dragon_lance",
+    "displayName": "Dragon Lance Recipe"
+  },
+  "235": {
+    "id": 235,
+    "name": "octarine_core",
+    "displayName": "Octarine Core"
+  },
+  "236": {
+    "id": 236,
+    "name": "dragon_lance",
+    "displayName": "Dragon Lance"
+  },
+  "237": {
+    "id": 237,
+    "name": "faerie_fire",
+    "displayName": "Faerie Fire"
+  },
+  "238": {
+    "id": 238,
+    "name": "recipe_iron_talon",
+    "displayName": "Iron Talon Recipe"
+  },
+  "239": {
+    "id": 239,
+    "name": "iron_talon",
+    "displayName": "Iron Talon"
+  },
+  "240": {
+    "id": 240,
+    "name": "blight_stone",
+    "displayName": "Orb of Blight"
+  },
+  "241": {
+    "id": 241,
+    "name": "tango_single",
+    "displayName": "Tango (Shared)"
+  },
+  "242": {
+    "id": 242,
+    "name": "crimson_guard",
+    "displayName": "Crimson Guard"
+  },
+  "243": {
+    "id": 243,
+    "name": "recipe_crimson_guard",
+    "displayName": "Crimson Guard Recipe"
+  },
+  "244": {
+    "id": 244,
+    "name": "wind_lace",
+    "displayName": "Wind Lace"
+  },
+  "245": {
+    "id": 245,
+    "name": "recipe_bloodthorn",
+    "displayName": "Bloodthorn Recipe"
+  },
+  "247": {
+    "id": 247,
+    "name": "moon_shard",
+    "displayName": "Moon Shard"
+  },
+  "248": {
+    "id": 248,
+    "name": "recipe_silver_edge",
+    "displayName": "Silver Edge Recipe"
+  },
+  "249": {
+    "id": 249,
+    "name": "silver_edge",
+    "displayName": "Silver Edge"
+  },
+  "250": {
+    "id": 250,
+    "name": "bloodthorn",
+    "displayName": "Bloodthorn"
+  },
+  "252": {
+    "id": 252,
+    "name": "echo_sabre",
+    "displayName": "Echo Sabre"
+  },
+  "253": {
+    "id": 253,
+    "name": "recipe_glimmer_cape",
+    "displayName": "Glimmer Cape Recipe"
+  },
+  "254": {
+    "id": 254,
+    "name": "glimmer_cape",
+    "displayName": "Glimmer Cape"
+  },
+  "255": {
+    "id": 255,
+    "name": "recipe_aeon_disk",
+    "displayName": "Aeon Disk Recipe"
+  },
+  "256": {
+    "id": 256,
+    "name": "aeon_disk",
+    "displayName": "Aeon Disk"
+  },
+  "257": {
+    "id": 257,
+    "name": "tome_of_knowledge",
+    "displayName": "Tome of Knowledge"
+  },
+  "258": {
+    "id": 258,
+    "name": "recipe_kaya",
+    "displayName": "Kaya Recipe"
+  },
+  "259": {
+    "id": 259,
+    "name": "kaya",
+    "displayName": "Kaya"
+  },
+  "260": {
+    "id": 260,
+    "name": "refresher_shard",
+    "displayName": "Refresher Shard"
+  },
+  "261": {
+    "id": 261,
+    "name": "crown",
+    "displayName": "Crown"
+  },
+  "262": {
+    "id": 262,
+    "name": "recipe_hurricane_pike",
+    "displayName": "Hurricane Pike Recipe"
+  },
+  "263": {
+    "id": 263,
+    "name": "hurricane_pike",
+    "displayName": "Hurricane Pike"
+  },
+  "265": {
+    "id": 265,
+    "name": "infused_raindrop",
+    "displayName": "Infused Raindrops"
+  },
+  "266": {
+    "id": 266,
+    "name": "recipe_spirit_vessel",
+    "displayName": "Spirit Vessel Recipe"
+  },
+  "267": {
+    "id": 267,
+    "name": "spirit_vessel",
+    "displayName": "Spirit Vessel"
+  },
+  "268": {
+    "id": 268,
+    "name": "recipe_holy_locket",
+    "displayName": "Holy Locket Recipe"
+  },
+  "269": {
+    "id": 269,
+    "name": "holy_locket",
+    "displayName": "Holy Locket"
+  },
+  "270": {
+    "id": 270,
+    "name": "recipe_ultimate_scepter_2",
+    "displayName": "Aghanim's Blessing Recipe"
+  },
+  "271": {
+    "id": 271,
+    "name": "ultimate_scepter_2",
+    "displayName": "Aghanim's Blessing"
+  },
+  "273": {
+    "id": 273,
+    "name": "kaya_and_sange",
+    "displayName": "Kaya and Sange"
+  },
+  "275": {
+    "id": 275,
+    "name": "recipe_trident",
+    "displayName": "Trident Recipe"
+  },
+  "276": {
+    "id": 276,
+    "name": "combo_breaker",
+    "displayName": "combo_breaker"
+  },
+  "277": {
+    "id": 277,
+    "name": "yasha_and_kaya",
+    "displayName": "Yasha and Kaya"
+  },
+  "279": {
+    "id": 279,
+    "name": "ring_of_tarrasque",
+    "displayName": "Ring of Tarrasque"
+  },
+  "286": {
+    "id": 286,
+    "name": "flying_courier",
+    "displayName": "Flying Courier"
+  },
+  "287": {
+    "id": 287,
+    "name": "keen_optic",
+    "displayName": "Keen Optic"
+  },
+  "288": {
+    "id": 288,
+    "name": "grove_bow",
+    "displayName": "Grove Bow"
+  },
+  "289": {
+    "id": 289,
+    "name": "quickening_charm",
+    "displayName": "Quickening Charm"
+  },
+  "290": {
+    "id": 290,
+    "name": "philosophers_stone",
+    "displayName": "Philosopher's Stone"
+  },
+  "291": {
+    "id": 291,
+    "name": "force_boots",
+    "displayName": "Force Boots"
+  },
+  "293": {
+    "id": 293,
+    "name": "phoenix_ash",
+    "displayName": "Phoenix Ash"
+  },
+  "294": {
+    "id": 294,
+    "name": "seer_stone",
+    "displayName": "Seer Stone"
+  },
+  "295": {
+    "id": 295,
+    "name": "greater_mango",
+    "displayName": "greater_mango"
+  },
+  "297": {
+    "id": 297,
+    "name": "vampire_fangs",
+    "displayName": "Vampire Fangs"
+  },
+  "298": {
+    "id": 298,
+    "name": "craggy_coat",
+    "displayName": "Craggy Coat"
+  },
+  "299": {
+    "id": 299,
+    "name": "greater_faerie_fire",
+    "displayName": "Greater Faerie Fire"
+  },
+  "300": {
+    "id": 300,
+    "name": "timeless_relic",
+    "displayName": "Timeless Relic"
+  },
+  "301": {
+    "id": 301,
+    "name": "mirror_shield",
+    "displayName": "Mirror Shield"
+  },
+  "302": {
+    "id": 302,
+    "name": "elixer",
+    "displayName": "Elixir"
+  },
+  "304": {
+    "id": 304,
+    "name": "ironwood_tree",
+    "displayName": "Ironwood Tree"
+  },
+  "305": {
+    "id": 305,
+    "name": "royal_jelly",
+    "displayName": "Royal Jelly"
+  },
+  "306": {
+    "id": 306,
+    "name": "pupils_gift",
+    "displayName": "Pupil's Gift"
+  },
+  "307": {
+    "id": 307,
+    "name": "tome_of_aghanim",
+    "displayName": "Tome of Aghanim"
+  },
+  "308": {
+    "id": 308,
+    "name": "repair_kit",
+    "displayName": "Repair Kit"
+  },
+  "309": {
+    "id": 309,
+    "name": "mind_breaker",
+    "displayName": "Mind Breaker"
+  },
+  "310": {
+    "id": 310,
+    "name": "third_eye",
+    "displayName": "Third Eye"
+  },
+  "311": {
+    "id": 311,
+    "name": "spell_prism",
+    "displayName": "Spell Prism"
+  },
+  "312": {
+    "id": 312,
+    "name": "horizon",
+    "displayName": "horizon"
+  },
+  "313": {
+    "id": 313,
+    "name": "fusion_rune",
+    "displayName": "Fusion Rune"
+  },
+  "325": {
+    "id": 325,
+    "name": "princes_knife",
+    "displayName": "Prince's Knife"
+  },
+  "327": {
+    "id": 327,
+    "name": "helm_of_the_undying",
+    "displayName": "Helm of the Undying"
+  },
+  "328": {
+    "id": 328,
+    "name": "mango_tree",
+    "displayName": "Mango Tree"
+  },
+  "330": {
+    "id": 330,
+    "name": "witless_shako",
+    "displayName": "Witless Shako"
+  },
+  "331": {
+    "id": 331,
+    "name": "vambrace",
+    "displayName": "Vambrace"
+  },
+  "334": {
+    "id": 334,
+    "name": "imp_claw",
+    "displayName": "Imp Claw"
+  },
+  "335": {
+    "id": 335,
+    "name": "flicker",
+    "displayName": "Flicker"
+  },
+  "336": {
+    "id": 336,
+    "name": "spy_gadget",
+    "displayName": "Telescope"
+  },
+  "349": {
+    "id": 349,
+    "name": "arcane_ring",
+    "displayName": "Arcane Ring"
+  },
+  "354": {
+    "id": 354,
+    "name": "ocean_heart",
+    "displayName": "Ocean Heart"
+  },
+  "355": {
+    "id": 355,
+    "name": "broom_handle",
+    "displayName": "Broom Handle"
+  },
+  "356": {
+    "id": 356,
+    "name": "trusty_shovel",
+    "displayName": "Trusty Shovel"
+  },
+  "357": {
+    "id": 357,
+    "name": "nether_shawl",
+    "displayName": "Nether Shawl"
+  },
+  "358": {
+    "id": 358,
+    "name": "dragon_scale",
+    "displayName": "Dragon Scale"
+  },
+  "360": {
+    "id": 360,
+    "name": "clumsy_net",
+    "displayName": "Clumsy Net"
+  },
+  "361": {
+    "id": 361,
+    "name": "enchanted_quiver",
+    "displayName": "Enchanted Quiver"
+  },
+  "362": {
+    "id": 362,
+    "name": "ninja_gear",
+    "displayName": "Ninja Gear"
+  },
+  "363": {
+    "id": 363,
+    "name": "illusionsts_cape",
+    "displayName": "Illusionist's Cape"
+  },
+  "364": {
+    "id": 364,
+    "name": "havoc_hammer",
+    "displayName": "Havoc Hammer"
+  },
+  "365": {
+    "id": 365,
+    "name": "panic_button",
+    "displayName": "Magic Lamp"
+  },
+  "366": {
+    "id": 366,
+    "name": "apex",
+    "displayName": "Apex"
+  },
+  "367": {
+    "id": 367,
+    "name": "ballista",
+    "displayName": "Ballista"
+  },
+  "368": {
+    "id": 368,
+    "name": "woodland_striders",
+    "displayName": "Woodland Striders"
+  },
+  "369": {
+    "id": 369,
+    "name": "trident",
+    "displayName": "Trident"
+  },
+  "372": {
+    "id": 372,
+    "name": "pirate_hat",
+    "displayName": "Pirate Hat"
+  },
+  "373": {
+    "id": 373,
+    "name": "dimensional_doorway",
+    "displayName": "dimensional_doorway"
+  },
+  "374": {
+    "id": 374,
+    "name": "ex_machina",
+    "displayName": "Ex Machina"
+  },
+  "375": {
+    "id": 375,
+    "name": "faded_broach",
+    "displayName": "Faded Broach"
+  },
+  "376": {
+    "id": 376,
+    "name": "paladin_sword",
+    "displayName": "Paladin Sword"
+  },
+  "378": {
+    "id": 378,
+    "name": "orb_of_destruction",
+    "displayName": "Orb of Destruction"
+  },
+  "379": {
+    "id": 379,
+    "name": "the_leveller",
+    "displayName": "The Leveller"
+  },
+  "381": {
+    "id": 381,
+    "name": "titan_sliver",
+    "displayName": "Titan Sliver"
+  },
+  "473": {
+    "id": 473,
+    "name": "voodoo_mask",
+    "displayName": "Voodoo Mask"
+  },
+  "485": {
+    "id": 485,
+    "name": "blitz_knuckles",
+    "displayName": "Blitz Knuckles"
+  },
+  "533": {
+    "id": 533,
+    "name": "recipe_witch_blade",
+    "displayName": "Witch Blade Recipe"
+  },
+  "534": {
+    "id": 534,
+    "name": "witch_blade",
+    "displayName": "Witch Blade"
+  },
+  "566": {
+    "id": 566,
+    "name": "wizard_glass",
+    "displayName": "wizard_glass"
+  },
+  "569": {
+    "id": 569,
+    "name": "orb_of_corrosion",
+    "displayName": "Orb of Corrosion"
+  },
+  "570": {
+    "id": 570,
+    "name": "gloves_of_travel",
+    "displayName": "gloves_of_travel"
+  },
+  "571": {
+    "id": 571,
+    "name": "trickster_cloak",
+    "displayName": "Trickster Cloak"
+  },
+  "573": {
+    "id": 573,
+    "name": "elven_tunic",
+    "displayName": "Elven Tunic"
+  },
+  "574": {
+    "id": 574,
+    "name": "cloak_of_flames",
+    "displayName": "Cloak of Flames"
+  },
+  "575": {
+    "id": 575,
+    "name": "venom_gland",
+    "displayName": "venom_gland"
+  },
+  "576": {
+    "id": 576,
+    "name": "gladiator_helm",
+    "displayName": "gladiator_helm"
+  },
+  "577": {
+    "id": 577,
+    "name": "possessed_mask",
+    "displayName": "Possessed Mask"
+  },
+  "578": {
+    "id": 578,
+    "name": "ancient_perseverance",
+    "displayName": "ancient_perseverance"
+  },
+  "582": {
+    "id": 582,
+    "name": "oakheart",
+    "displayName": "oakheart"
+  },
+  "585": {
+    "id": 585,
+    "name": "stormcrafter",
+    "displayName": "Stormcrafter"
+  },
+  "588": {
+    "id": 588,
+    "name": "overflowing_elixir",
+    "displayName": "overflowing_elixir"
+  },
+  "589": {
+    "id": 589,
+    "name": "mysterious_hat",
+    "displayName": "Fairy's Trinket"
+  },
+  "593": {
+    "id": 593,
+    "name": "fluffy_hat",
+    "displayName": "Fluffy Hat"
+  },
+  "596": {
+    "id": 596,
+    "name": "falcon_blade",
+    "displayName": "Falcon Blade"
+  },
+  "598": {
+    "id": 598,
+    "name": "mage_slayer",
+    "displayName": "Mage Slayer"
+  },
+  "599": {
+    "id": 599,
+    "name": "recipe_falcon_blade",
+    "displayName": "Falcon Blade Recipe"
+  },
+  "600": {
+    "id": 600,
+    "name": "overwhelming_blink",
+    "displayName": "Overwhelming Blink"
+  },
+  "603": {
+    "id": 603,
+    "name": "swift_blink",
+    "displayName": "Swift Blink"
+  },
+  "604": {
+    "id": 604,
+    "name": "arcane_blink",
+    "displayName": "Arcane Blink"
+  },
+  "606": {
+    "id": 606,
+    "name": "recipe_arcane_blink",
+    "displayName": "Arcane Blink Recipe"
+  },
+  "607": {
+    "id": 607,
+    "name": "recipe_swift_blink",
+    "displayName": "Swift Blink Recipe"
+  },
+  "608": {
+    "id": 608,
+    "name": "recipe_overwhelming_blink",
+    "displayName": "Overwhelming Blink Recipe"
+  },
+  "609": {
+    "id": 609,
+    "name": "aghanims_shard",
+    "displayName": "Aghanim's Shard"
+  },
+  "610": {
+    "id": 610,
+    "name": "wind_waker",
+    "displayName": "Wind Waker"
+  },
+  "612": {
+    "id": 612,
+    "name": "recipe_wind_waker",
+    "displayName": "Wind Waker Recipe"
+  },
+  "633": {
+    "id": 633,
+    "name": "recipe_helm_of_the_overlord",
+    "displayName": "Helm of the Overlord Recipe"
+  },
+  "635": {
+    "id": 635,
+    "name": "helm_of_the_overlord",
+    "displayName": "Helm of the Overlord"
+  },
+  "637": {
+    "id": 637,
+    "name": "star_mace",
+    "displayName": "star_mace"
+  },
+  "638": {
+    "id": 638,
+    "name": "penta_edged_sword",
+    "displayName": "Penta-Edged Sword"
+  },
+  "655": {
+    "id": 655,
+    "name": "grandmasters_glaive",
+    "displayName": "grandmasters_glaive"
+  },
+  "674": {
+    "id": 674,
+    "name": "warhammer",
+    "displayName": "warhammer"
+  },
+  "676": {
+    "id": 676,
+    "name": "ceremonial_robe",
+    "displayName": "Ceremonial Robe"
+  },
+  "677": {
+    "id": 677,
+    "name": "book_of_shadows",
+    "displayName": "Book of Shadows"
+  },
+  "678": {
+    "id": 678,
+    "name": "giants_ring",
+    "displayName": "Giant's Ring"
+  },
+  "679": {
+    "id": 679,
+    "name": "vengeances_shadow",
+    "displayName": "Shadow of Vengeance"
+  },
+  "680": {
+    "id": 680,
+    "name": "bullwhip",
+    "displayName": "Bullwhip"
+  },
+  "686": {
+    "id": 686,
+    "name": "quicksilver_amulet",
+    "displayName": "Quicksilver Amulet"
+  },
+  "691": {
+    "id": 691,
+    "name": "recipe_eternal_shroud",
+    "displayName": "Eternal Shroud Recipe"
+  },
+  "692": {
+    "id": 692,
+    "name": "eternal_shroud",
+    "displayName": "Eternal Shroud"
+  },
+  "725": {
+    "id": 725,
+    "name": "aghanims_shard_roshan",
+    "displayName": "Aghanim's Shard - Consumable"
+  },
+  "727": {
+    "id": 727,
+    "name": "ultimate_scepter_roshan",
+    "displayName": "Aghanim's Blessing - Roshan"
+  },
+  "731": {
+    "id": 731,
+    "name": "satchel",
+    "displayName": "satchel"
+  },
+  "824": {
+    "id": 824,
+    "name": "assassins_dagger",
+    "displayName": "assassins_dagger"
+  },
+  "825": {
+    "id": 825,
+    "name": "ascetic_cap",
+    "displayName": "Ascetic's Cap"
+  },
+  "826": {
+    "id": 826,
+    "name": "sample_picker",
+    "displayName": "sample_picker"
+  },
+  "827": {
+    "id": 827,
+    "name": "icarus_wings",
+    "displayName": "icarus_wings"
+  },
+  "828": {
+    "id": 828,
+    "name": "misericorde",
+    "displayName": "Brigand's Blade"
+  },
+  "829": {
+    "id": 829,
+    "name": "force_field",
+    "displayName": "Arcanist's Armor"
+  },
+  "834": {
+    "id": 834,
+    "name": "black_powder_bag",
+    "displayName": "Blast Rig"
+  },
+  "835": {
+    "id": 835,
+    "name": "paintball",
+    "displayName": "Fae Grenade"
+  },
+  "836": {
+    "id": 836,
+    "name": "light_robes",
+    "displayName": "light_robes"
+  },
+  "837": {
+    "id": 837,
+    "name": "heavy_blade",
+    "displayName": "Witchbane"
+  },
+  "838": {
+    "id": 838,
+    "name": "unstable_wand",
+    "displayName": "Pig Pole"
+  },
+  "839": {
+    "id": 839,
+    "name": "fortitude_ring",
+    "displayName": "fortitude_ring"
+  },
+  "849": {
+    "id": 849,
+    "name": "mechanical_arm",
+    "displayName": "mechanical_arm"
+  },
+  "907": {
+    "id": 907,
+    "name": "recipe_wraith_pact",
+    "displayName": "recipe_wraith_pact"
+  },
+  "908": {
+    "id": 908,
+    "name": "wraith_pact",
+    "displayName": "Wraith Pact"
+  },
+  "910": {
+    "id": 910,
+    "name": "recipe_revenants_brooch",
+    "displayName": "Revenant's Brooch Recipe"
+  },
+  "911": {
+    "id": 911,
+    "name": "revenants_brooch",
+    "displayName": "Revenant's Brooch"
+  },
+  "931": {
+    "id": 931,
+    "name": "boots_of_bearing",
+    "displayName": "Boots of Bearing"
+  },
+  "938": {
+    "id": 938,
+    "name": "slime_vial",
+    "displayName": "slime_vial"
+  },
+  "939": {
+    "id": 939,
+    "name": "harpoon",
+    "displayName": "Harpoon"
+  },
+  "940": {
+    "id": 940,
+    "name": "wand_of_the_brine",
+    "displayName": "wand_of_the_brine"
+  },
+  "945": {
+    "id": 945,
+    "name": "seeds_of_serenity",
+    "displayName": "Seeds of Serenity"
+  },
+  "946": {
+    "id": 946,
+    "name": "lance_of_pursuit",
+    "displayName": "Lance of Pursuit"
+  },
+  "948": {
+    "id": 948,
+    "name": "tome_of_omniscience",
+    "displayName": "tome_of_omniscience"
+  },
+  "949": {
+    "id": 949,
+    "name": "ogre_seal_totem",
+    "displayName": "Ogre Seal Totem"
+  },
+  "968": {
+    "id": 968,
+    "name": "arcane_scout",
+    "displayName": "arcane_scout"
+  },
+  "969": {
+    "id": 969,
+    "name": "barricade",
+    "displayName": "barricade"
+  },
+  "990": {
+    "id": 990,
+    "name": "eye_of_the_vizier",
+    "displayName": "Eye of the Vizier"
+  },
+  "998": {
+    "id": 998,
+    "name": "manacles_of_power",
+    "displayName": "manacles_of_power"
+  },
+  "1000": {
+    "id": 1000,
+    "name": "bottomless_chalice",
+    "displayName": "bottomless_chalice"
+  },
+  "1017": {
+    "id": 1017,
+    "name": "wand_of_sanctitude",
+    "displayName": "wand_of_sanctitude"
+  },
+  "1021": {
+    "id": 1021,
+    "name": "river_painter",
+    "displayName": "River Vial: Chrome"
+  },
+  "1022": {
+    "id": 1022,
+    "name": "river_painter2",
+    "displayName": "River Vial: Dry"
+  },
+  "1023": {
+    "id": 1023,
+    "name": "river_painter3",
+    "displayName": "River Vial: Slime"
+  },
+  "1024": {
+    "id": 1024,
+    "name": "river_painter4",
+    "displayName": "River Vial: Oil"
+  },
+  "1025": {
+    "id": 1025,
+    "name": "river_painter5",
+    "displayName": "River Vial: Electrified"
+  },
+  "1026": {
+    "id": 1026,
+    "name": "river_painter6",
+    "displayName": "River Vial: Potion"
+  },
+  "1027": {
+    "id": 1027,
+    "name": "river_painter7",
+    "displayName": "River Vial: Blood"
+  },
+  "1028": {
+    "id": 1028,
+    "name": "mutation_tombstone",
+    "displayName": "Tombstone"
+  },
+  "1029": {
+    "id": 1029,
+    "name": "super_blink",
+    "displayName": "super_blink"
+  },
+  "1030": {
+    "id": 1030,
+    "name": "pocket_tower",
+    "displayName": "Pocket Tower"
+  },
+  "1032": {
+    "id": 1032,
+    "name": "pocket_roshan",
+    "displayName": "Pocket Roshan"
+  },
+  "1076": {
+    "id": 1076,
+    "name": "specialists_array",
+    "displayName": "Specialist's Array"
+  },
+  "1077": {
+    "id": 1077,
+    "name": "dagger_of_ristul",
+    "displayName": "Dagger of Ristul"
+  },
+  "1090": {
+    "id": 1090,
+    "name": "muertas_gun",
+    "displayName": "Mercy & Grace"
+  },
+  "1091": {
+    "id": 1091,
+    "name": "samurai_tabi",
+    "displayName": "samurai_tabi"
+  },
+  "1092": {
+    "id": 1092,
+    "name": "recipe_hermes_sandals",
+    "displayName": "recipe_hermes_sandals"
+  },
+  "1093": {
+    "id": 1093,
+    "name": "hermes_sandals",
+    "displayName": "hermes_sandals"
+  },
+  "1094": {
+    "id": 1094,
+    "name": "recipe_lunar_crest",
+    "displayName": "recipe_lunar_crest"
+  },
+  "1095": {
+    "id": 1095,
+    "name": "lunar_crest",
+    "displayName": "Lunar Crest"
+  },
+  "1096": {
+    "id": 1096,
+    "name": "recipe_disperser",
+    "displayName": "Disperser Recipe"
+  },
+  "1097": {
+    "id": 1097,
+    "name": "disperser",
+    "displayName": "Disperser"
+  },
+  "1098": {
+    "id": 1098,
+    "name": "recipe_samurai_tabi",
+    "displayName": "recipe_samurai_tabi"
+  },
+  "1099": {
+    "id": 1099,
+    "name": "recipe_witches_switch",
+    "displayName": "recipe_witches_switch"
+  },
+  "1100": {
+    "id": 1100,
+    "name": "witches_switch",
+    "displayName": "witches_switch"
+  },
+  "1101": {
+    "id": 1101,
+    "name": "recipe_harpoon",
+    "displayName": "Harpoon Recipe"
+  },
+  "1106": {
+    "id": 1106,
+    "name": "recipe_phylactery",
+    "displayName": "Phylactery Recipe"
+  },
+  "1107": {
+    "id": 1107,
+    "name": "phylactery",
+    "displayName": "Phylactery"
+  },
+  "1122": {
+    "id": 1122,
+    "name": "diadem",
+    "displayName": "Diadem"
+  },
+  "1123": {
+    "id": 1123,
+    "name": "blood_grenade",
+    "displayName": "Blood Grenade"
+  },
+  "1124": {
+    "id": 1124,
+    "name": "spark_of_courage",
+    "displayName": "Spark of Courage"
+  },
+  "1125": {
+    "id": 1125,
+    "name": "cornucopia",
+    "displayName": "Cornucopia"
+  },
+  "1127": {
+    "id": 1127,
+    "name": "recipe_pavise",
+    "displayName": "Pavise Recipe"
+  },
+  "1128": {
+    "id": 1128,
+    "name": "pavise",
+    "displayName": "Pavise"
+  },
+  "1154": {
+    "id": 1154,
+    "name": "royale_with_cheese",
+    "displayName": "Block of Cheese"
+  },
+  "1156": {
+    "id": 1156,
+    "name": "ancient_guardian",
+    "displayName": "Ancient Guardian"
+  },
+  "1157": {
+    "id": 1157,
+    "name": "safety_bubble",
+    "displayName": "Safety Bubble"
+  },
+  "1159": {
+    "id": 1159,
+    "name": "nemesis_curse",
+    "displayName": "Nemesis Curse"
+  },
+  "1160": {
+    "id": 1160,
+    "name": "avianas_feather",
+    "displayName": "Aviana's Feather"
+  },
+  "1161": {
+    "id": 1161,
+    "name": "unwavering_condition",
+    "displayName": "Unwavering Condition"
+  },
+  "1164": {
+    "id": 1164,
+    "name": "aetherial_halo",
+    "displayName": "aetherial_halo"
+  },
+  "1167": {
+    "id": 1167,
+    "name": "light_collector",
+    "displayName": "Light Collector"
+  },
+  "1440": {
+    "id": 1440,
+    "name": "black_grimoire",
+    "displayName": "Black Grimoire"
+  },
+  "1441": {
+    "id": 1441,
+    "name": "grisgris",
+    "displayName": "Gris-Gris"
+  },
+  "1466": {
+    "id": 1466,
+    "name": "gungir",
+    "displayName": "Gleipnir"
+  },
+  "1565": {
+    "id": 1565,
+    "name": "recipe_gungir",
+    "displayName": "Gleipnir Recipe"
+  },
+  "1575": {
+    "id": 1575,
+    "name": "orb_of_frost",
+    "displayName": "Orb of Frost"
+  },
+  "1576": {
+    "id": 1576,
+    "name": "enhancement_vast",
+    "displayName": "Vast"
+  },
+  "1577": {
+    "id": 1577,
+    "name": "enhancement_quickened",
+    "displayName": "Quickened"
+  },
+  "1578": {
+    "id": 1578,
+    "name": "cursed_circlet",
+    "displayName": "Accursed"
+  },
+  "1579": {
+    "id": 1579,
+    "name": "ogre_heart",
+    "displayName": "Restorative"
+  },
+  "1580": {
+    "id": 1580,
+    "name": "neutral_tabi",
+    "displayName": "Elusive"
+  },
+  "1581": {
+    "id": 1581,
+    "name": "enhancement_audacious",
+    "displayName": "Audacious"
+  },
+  "1582": {
+    "id": 1582,
+    "name": "hellbear_totem",
+    "displayName": "hellbear_totem"
+  },
+  "1583": {
+    "id": 1583,
+    "name": "enhancement_mystical",
+    "displayName": "Mystical"
+  },
+  "1584": {
+    "id": 1584,
+    "name": "enhancement_alert",
+    "displayName": "Alert"
+  },
+  "1585": {
+    "id": 1585,
+    "name": "enhancement_brawny",
+    "displayName": "Brawny"
+  },
+  "1586": {
+    "id": 1586,
+    "name": "enhancement_tough",
+    "displayName": "Tough"
+  },
+  "1587": {
+    "id": 1587,
+    "name": "enhancement_feverish",
+    "displayName": "Feverish"
+  },
+  "1588": {
+    "id": 1588,
+    "name": "enhancement_fleetfooted",
+    "displayName": "Fleetfooted"
+  },
+  "1589": {
+    "id": 1589,
+    "name": "enhancement_crude",
+    "displayName": "Crude"
+  },
+  "1590": {
+    "id": 1590,
+    "name": "enhancement_boundless",
+    "displayName": "Boundless"
+  },
+  "1591": {
+    "id": 1591,
+    "name": "enhancement_wise",
+    "displayName": "Wise"
+  },
+  "1592": {
+    "id": 1592,
+    "name": "enhancement_timeless",
+    "displayName": "Timeless"
+  },
+  "1593": {
+    "id": 1593,
+    "name": "enhancement_greedy",
+    "displayName": "Greedy"
+  },
+  "1594": {
+    "id": 1594,
+    "name": "enhancement_vampiric",
+    "displayName": "Vampiric"
+  },
+  "1595": {
+    "id": 1595,
+    "name": "enhancement_keen_eyed",
+    "displayName": "Keen-eyed"
+  },
+  "1596": {
+    "id": 1596,
+    "name": "enhancement_evolved",
+    "displayName": "Evolved"
+  },
+  "1597": {
+    "id": 1597,
+    "name": "enhancement_titanic",
+    "displayName": "Titanic"
+  },
+  "1600": {
+    "id": 1600,
+    "name": "rippers_lash",
+    "displayName": "Ripper's Lash"
+  },
+  "1602": {
+    "id": 1602,
+    "name": "gale_guard",
+    "displayName": "Gale Guard"
+  },
+  "1607": {
+    "id": 1607,
+    "name": "magnifying_monocle",
+    "displayName": "Magnifying Monocle"
+  },
+  "1608": {
+    "id": 1608,
+    "name": "pyrrhic_cloak",
+    "displayName": "Pyrrhic Cloak"
+  },
+  "1609": {
+    "id": 1609,
+    "name": "madstone_bundle",
+    "displayName": "Madstone Bundle"
+  },
+  "1610": {
+    "id": 1610,
+    "name": "miniboss_minion_summoner",
+    "displayName": "miniboss_minion_summoner"
+  },
+  "1636": {
+    "id": 1636,
+    "name": "crystal_raindrop",
+    "displayName": "Crystal Raindrop"
+  },
+  "1639": {
+    "id": 1639,
+    "name": "sisters_shroud",
+    "displayName": "Sister's Shroud"
+  },
+  "1641": {
+    "id": 1641,
+    "name": "outworld_staff",
+    "displayName": "Outworld Staff"
+  },
+  "1645": {
+    "id": 1645,
+    "name": "divine_regalia_broken",
+    "displayName": "Disgraced Regalia"
+  },
+  "1646": {
+    "id": 1646,
+    "name": "circlet_of_the_flayed_twins",
+    "displayName": "Circlet of the Flayed Twins"
+  },
+  "1647": {
+    "id": 1647,
+    "name": "enhancement_fierce",
+    "displayName": "Fierce"
+  },
+  "1648": {
+    "id": 1648,
+    "name": "enhancement_dominant",
+    "displayName": "Dominant"
+  },
+  "1649": {
+    "id": 1649,
+    "name": "enhancement_restorative",
+    "displayName": "Restorative"
+  },
+  "1650": {
+    "id": 1650,
+    "name": "enhancement_thick",
+    "displayName": "Thick"
+  },
+  "1651": {
+    "id": 1651,
+    "name": "enhancement_curious",
+    "displayName": "Unleashed"
+  },
+  "1652": {
+    "id": 1652,
+    "name": "furion_gold_bag",
+    "displayName": "Bag of Gold"
+  },
+  "1715": {
+    "id": 1715,
+    "name": "recipe_specialists_array",
+    "displayName": "recipe_specialists_array"
+  },
+  "1801": {
+    "id": 1801,
+    "name": "caster_rapier",
+    "displayName": "caster_rapier"
+  },
+  "1802": {
+    "id": 1802,
+    "name": "tiara_of_selemene",
+    "displayName": "Tiara of Selemene"
+  },
+  "1803": {
+    "id": 1803,
+    "name": "doubloon",
+    "displayName": "Doubloon"
+  },
+  "1804": {
+    "id": 1804,
+    "name": "roshans_banner",
+    "displayName": "Roshan's Banner"
+  },
+  "1805": {
+    "id": 1805,
+    "name": "recipe_devastator",
+    "displayName": "Parasma Recipe"
+  },
+  "1806": {
+    "id": 1806,
+    "name": "devastator",
+    "displayName": "Parasma"
+  },
+  "1808": {
+    "id": 1808,
+    "name": "angels_demise",
+    "displayName": "Khanda"
+  },
+  "2091": {
+    "id": 2091,
+    "name": "tier1_token",
+    "displayName": "Tier 1 Token"
+  },
+  "2092": {
+    "id": 2092,
+    "name": "tier2_token",
+    "displayName": "Tier 2 Token"
+  },
+  "2093": {
+    "id": 2093,
+    "name": "tier3_token",
+    "displayName": "Tier 3 Token"
+  },
+  "2094": {
+    "id": 2094,
+    "name": "tier4_token",
+    "displayName": "Tier 4 Token"
+  },
+  "2095": {
+    "id": 2095,
+    "name": "tier5_token",
+    "displayName": "Tier 5 Token"
+  },
+  "2096": {
+    "id": 2096,
+    "name": "vindicators_axe",
+    "displayName": "Vindicator's Axe"
+  },
+  "2098": {
+    "id": 2098,
+    "name": "horizons_equilibrium",
+    "displayName": "horizons_equilibrium"
+  },
+  "2099": {
+    "id": 2099,
+    "name": "blighted_spirit",
+    "displayName": "blighted_spirit"
+  },
+  "2190": {
+    "id": 2190,
+    "name": "dandelion_amulet",
+    "displayName": "Dandelion Amulet"
+  },
+  "2191": {
+    "id": 2191,
+    "name": "turtle_shell",
+    "displayName": "turtle_shell"
+  },
+  "2192": {
+    "id": 2192,
+    "name": "martyrs_plate",
+    "displayName": "Martyr's Plate"
+  },
+  "2193": {
+    "id": 2193,
+    "name": "gossamer_cape",
+    "displayName": "Gossamer Cape"
+  },
+  "4204": {
+    "id": 4204,
+    "name": "famango",
+    "displayName": "Healing Lotus"
+  },
+  "4205": {
+    "id": 4205,
+    "name": "great_famango",
+    "displayName": "Great Healing Lotus"
+  },
+  "4206": {
+    "id": 4206,
+    "name": "greater_famango",
+    "displayName": "Greater Healing Lotus"
+  },
+  "4300": {
+    "id": 4300,
+    "name": "ofrenda",
+    "displayName": "Beloved Memory"
+  },
+  "4301": {
+    "id": 4301,
+    "name": "ofrenda_shovel",
+    "displayName": "Scrying Shovel"
+  },
+  "4302": {
+    "id": 4302,
+    "name": "ofrenda_pledge",
+    "displayName": "Forebearer's Fortune"
+  }
+}

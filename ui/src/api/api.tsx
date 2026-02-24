@@ -38,6 +38,59 @@ export type Series = {
     team_b_score: number
 }
 
+export type PlayerData = {
+    name: string | null
+    facet: number
+    kills: number
+    level: number
+    deaths: number
+    denies: number
+    item_0: number
+    item_1: number
+    item_2: number
+    item_3: number
+    item_4: number
+    item_5: number
+    assists: number
+    hero_id: number
+    last_hits: number
+    net_worth: number
+    player_id: number
+    backpack_0: number
+    backpack_1: number
+    backpack_2: number
+    is_radiant: boolean
+    xp_per_min: number
+    player_slot: number
+    gold_per_min: number
+    item_neutral: number
+}
+
+export type SeriesMatchDetail = {
+    match_id: number
+    duration: number
+    radiant_win: boolean
+    picks_bans: unknown
+    players_data: PlayerData[]
+    radiant_gold_adv: number[]
+    radiant_xp_adv: number[]
+    radiant_score: number
+    dire_score: number
+    radiant_captain: number | null
+    dire_captain: number | null
+}
+
+export type SeriesDetail = {
+    series_id: number
+    start_time: string
+    team_a: TeamInfo
+    team_b: TeamInfo
+    league: LeagueInfo
+    team_a_score: number
+    team_b_score: number
+    matches: SeriesMatchDetail[]
+}
+
 export type Pagination = {
     nc?: number
     has_more: boolean
@@ -73,9 +126,13 @@ async function fetchApi<T>(url: URL, signal: AbortSignal, errorMessage: string):
 }
 
 export async function getSeries(params: Filters, signal: AbortSignal): Promise<GetSeriesResponse> {
-    await new Promise(res => setTimeout(res, 2000))
     const url = buildUrl("/series", params)
     return fetchApi(url, signal, "Failed to fetch series")
+}
+
+export async function getSeriesById(id: number, signal: AbortSignal): Promise<SeriesDetail> {
+    const url = new URL(`${API_BASE_URL}/series/${id}`)
+    return fetchApi(url, signal, "Failed to fetch series details")
 }
 
 export async function searchLeagues(query: string, signal: AbortSignal): Promise<LeagueSearchResult[]> {

@@ -1,12 +1,12 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
-import { getSeries, type Filters, type GetSeriesResponse } from "../api/api"
-import { FiltersSidebar } from "../components/FiltersSidebar"
-import { SeriesList } from "../components/SeriesList"
-import { Button } from "../components/ui/index"
+import { getSeries, type Filters, type GetSeriesResponse } from "@/api/api"
+import { FiltersSidebar } from "@/components/FiltersSidebar"
+import { SeriesList } from "@/components/SeriesList"
+import { Button } from "@/components/ui"
 
-export const Route = createFileRoute("/series")({
+export const Route = createFileRoute("/series/")({
     component: Series,
     validateSearch: (search: Record<string, unknown>): Filters => {
         const validLimits = [20, 40, 60]
@@ -28,14 +28,7 @@ function Series() {
     const { data, isLoading, error } = useQuery({
         queryKey: ["series", search],
         queryFn: async ({ signal }): Promise<GetSeriesResponse> => {
-            const filters: Filters = {
-                league: search.league !== undefined ? Number(search.league) : undefined,
-                team: search.team !== undefined ? Number(search.team) : undefined,
-                sort: search.sort as Filters["sort"],
-                limit: search.limit,
-                c: search.c,
-            }
-            return getSeries(filters, signal)
+            return getSeries(search, signal)
         },
         retry: 2,
     })

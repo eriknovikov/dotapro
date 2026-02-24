@@ -9,16 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SeriesRouteImport } from './routes/series'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SeriesIndexRouteImport } from './routes/series/index'
+import { Route as SeriesIdRouteImport } from './routes/series/$id'
 
-const SeriesRoute = SeriesRouteImport.update({
-  id: '/series',
-  path: '/series',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
@@ -34,50 +30,57 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SeriesIndexRoute = SeriesIndexRouteImport.update({
+  id: '/series/',
+  path: '/series/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeriesIdRoute = SeriesIdRouteImport.update({
+  id: '/series/$id',
+  path: '/series/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/matches': typeof MatchesRoute
-  '/series': typeof SeriesRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/series/': typeof SeriesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/matches': typeof MatchesRoute
-  '/series': typeof SeriesRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/series': typeof SeriesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/matches': typeof MatchesRoute
-  '/series': typeof SeriesRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/series/': typeof SeriesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/matches' | '/series'
+  fullPaths: '/' | '/about' | '/matches' | '/series/$id' | '/series/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/matches' | '/series'
-  id: '__root__' | '/' | '/about' | '/matches' | '/series'
+  to: '/' | '/about' | '/matches' | '/series/$id' | '/series'
+  id: '__root__' | '/' | '/about' | '/matches' | '/series/$id' | '/series/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   MatchesRoute: typeof MatchesRoute
-  SeriesRoute: typeof SeriesRoute
+  SeriesIdRoute: typeof SeriesIdRoute
+  SeriesIndexRoute: typeof SeriesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/series': {
-      id: '/series'
-      path: '/series'
-      fullPath: '/series'
-      preLoaderRoute: typeof SeriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/matches': {
       id: '/matches'
       path: '/matches'
@@ -99,6 +102,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/series/': {
+      id: '/series/'
+      path: '/series'
+      fullPath: '/series/'
+      preLoaderRoute: typeof SeriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/series/$id': {
+      id: '/series/$id'
+      path: '/series/$id'
+      fullPath: '/series/$id'
+      preLoaderRoute: typeof SeriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -106,7 +123,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   MatchesRoute: MatchesRoute,
-  SeriesRoute: SeriesRoute,
+  SeriesIdRoute: SeriesIdRoute,
+  SeriesIndexRoute: SeriesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

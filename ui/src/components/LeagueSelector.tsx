@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react"
 import { searchLeagues } from "../api/api"
-import { useDebounce } from "../hooks/useDebounce"
-import { cn } from "../lib/utils"
+import { useDebounce } from "../hooks"
+import { cn, getPopularData } from "../lib"
 import { Spinner } from "./Spinner"
-import popularData from "../assets/static_data.json"
 
 // ============================================================================
 // Types
@@ -114,7 +113,7 @@ export function LeagueSelector({
 
     const items = useMemo(() => {
         if (debouncedQuery.trim().length === 0) {
-            return popularData.popular_leagues
+            return getPopularData().popular_leagues
         }
         return (searchResults || []).map(l => ({ id: l.league_id, name: l.name }))
     }, [debouncedQuery, searchResults])

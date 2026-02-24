@@ -136,8 +136,8 @@ func (m *Model) GetOne(ctx context.Context, id int64) (*types.SeriesDetail, erro
 		ColumnExpr("team_b.logo_url AS team_b__logo_url").
 		ColumnExpr("l.name AS league__name").
 		ColumnExpr("l.tier AS league__tier").
-		ColumnExpr("s.team_a_score AS team_a__score").
-		ColumnExpr("s.team_b_score AS team_b__score").
+		ColumnExpr("s.team_a_score").
+		ColumnExpr("s.team_b_score").
 		TableExpr("series AS s").
 		Join("LEFT JOIN leagues AS l USING (league_id)").
 		Join("LEFT JOIN teams AS team_a ON team_a.team_id = s.team_a_id").
