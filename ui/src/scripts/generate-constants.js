@@ -9,6 +9,7 @@ const OUTPUT_DIR = path.resolve(__dirname, "../assets/static_data")
 
 const URLS = {
     heroes: "https://raw.githubusercontent.com/odota/dotaconstants/master/build/heroes.json",
+    heroLore: "https://raw.githubusercontent.com/odota/dotaconstants/master/build/hero_lore.json", // Added
     itemIds: "https://raw.githubusercontent.com/odota/dotaconstants/master/build/item_ids.json",
     items: "https://raw.githubusercontent.com/odota/dotaconstants/master/build/items.json",
 }
@@ -21,8 +22,10 @@ async function fetchData(url) {
 
 async function generate() {
     console.log("⬇️  Fetching Dota 2 constants from OpenDota GitHub...")
-    const [heroesRaw, itemIdsRaw, itemsRaw] = await Promise.all([
+    // Fetch all data sources in parallel
+    const [heroesRaw, heroLoreRaw, itemIdsRaw, itemsRaw] = await Promise.all([
         fetchData(URLS.heroes),
+        fetchData(URLS.heroLore),
         fetchData(URLS.itemIds),
         fetchData(URLS.items),
     ])
@@ -30,10 +33,14 @@ async function generate() {
     console.log("⚙️  Processing Heroes...")
     const heroes = {}
     for (const hero of Object.values(heroesRaw)) {
+        // The lore JSON uses the short name (e.g. "antimage") as the key
+        const shortName = hero.name.replace("npc_dota_hero_", "")
+
         heroes[hero.id] = {
             id: hero.id,
-            name: hero.name.replace("npc_dota_hero_", ""),
+            name: shortName,
             displayName: hero.localized_name,
+            lore: heroLoreRaw[shortName] || null, // Map the lore here
         }
     }
 
@@ -54,6 +61,15 @@ async function generate() {
             id,
             name: itemName,
             displayName: itemData.dname || itemName,
+            cost: itemData.cost || 0,
+            lore: itemData.lore || "",
+            mc: itemData.mc || false,
+            hc: itemData.hc || false,
+            cd: itemData.cd || false,
+            abilities: itemData.abilities || [],
+            attrib: itemData.attrib || [],
+            components: itemData.components || null,
+            tier: itemData.tier || null,
         }
 
         // OpenDota marks neutral items with a numeric "tier" property
@@ -68,7 +84,7 @@ async function generate() {
     // Ensure output directory exists
     await fs.mkdir(OUTPUT_DIR, { recursive: true })
 
-    // Write separate JSON files (popular.json is manually maintained, not generated)
+    // Write separate JSON files
     await Promise.all([
         fs.writeFile(path.join(OUTPUT_DIR, "heroes.json"), JSON.stringify(heroes, null, 2), "utf-8"),
         fs.writeFile(path.join(OUTPUT_DIR, "items.json"), JSON.stringify(items, null, 2), "utf-8"),

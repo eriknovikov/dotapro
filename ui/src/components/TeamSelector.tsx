@@ -222,7 +222,7 @@ export function TeamSelector({
                 isExternalUpdateRef.current = false
                 return
             }
-            
+
             if (isExternalUpdateRef.current) {
                 inputRef.current.textContent = inputValue
                 // Don't manipulate selection range to avoid unwanted focus
@@ -268,16 +268,13 @@ export function TeamSelector({
         }
     }, [isOpen])
 
-    const handleInputChange = useCallback(
-        (e: React.FormEvent<HTMLDivElement>) => {
-            const text = e.currentTarget.textContent || ""
-            setInputValue(text)
-            if (!isExternalUpdateRef.current) {
-                setIsOpen(true)
-            }
-        },
-        [],
-    )
+    const handleInputChange = useCallback((e: React.FormEvent<HTMLDivElement>) => {
+        const text = e.currentTarget.textContent || ""
+        setInputValue(text)
+        if (!isExternalUpdateRef.current) {
+            setIsOpen(true)
+        }
+    }, [])
 
     const handleInputPaste = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault()
@@ -387,7 +384,7 @@ export function TeamSelector({
                     "bg-background border-border text-foreground",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-800/50",
                     "transition-all duration-200 ease-in-out",
-                    "whitespace-pre-wrap break-words",
+                    "whitespace-pre-wrap wrap-break-word",
                     inputClassName,
                 )}
             />
@@ -447,12 +444,7 @@ export function TeamSelector({
             )}
         >
             {team.logo_url && (
-                <img
-                    src={team.logo_url}
-                    alt={team.name}
-                    className="w-6 h-6 object-contain flex-shrink-0"
-                    loading="lazy"
-                />
+                <img src={team.logo_url} alt={team.name} className="w-6 h-6 object-contain shrink-0" loading="lazy" />
             )}
             <span className="truncate">{team.name}</span>
         </li>

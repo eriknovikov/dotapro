@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Check, Clock, Copy, ExternalLink } from "lucide-react"
-import type { SeriesMatchDetail } from "@/api/api"
+import type { SeriesMatchDetail, TeamInfo } from "@/api/api"
 import { Button } from "@/components/ui"
 import { PlayersTable } from "./PlayersTable"
 import { formatDuration, copyToClipboard } from "@/lib"
@@ -8,9 +8,16 @@ import { formatDuration, copyToClipboard } from "@/lib"
 interface GameTabContentProps {
     match: SeriesMatchDetail
     gameNumber: number
+    radiantTeam: TeamInfo
+    direTeam: TeamInfo
 }
 
-export function GameTabContent({ match }: GameTabContentProps) {
+export function GameTabContent({
+    match,
+    gameNumber,
+    radiantTeam,
+    direTeam,
+}: GameTabContentProps) {
     const [copied, setCopied] = React.useState(false)
 
     const handleCopyId = async () => {
@@ -63,7 +70,11 @@ export function GameTabContent({ match }: GameTabContentProps) {
                 </div>
             </div>
             <div className="px-6 pb-6">
-                <PlayersTable match={match} />
+                <PlayersTable
+                    match={match}
+                    radiantTeam={radiantTeam}
+                    direTeam={direTeam}
+                />
             </div>
         </div>
     )

@@ -1,22 +1,43 @@
-import { Crown, Backpack } from "lucide-react"
-import type { SeriesMatchDetail, PlayerData } from "@/api/api"
+import { Crown, Trophy } from "lucide-react"
+import type { SeriesMatchDetail, PlayerData, TeamInfo } from "@/api/api"
 import { getHeroImageUrl, getItemImageUrl, cn } from "@/lib"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { HeroTooltipContent } from "./HeroTooltipContent"
+import { ItemTooltipContent } from "./ItemTooltipContent"
 
 interface PlayersTableProps {
     match: SeriesMatchDetail
+    radiantTeam: TeamInfo
+    direTeam: TeamInfo
 }
 
-export function PlayersTable({ match }: PlayersTableProps) {
-    const { players_data, radiant_captain, dire_captain } = match
+export function PlayersTable({ match, radiantTeam, direTeam }: PlayersTableProps) {
+    const { players_data, radiant_captain, dire_captain, radiant_win, radiant_score, dire_score } = match
 
     const radiantPlayers = players_data.filter(p => p.is_radiant)
     const direPlayers = players_data.filter(p => !p.is_radiant)
 
     return (
         <div className="flex flex-col gap-3">
-            <TeamPlayersTable players={radiantPlayers} team="Radiant" captain={radiant_captain} teamColor="secondary" />
-            <TeamPlayersTable players={direPlayers} team="Dire" captain={dire_captain} teamColor="primary" />
+            <TeamPlayersTable
+                players={radiantPlayers}
+                team="Radiant"
+                captain={radiant_captain}
+                teamColor="secondary"
+                teamInfo={radiantTeam}
+                score={radiant_score}
+                isWinner={radiant_win}
+            />
+            <TeamPlayersTable
+                players={direPlayers}
+                team="Dire"
+                captain={dire_captain}
+                teamColor="primary"
+                teamInfo={direTeam}
+                score={dire_score}
+                isWinner={!radiant_win}
+            />
         </div>
     )
 }
@@ -26,38 +47,44 @@ interface TeamPlayersTableProps {
     team: "Radiant" | "Dire"
     captain: number | null
     teamColor: "primary" | "secondary"
+    teamInfo: TeamInfo
+    score: number
+    isWinner: boolean
 }
 
-function TeamPlayersTable({ players, team, captain, teamColor }: TeamPlayersTableProps) {
-    const teamColorClass = teamColor === "secondary" ? "text-secondary" : "text-primary"
-
-    const formatNetWorth = (netWorth: number) => {
-        if (netWorth >= 1000) {
-            return `${(netWorth / 1000).toFixed(1)}K`
-        }
-        return `${netWorth}K`
+const formatNetWorth = (netWorth: number) => {
+    if (netWorth >= 1000) {
+        return `${(netWorth / 1000).toFixed(1)}K`
     }
+    return `${netWorth}K`
+}
 
+function TeamPlayersTable({ players, team, captain, teamInfo, score, isWinner }: TeamPlayersTableProps) {
     return (
         <div className="bg-background-accent rounded-lg p-4">
-            <div className={cn("text-sm font-semibold mb-3 flex items-center gap-2", teamColorClass)}>
-                <span>{team}</span>
-                <span className="text-foreground-muted">({players.length})</span>
+            <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-semibold">{teamInfo.name}</span>
+                <span className="text-foreground-muted text-sm">{score}</span>
+                {isWinner && (
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white font-semibold">
+                        <Trophy className="size-5 text-secondary" />
+                    </div>
+                )}
             </div>
 
-            <Table>
+            <Table className="table-fixed">
                 <TableHeader>
                     <TableRow className="border-border hover:bg-transparent">
-                        <TableHead className="w-16 px-2 text-xs text-foreground-muted uppercase tracking-wider">
+                        <TableHead className="w-7 px-2 text-xs text-foreground-muted uppercase tracking-wider">
                             Hero
                         </TableHead>
-                        <TableHead className="w-36 px-2 text-xs text-foreground-muted uppercase tracking-wider">
+                        <TableHead className="w-16 px-2 text-xs text-foreground-muted uppercase tracking-wider">
                             Player
                         </TableHead>
-                        <TableHead className="w-56 px-2 text-xs text-foreground-muted uppercase tracking-wider">
+                        <TableHead className="w-28 px-2 text-xs text-foreground-muted uppercase tracking-wider">
                             Items
                         </TableHead>
-                        <TableHead className="w-20 px-2 text-right text-xs text-secondary-500 uppercase tracking-wider">
+                        <TableHead className="w-12 px-2 text-right text-xs text-secondary-500 uppercase tracking-wider">
                             NET
                         </TableHead>
                         <TableHead className="w-20 px-2 text-center text-xs text-foreground-muted uppercase tracking-wider">
@@ -67,7 +94,7 @@ function TeamPlayersTable({ players, team, captain, teamColor }: TeamPlayersTabl
                             <span className="text-foreground-muted mx-0.5">/</span>
                             <span className="text-foreground">A</span>
                         </TableHead>
-                        <TableHead className="w-16 px-2 text-center text-xs text-foreground-muted uppercase tracking-wider">
+                        <TableHead className="w-12 px-2 text-center text-xs text-foreground-muted uppercase tracking-wider">
                             LH
                         </TableHead>
                     </TableRow>
@@ -76,81 +103,51 @@ function TeamPlayersTable({ players, team, captain, teamColor }: TeamPlayersTabl
                     {players.map(player => {
                         const isCaptain = captain === player.player_id
                         return (
-                            <TableRow key={player.player_id} className="border-border hover:bg-background/50">
+                            <TableRow
+                                key={player.player_id}
+                                className="border-border hover:bg-background/50 border-b-2 "
+                            >
                                 {/* Hero */}
-                                <TableCell className="w-16 px-2 py-0">
-                                    <img src={getHeroImageUrl(player.hero_id)} className="h-10" />
+                                <TableCell className="px-2">
+                                    <TooltipProvider delayDuration={100}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <img
+                                                    src={getHeroImageUrl(player.hero_id)}
+                                                    className="h-8 cursor-pointer"
+                                                />
+                                            </TooltipTrigger>
+                                            <TooltipContent className="p-0 border-none bg-transparent" side="right">
+                                                <HeroTooltipContent heroId={player.hero_id} />
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </TableCell>
                                 {/* Player */}
-                                <TableCell className="w-36 px-2 py-0">
+                                <TableCell className="px-2 py-0">
                                     <div className="flex items-center gap-1 min-w-0">
                                         <span className="text-md truncate" title={player.name ?? "unknown"}>
                                             {player.name ?? "unknown"}
                                         </span>
                                         {isCaptain && (
-                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-secondary/20 text-secondary shrink-0">
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-secondary/20 shrink-0 text-secondary">
                                                 <Crown className="w-3 h-3" />
                                             </span>
                                         )}
                                     </div>
                                 </TableCell>
                                 {/* Items */}
-                                <TableCell className="w-56 px-2 py-0">
-                                    <div className="flex flex-col gap-1">
-                                        {/* Inventory items */}
-                                        <div className="flex gap-1">
-                                            {[0, 1, 2, 3, 4, 5].map(slot => {
-                                                const itemId = player[`item_${slot}` as keyof PlayerData] as number
-                                                const itemUrl = getItemImageUrl(itemId)
-                                                return (
-                                                    <div
-                                                        key={slot}
-                                                        className={cn(
-                                                            "w-6 h-6 rounded",
-                                                            itemUrl ? "" : "bg-background border border-border",
-                                                        )}
-                                                    >
-                                                        {itemUrl && <img src={itemUrl} className="w-6 h-6 rounded" />}
-                                                    </div>
-                                                )
-                                            })}
-                                            {/* Neutral item */}
-                                            {player.item_neutral > 0 && (
-                                                <img
-                                                    src={getItemImageUrl(player.item_neutral)}
-                                                    className="h-4 w-auto rounded"
-                                                />
-                                            )}
-                                        </div>
-                                        {/* Backpack section */}
-                                        <div className="flex items-center gap-1">
-                                            <Backpack className="w-3 h-3 text-foreground-muted" />
-                                            {[0, 1, 2].map(slot => {
-                                                const itemId = player[`backpack_${slot}` as keyof PlayerData] as number
-                                                const itemUrl = getItemImageUrl(itemId)
-                                                return (
-                                                    <div
-                                                        key={`backpack-${slot}`}
-                                                        className={cn(
-                                                            "w-5 h-5 rounded",
-                                                            itemUrl ? "" : "bg-background border border-border",
-                                                        )}
-                                                    >
-                                                        {itemUrl && <img src={itemUrl} className="w-5 h-5 rounded" />}
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
-                                    </div>
+                                <TableCell className="px-2 py-1">
+                                    <PlayerItems player={player} />
                                 </TableCell>
                                 {/* NET */}
-                                <TableCell className="w-20 px-2 py-0 text-right">
+                                <TableCell className="px-2 py-0 text-right">
                                     <span className="text-sm text-secondary-500">
                                         {formatNetWorth(player.net_worth)}
                                     </span>
                                 </TableCell>
                                 {/* KDA */}
-                                <TableCell className="w-20 px-2 py-0 text-center">
+                                <TableCell className="px-2 py-0 text-center">
                                     <span className="text-sm">
                                         <span className="text-success-200">{player.kills}</span>
                                         <span className="text-foreground-muted mx-0.5">/</span>
@@ -160,7 +157,7 @@ function TeamPlayersTable({ players, team, captain, teamColor }: TeamPlayersTabl
                                     </span>
                                 </TableCell>
                                 {/* LH */}
-                                <TableCell className="w-16 px-2 py-0 text-center">
+                                <TableCell className="px-2 py-0 text-center">
                                     <span className="text-sm text-foreground-muted">{player.last_hits}</span>
                                 </TableCell>
                             </TableRow>
@@ -170,4 +167,134 @@ function TeamPlayersTable({ players, team, captain, teamColor }: TeamPlayersTabl
             </Table>
         </div>
     )
+}
+
+// ============================================================================
+// Helper Components
+// ============================================================================
+
+interface PlayerItemsProps {
+    player: PlayerData
+}
+
+function PlayerItems({ player }: PlayerItemsProps) {
+    return (
+        <div className="flex gap-2 items-center">
+            {/* Inventory items */}
+            <div className="flex flex-col gap-1">
+                <div className="flex gap-1">
+                    {getInventorySlots(player).map(slot => (
+                        <ItemSlot
+                            key={slot.key}
+                            itemId={slot.itemId}
+                            itemUrl={slot.itemUrl}
+                            widthClass={slot.widthClass}
+                            heightClass={slot.heightClass}
+                            emptyBgClass={slot.emptyBgClass}
+                        />
+                    ))}
+                </div>
+                {/* Backpack section */}
+                <div className="flex gap-1">
+                    {getBackpackSlots(player).map(slot => (
+                        <ItemSlot
+                            key={slot.key}
+                            itemId={slot.itemId}
+                            itemUrl={slot.itemUrl}
+                            widthClass={slot.widthClass}
+                            heightClass={slot.heightClass}
+                            emptyBgClass={slot.emptyBgClass}
+                        />
+                    ))}
+                </div>
+            </div>
+            {/* Neutral item */}
+            <NeutralItemSlot itemId={player.item_neutral} />
+        </div>
+    )
+}
+
+interface ItemSlotProps {
+    key: string
+    itemId: number
+    itemUrl: string
+    widthClass: string
+    heightClass: string
+    emptyBgClass: string
+}
+
+function ItemSlot({ itemId, itemUrl, widthClass, heightClass, emptyBgClass }: ItemSlotProps) {
+    const isEmpty = itemId === 0 || itemUrl === ""
+
+    return (
+        <TooltipProvider delayDuration={100}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
+                        {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent className="p-0 border-none bg-transparent" side="left">
+                    <ItemTooltipContent itemId={itemId} />
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
+
+function NeutralItemSlot({ itemId }: { itemId: number }) {
+    return (
+        <TooltipProvider delayDuration={100}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <div className="w-10.5 h-7 rounded bg-black border border-border">
+                        {itemId > 0 && (
+                            <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />
+                        )}
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent className="p-0 border-none bg-transparent" side="right">
+                    <ItemTooltipContent itemId={itemId} />
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function emptyLast<T extends { isEmpty: boolean }>(a: T, b: T): number {
+    if (a.isEmpty && !b.isEmpty) return 1
+    if (!a.isEmpty && b.isEmpty) return -1
+    return 0
+}
+
+function getInventorySlots(player: PlayerData): ItemSlotProps[] {
+    return [0, 1, 2, 3, 4, 5]
+        .map(slot => ({
+            key: `item-${slot}`,
+            itemId: player[`item_${slot}` as keyof PlayerData] as number,
+            itemUrl: getItemImageUrl(player[`item_${slot}` as keyof PlayerData] as number),
+            widthClass: "w-9",
+            heightClass: "h-6",
+            emptyBgClass: "bg-black border border-border",
+        }))
+        .map(slot => ({ ...slot, isEmpty: slot.itemId === 0 }))
+        .sort(emptyLast)
+}
+
+function getBackpackSlots(player: PlayerData): ItemSlotProps[] {
+    return [0, 1, 2]
+        .map(slot => ({
+            key: `backpack-${slot}`,
+            itemId: player[`backpack_${slot}` as keyof PlayerData] as number,
+            itemUrl: getItemImageUrl(player[`backpack_${slot}` as keyof PlayerData] as number),
+            widthClass: "w-7.5",
+            heightClass: "h-5",
+            emptyBgClass: "bg-background border border-border",
+        }))
+        .map(slot => ({ ...slot, isEmpty: slot.itemUrl === "" }))
+        .sort(emptyLast)
 }

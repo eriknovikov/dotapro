@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { getHeroById, getItemById } from "./dotautils"
+import { getHeroById, getItemById, getNeutralById } from "./dotautils"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -76,11 +76,22 @@ export function getHeroImageUrl(heroId: number): string {
 }
 
 export function getItemImageUrl(itemId: number): string {
-    const item = getItemById(itemId)
-    if (!item || itemId === 0) {
-        // Return empty string for empty slots or unknown items
+    if (itemId === 0) {
+        // Return empty string for empty slots
         return ""
     }
-    // OpenDota CDN pattern: https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/{item_name}.png
-    return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png`
+    // First try to find in regular items
+    const item = getItemById(itemId)
+    if (item) {
+        // OpenDota CDN pattern: https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/{item_name}.png
+        return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${item.name}.png`
+    }
+    // Then try to find in neutral items
+    const neutral = getNeutralById(itemId)
+    if (neutral) {
+        // OpenDota CDN pattern: https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/{item_name}.png
+        return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/${neutral.name}.png`
+    }
+    // Return empty string for unknown items
+    return ""
 }

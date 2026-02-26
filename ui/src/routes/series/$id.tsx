@@ -52,7 +52,7 @@ function SeriesDetailPage() {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="py-6 max-w-7xl mx-auto">
             <SeriesHeader series={data} />
 
             {data.matches.length > 0 ? (
@@ -66,7 +66,12 @@ function SeriesDetailPage() {
                     </TabsList>
                     {data.matches.map((match, i) => (
                         <TabsContent key={i} value={`game-${i + 1}`}>
-                            <GameTabContent match={match} gameNumber={i + 1} />
+                            <GameTabContent
+                                match={match}
+                                gameNumber={i + 1}
+                                radiantTeam={data.team_a}
+                                direTeam={data.team_b}
+                            />
                         </TabsContent>
                     ))}
                 </Tabs>

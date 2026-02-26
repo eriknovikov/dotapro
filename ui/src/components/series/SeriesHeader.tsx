@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react"
-import { useNavigate } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import type { SeriesDetail } from "@/api/api"
 import { formatRelativeTime } from "@/lib"
 import { Button } from "@/components/ui"
@@ -10,28 +10,21 @@ interface SeriesHeaderProps {
 
 export function SeriesHeader({ series }: SeriesHeaderProps) {
     const { team_a, team_b, league, team_a_score, team_b_score, start_time } = series
-    const navigate = useNavigate()
-
-    const handleBackToSeries = () => {
-        navigate({ to: "/series" })
-    }
 
     return (
-        <div className="rounded-xl px-6 md:px-8 pb-2">
+        <div className="rounded-xl pb-2">
             {/* Back Button */}
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackToSeries}
-                className="mb-4 -ml-2 text-foreground-muted hover:text-foreground"
+            <Link
+                className="mb-4 text-foreground-muted hover:text-foreground flex items-center gap-2 w-fit"
+                to="/series"
             >
                 <ChevronLeft className="h-4 w-4" />
                 Back to Series
-            </Button>
+            </Link>
             {/* Teams and Score */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+            <div className="flex flex-col md:flex-row items-center gap-25">
                 {/* Team A */}
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-1">
                     {team_a.logo_url && (
                         <img
                             src={team_a.logo_url}
@@ -48,7 +41,7 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                 </div>
 
                 {/* Team B */}
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-1">
                     <span className="text-xl md:text-3xl font-bold font-shantell">{team_b.name}</span>
                     {team_b.logo_url && (
                         <img
@@ -61,12 +54,10 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
             </div>
 
             {/* League and Time */}
-            <div className="text-center mt-4 text-sm text-foreground-muted">
+            <div className=" mt-4 text-sm text-foreground-muted">
                 <span className="font-medium">{league.name}</span>
                 <span className="mx-2">•</span>
-                <span className="inline-block px-2 py-0.5 rounded text-xs bg-secondary/20 text-secondary">
-                    {league.tier}
-                </span>
+                <span className="inline-block px-2 py-0.5 rounded text-xs bg-secondary/20">{league.tier}</span>
                 <span className="mx-2">•</span>
                 <span>~{formatRelativeTime(start_time)} ago</span>
             </div>

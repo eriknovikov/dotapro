@@ -27,9 +27,9 @@ export function Navbar() {
 
     return (
         <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-lg shadow-primary-500/5">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between h-16">
-                    <div className="flex-shrink-0 flex items-center gap-2">
+                    <div className="shrink-0 flex items-center gap-2">
                         <picture>
                             <source srcSet="/logo-48.webp" media="(min-width: 768px)" />
                             <img src="/logo-32x32.webp" alt="" className="h-8 md:h-12 w-auto" />
@@ -37,14 +37,14 @@ export function Navbar() {
 
                         <Link
                             to="/"
-                            className="text-3xl font-teko bg-gradient-to-r from-foreground to-foreground bg-clip-text text-transparent hover:from-[hsl(38,92%,50%)] hover:to-[hsl(0,84%,50%)]"
+                            className="text-3xl font-teko bg-linear-to-r from-foreground to-foreground bg-clip-text text-transparent hover:from-[hsl(38,92%,50%)] hover:to-[hsl(0,84%,50%)]"
                         >
                             dotapro.com
                         </Link>
                     </div>
 
                     <div className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-4">
+                        <div className="flex items-baseline space-x-4">
                             {navLinks.map(link => (
                                 <NavLink key={link.to} to={link.to} label={link.label} />
                             ))}

@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
 function Index() {
     return (
         <main className="flex-1 min-h-[calc(100vh-4rem)]">
-            <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="max-w-7xl mx-auto py-12">
                 {/* Hero Section */}
                 <div className="flex justify-center mb-16">
                     <div className="flex flex-col items-start">

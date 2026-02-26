@@ -6,7 +6,7 @@ export const Route = createFileRoute("/about")({
 
 function About() {
     return (
-        <div className="p-6 min-h-[calc(100vh-4rem)] max-w-4xl mx-auto">
+        <div className="py-6 min-h-[calc(100vh-4rem)] max-w-4xl mx-auto">
             <div className="space-y-8">
                 {/* What's dotapro */}
                 <div className="shadow-md shadow-gray-900 p-10">
