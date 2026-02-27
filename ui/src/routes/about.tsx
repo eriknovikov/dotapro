@@ -17,10 +17,11 @@ function About() {
                         the pro scene.
                     </p>
                     <p className="text-foreground-muted leading-relaxed">
-                        The key reason for building this was that traditional Dota 2 analytics platforms just dump a
-                        mountain of data on you and say "good luck figuring it out". dotapro focuses on the analytics
-                        that actually matter to Dota players, presented in a clean, modern UI that doesn't make your
-                        eyes bleed. Think of it as OpenDota/Stratz/Liquipedia, but on steroids.
+                        It's by no means a replacement or better alternative of traditional heavy-weight analyitics
+                        sites like Dotabuff, Stratz, or OpenDota; it's just that our focus is completely different.
+                        Other platforms just dump a mountain of data on you and say "good luck figuring it out", while
+                        dotapro focuses on the analytics that actually matter to Dota players (according to real
+                        players), without the noise of public matches data.
                     </p>
                 </div>
 
@@ -78,22 +79,14 @@ function About() {
                 <div className="shadow-md shadow-gray-900 p-10">
                     <h2 className="text-2xl font-bold text-foreground mb-4">Contributing</h2>
                     <p className="text-foreground-muted leading-relaxed mb-4">
-                        dotapro is open source and I'd love to have you contribute! Whether you're fixing bugs, adding
-                        features, or just have ideas for improvements – all help is appreciated.
+                        dotapro.com is open source, and we would appreciate your help greatly!
                     </p>
-                    <p className="text-foreground-muted leading-relaxed mb-4">
-                        <strong className="text-foreground">Ways to contribute:</strong>
-                    </p>
+
                     <ul className="text-foreground-muted space-y-2 ml-6 list-disc mb-4">
                         <li>Submit pull requests for bug fixes or new features</li>
                         <li>Open issues for bugs you find or features you'd like to see</li>
                         <li>Share feedback and suggestions (I'm always open to ideas!)</li>
                     </ul>
-                    <p className="text-foreground-muted leading-relaxed">
-                        The project will be on GitHub once I get it properly public-ready. In the meantime, feel free to
-                        reach out if you want to contribute or just chat about the project. I'm pretty responsive and
-                        happy to help new contributors get started!
-                    </p>
                 </div>
 
                 {/* Footer */}

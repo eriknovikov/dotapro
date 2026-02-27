@@ -10,7 +10,7 @@ migrate-up:
 
 # Rollback the last migration
 migrate-down:
-	migrate -path $(MIGRATIONS_PATH) -database $(LOCAL_DB_URL) down 1
+	migrate -path $(MIGRATIONS_PATH) -database $(LOCAL_DB_URL) down 2
 
 # Create a new migration file pair (usage: make migrate-new name=add_users_table)
 migrate-new:

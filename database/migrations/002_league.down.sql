@@ -1,7 +1,4 @@
-DELETE EXTENSION IF NOT EXISTS pg_trgm;
 
+DROP INDEX IF EXISTS leagues_name_trgm_idx;
 
-DELETE INDEX IF NOT EXISTS leagues_name_trgm_idx 
-
-
-DELETE INDEX IF NOT EXISTS teams_name_trgm_idx 
+DROP INDEX IF EXISTS teams_name_trgm_idx;

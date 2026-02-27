@@ -59,7 +59,7 @@ const formatNetWorth = (netWorth: number) => {
     return `${netWorth}K`
 }
 
-function TeamPlayersTable({ players, team, captain, teamInfo, score, isWinner }: TeamPlayersTableProps) {
+function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamPlayersTableProps) {
     return (
         <div className="bg-background-accent rounded-lg p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -126,7 +126,10 @@ function TeamPlayersTable({ players, team, captain, teamInfo, score, isWinner }:
                                 {/* Player */}
                                 <TableCell className="px-2 py-0">
                                     <div className="flex items-center gap-1 min-w-0">
-                                        <span className="text-md truncate" title={player.name ?? "unknown"}>
+                                        <span
+                                            className={cn("text-md truncate", player.name ?? "")}
+                                            title={player.name ?? "unknown"}
+                                        >
                                             {player.name ?? "unknown"}
                                         </span>
                                         {isCaptain && (

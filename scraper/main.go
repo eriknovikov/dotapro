@@ -16,7 +16,6 @@ import (
 
 const DB_CREATION_TIMEOUT = time.Second * 5
 const SSM_TIMEOUT = time.Second * 5
-const SCRAPING_LIMIT = 800 // 1 batches of 800
 
 var DB *bun.DB
 
