@@ -88,13 +88,6 @@ function About() {
                         <li>Share feedback and suggestions (I'm always open to ideas!)</li>
                     </ul>
                 </div>
-
-                {/* Footer */}
-                <div className="text-center text-foreground-muted text-sm pt-4">
-                    <p>
-                        Made with ❤️ for the <span className="text-nowrap">Dota 2</span> community
-                    </p>
-                </div>
             </div>
         </div>
     )

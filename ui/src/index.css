@@ -166,6 +166,7 @@
 html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
 }
 
 body {
@@ -173,6 +174,7 @@ body {
     line-height: 1.5;
     color: hsl(0, 0%, 98%);
     background-color: hsl(0, 0%, 4%);
+    overflow-x: hidden;
 }
 
 *:focus-visible {
@@ -224,6 +226,32 @@ body {
 
 .spinner-gradient {
     animation: spinner-gradient 1s linear infinite;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.slide-in-right {
+    animation: slideInFromRight 300ms ease-out;
+}
+
+.slide-out-right {
+    animation: slideOutToRight 300ms ease-in;
 }
 
 .text-primary {
