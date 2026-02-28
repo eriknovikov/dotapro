@@ -18,10 +18,10 @@ function About() {
                     </p>
                     <p className="text-foreground-muted leading-relaxed">
                         It's by no means a replacement or better alternative of traditional heavy-weight analyitics
-                        sites like Dotabuff, Stratz, or OpenDota; it's just that our focus is completely different.
-                        Other platforms just dump a mountain of data on you and say "good luck figuring it out", while
-                        dotapro focuses on the analytics that actually matter to Dota players (according to real
-                        players), without the noise of public matches data.
+                        sites like Dotabuff, Stratz, or OpenDota; it's just that my focus is completely different. Other
+                        platforms just dump a mountain of data on you and say "good luck figuring it out", while dotapro
+                        focuses on the analytics that actually matter to Dota players (according to real players),
+                        without the noise of public matches data.
                     </p>
                 </div>
 
@@ -79,7 +79,7 @@ function About() {
                 <div className="shadow-md shadow-gray-900 p-10">
                     <h2 className="text-2xl font-bold text-foreground mb-4">Contributing</h2>
                     <p className="text-foreground-muted leading-relaxed mb-4">
-                        dotapro.com is open source, and we would appreciate your help greatly!
+                        dotapro.com is open source, and I would appreciate your help greatly! You could:
                     </p>
 
                     <ul className="text-foreground-muted space-y-2 ml-6 list-disc mb-4">
