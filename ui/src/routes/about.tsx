@@ -18,10 +18,10 @@ function About() {
                     </p>
                     <p className="text-foreground-muted leading-relaxed">
                         It's by no means a replacement or better alternative of traditional heavy-weight analyitics
-                        sites like Dotabuff, Stratz, or OpenDota; it's just that my focus is completely different. Other
-                        platforms just dump a mountain of data on you and say "good luck figuring it out", while dotapro
-                        focuses on the analytics that actually matter to Dota players (according to real players),
-                        without the noise of public matches data.
+                        sites like Dotabuff, Stratz, or OpenDota; it's just that dotapro's focus is completely
+                        different. Other platforms just dump a mountain of data on you and say "good luck figuring it
+                        out", while dotapro focuses on the analytics that actually matter to Dota players (according to
+                        real players), without the noise of public matches data.
                     </p>
                 </div>
 
