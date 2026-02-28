@@ -6,25 +6,36 @@ import (
 	"strings"
 )
 
+const (
+	// Valid league tiers for filtering
+	TierPremium      = "premium"
+	TierProfessional = "professional"
+	TierAmateur      = "amateur"
+	TierUnknown      = "unknown"
+)
+
+// QueryBuilder builds SQL queries for the OpenDota explorer API
 type QueryBuilder struct{}
 
-func (b *QueryBuilder) GetIds(last_fetched_match_id int64, limit int) string {
+// GetIds builds a query to fetch match IDs from OpenDota
+func (b *QueryBuilder) GetIds(lastFetchedMatchID int64, limit int) string {
 	return fmt.Sprintf(`
 		SELECT m.match_id
 		FROM matches m
 		LEFT JOIN leagues l ON m.leagueid = l.leagueid
-		WHERE l.tier IN ('premium', 'professional') 
-			AND m.match_id > %v
+		WHERE l.tier IN ('%s', '%s')
+			AND m.match_id > %d
 			AND m.series_id != 0
-			AND m.radiant_team_id IS NOT NULL 
+			AND m.radiant_team_id IS NOT NULL
 			AND m.dire_team_id IS NOT NULL
 		ORDER BY m.match_id ASC
 		LIMIT %d;
-	`, last_fetched_match_id, limit)
+	`, TierPremium, TierProfessional, lastFetchedMatchID, limit)
 }
 
-func (b *QueryBuilder) GetMatches(matchIds []int64) string {
-	stringified := b.stringifyMatchIDs(matchIds)
+// GetMatches builds a query to fetch match details from OpenDota
+func (b *QueryBuilder) GetMatches(matchIDs []int64) string {
+	stringified := b.stringifyMatchIDs(matchIDs)
 	return fmt.Sprintf(`
 		SELECT
 			m.match_id,
@@ -34,10 +45,10 @@ func (b *QueryBuilder) GetMatches(matchIds []int64) string {
 			m.version,
 			mp.patch,
 			JSON_BUILD_OBJECT(
-                'id', m.leagueid,
-                'name', l.name,
-                'tier', l.tier
-                ) AS league,
+				'id', m.leagueid,
+				'name', l.name,
+				'tier', l.tier
+			) AS league,
 			JSON_BUILD_OBJECT(
 				'id', m.radiant_team_id,
 				'name', rt.name,
@@ -114,6 +125,7 @@ func (b *QueryBuilder) GetMatches(matchIds []int64) string {
 	`, stringified)
 }
 
+// stringifyMatchIDs converts a slice of match IDs to a comma-separated string
 func (b *QueryBuilder) stringifyMatchIDs(ids []int64) string {
 	if len(ids) == 0 {
 		return ""

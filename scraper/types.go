@@ -9,6 +9,7 @@ import (
 
 // --- DB Models ---
 
+// League represents a Dota 2 league/tournament
 type League struct {
 	bun.BaseModel `bun:"table:leagues"`
 	LeagueID      int64  `bun:"league_id,pk"`
@@ -16,6 +17,7 @@ type League struct {
 	Tier          string `bun:"tier"`
 }
 
+// Team represents a Dota 2 professional team
 type Team struct {
 	bun.BaseModel `bun:"table:teams"`
 	TeamID        int64  `bun:"team_id,pk"`
@@ -24,12 +26,14 @@ type Team struct {
 	LogoURL       string `bun:"logo_url"`
 }
 
+// Player represents a Dota 2 player
 type Player struct {
 	bun.BaseModel `bun:"table:players"`
 	PlayerID      int64  `bun:"player_id,pk"`
 	Name          string `bun:"name,notnull"`
 }
 
+// Series represents a series of matches between two teams
 type Series struct {
 	bun.BaseModel `bun:"table:series"`
 	SeriesID      int64     `bun:"series_id,pk"`
@@ -41,6 +45,7 @@ type Series struct {
 	TeamBScore    int16     `bun:"team_b_score,default:0"`
 }
 
+// Match represents a Dota 2 match
 type Match struct {
 	bun.BaseModel  `bun:"table:matches"`
 	MatchID        int64     `bun:"match_id,pk"`
@@ -57,6 +62,7 @@ type Match struct {
 	Patch          string    `bun:"patch"`
 }
 
+// MatchMetadata contains additional match data stored separately
 type MatchMetadata struct {
 	bun.BaseModel  `bun:"table:matches_metadata"`
 	MatchID        int64           `bun:"match_id,pk"`
@@ -71,18 +77,21 @@ type MatchMetadata struct {
 	Version        int             `bun:"version"`
 }
 
+// SeriesMatch represents the relationship between a series and a match
 type SeriesMatch struct {
 	bun.BaseModel `bun:"table:series_match"`
 	SeriesID      int64 `bun:"series_id,pk"`
 	MatchID       int64 `bun:"match_id,pk"`
 }
 
+// SeriesScore tracks the score for a series (not stored in DB)
 type SeriesScore struct {
-	SeriesID    int64
-	TeamAWins   int16
-	TeamBWins   int16
+	SeriesID  int64
+	TeamAWins int16
+	TeamBWins int16
 }
 
+// ScraperMetadata stores scraper state information
 type ScraperMetadata struct {
 	bun.BaseModel      `bun:"table:scraper_metadata"`
 	ID                 int16 `bun:"id,pk"`
@@ -91,6 +100,7 @@ type ScraperMetadata struct {
 
 // --- Source Structs (OpenDota Mapping) ---
 
+// ODMatch represents a match from OpenDota API
 type ODMatch struct {
 	MatchID        int64           `json:"match_id"`
 	RadiantWin     bool            `json:"radiant_win"`
@@ -108,12 +118,14 @@ type ODMatch struct {
 	PicksBans      json.RawMessage `json:"picks_bans"`
 }
 
+// ODLeague represents a league from OpenDota API
 type ODLeague struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
 	Tier string `json:"tier"`
 }
 
+// ODTeam represents a team from OpenDota API
 type ODTeam struct {
 	ID      int64  `json:"id"`
 	Name    string `json:"name"`
@@ -123,6 +135,7 @@ type ODTeam struct {
 	Captain *int64 `json:"captain"` // NULL represents no captain
 }
 
+// ODPlayerShort represents a player summary from OpenDota API
 type ODPlayerShort struct {
 	PlayerID   int64  `json:"player_id"`
 	HeroID     int64  `json:"hero_id"`
