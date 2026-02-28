@@ -2,17 +2,26 @@
 
 ## Overview
 
-Dota 2 match data aggregation system. Scrapes from OpenDota API, stores in PostgreSQL, provides REST API. React frontend for visualization.
+Dota 2 professional match data aggregation platform. Scrapes from OpenDota API, stores in PostgreSQL, provides REST API with React frontend for visualization.
 
 ## Infrastructure
 
-AWS RDS (PostgreSQL) in public VPC, Lambda for API and scraper, S3 + CloudFront for frontend.
+| Service | Purpose |
+|---------|---------|
+| AWS RDS (PostgreSQL) | Primary database in public VPC |
+| Lambda (API) | REST API server |
+| Lambda (Scraper) | Data ingestion from OpenDota |
+| S3 + CloudFront | Static frontend hosting |
+| API Gateway | API routing |
+| EventBridge | Scheduled scraper (1/min) |
 
 ## Tech Stack
 
-- **API**: Go 1.25, Chi router, Bun ORM + pgx, zerolog
-- **DB**: PostgreSQL 16, golang-migrate
-- **Frontend**: React + Tailwind v4 + Vite, TanStack Router/Query/Table, shadcn/ui, pnpm
+| Component | Technology |
+|-----------|------------|
+| API | Go 1.25, Chi router, Bun ORM + pgx, zerolog |
+| Database | PostgreSQL 16, golang-migrate |
+| Frontend | React, Tailwind v4, Vite, TanStack Router/Query/Table, shadcn/ui, pnpm |
 
 ## Directory Structure
 
@@ -23,44 +32,51 @@ database/     - Schemas, migrations, queries, makefile
 ui/           - React app (src/components/, src/routes/, src/api/, src/hooks/, src/lib/)
 ```
 
-## App Flow
+## Data Flow
 
+```
 Users → React UI → CloudFront → API Gateway → API Lambda → RDS → JSON
 Scraper Lambda (EventBridge 1/min) → OpenDota → RDS
+```
 
 ## Database Schema
 
 **Tables**: `leagues`, `teams`, `players`, `users`, `series`, `series_match`, `matches`, `matches_metadata`, `user_feeds`, `user_feed_filters`
 
-**Key indexes**: GIN on array columns (heroes, players), BTREE on foreign keys and timestamps
+**Indexes**: GIN on array columns (heroes, players), BTREE on foreign keys and timestamps
 
 **Triggers**: `after_match_insert` auto-creates series and updates scores
 
 ## API Endpoints
 
-- `GET /matches` - List matches (filters: league, team, player, hero, sort, cursor pagination)
-- `GET /matches/:id` - Match details
-- `GET /series` - Series list (filters: league, team, sort, cursor pagination)
-- `GET /series/:id` - Matches in a series
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/matches` | List matches (filters: league, team, player, hero, sort, cursor pagination) |
+| GET | `/matches/:id` | Match details |
+| GET | `/series` | Series list (filters: league, team, sort, cursor pagination) |
+| GET | `/series/:id` | Matches in a series |
 
 ## Frontend Design System
 
-**Theme**: Dota 2 Dark (Dire Red `hsl(0,84%,50%)`, Radiant Gold `hsl(38,92%,50%)`, Deep Dark `hsl(0,0%,4%)`)
+**Theme**: Dota 2 Dark
+- Dire Red: `hsl(0,84%,50%)`
+- Radiant Gold: `hsl(38,92%,50%)`
+- Deep Dark: `hsl(0,0%,4%)`
 
 **Components**: Button, Input, Select, Card, Badge, Spinner, EmptyState, ErrorState (shadcn/ui + custom)
 
 **Tokens**: Full color scales, custom spacing (18, 88, 128), border radius, shadows, transitions
 
-## React Guidelines
+## Development Guidelines
 
+### React
 - TanStack Router for type-safe routing
 - TanStack Query for data fetching
 - `filtersRef` for non-rerendering filter state
 - `router.navigate({ replace: true })` for URL updates without rerender
 - TypeScript throughout
 
-## Go Guidelines
-
+### Go
 - Descriptive naming, small focused functions
 - Separate packages by functionality
 - Types in `types.go`, struct tags for JSON/Bun
@@ -90,31 +106,33 @@ cd ui && npm run dev
 
 ## Environment Variables
 
-- `ENVIRON` - `local` or `prod`
-- `LOCAL_DB_URL` - Local DB connection (local only)
-- `DB_URL_PARAM_NAME` - SSM parameter name (prod only)
-- `LOCAL_ADDR` - API address (local only, default `localhost:8080`)
-- `SCRAPING_LIMIT` - Matches per scrape (default 800)
+| Variable | Description |
+|----------|-------------|
+| `ENVIRON` | `local` or `prod` |
+| `LOCAL_DB_URL` | Local DB connection (local only) |
+| `DB_URL_PARAM_NAME` | SSM parameter name (prod only) |
+| `LOCAL_ADDR` | API address (local only, default `localhost:8080`) |
+| `SCRAPING_LIMIT` | Matches per scrape (default 800) |
 
-## CI/CD
+## CI/CD Pipeline
 
+```
 Push to main → build Lambdas → deploy to AWS → build React → upload to S3 → invalidate CloudFront
+```
 
-## Lambda Config
+## Lambda Configuration
 
-- **API**: API Gateway trigger, 256 MB, 30 sec timeout
-- **Scraper**: EventBridge (1/min), 512 MB, 5 min timeout
+| Lambda | Trigger | Memory | Timeout |
+|--------|---------|--------|---------|
+| API | API Gateway | 256 MB | 30 sec |
+| Scraper | EventBridge (1/min) | 512 MB | 5 min |
+
+## Performance
+
+- **Database**: Array columns with GIN indexes, denormalized data, batch inserts (800 per transaction)
+- **API**: Connection pooling via pgx, 5-10 sec request timeouts
+- **Scraper**: Batch processing (800), retry logic (3 attempts), HTTP connection pooling
 
 ## Security
 
 RDS in public subnet for cost efficiency (no NAT GW ~$32/mo, no bastion hosts)
-
-## Performance
-
-- **DB**: Array columns with GIN indexes, denormalized data, batch inserts (800 per transaction)
-- **API**: Connection pooling via pgx, 5-10 sec request timeouts
-- **Scraper**: Batch processing (800), retry logic (3 attempts), HTTP connection pooling
-
-## Model Response Guidelines
-
-Never run commands yourself. Say "now run `{COMMAND}` to do `{ACTION}`".

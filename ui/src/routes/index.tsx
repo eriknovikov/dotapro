@@ -57,7 +57,7 @@ function Index() {
                         {/* Main Image Container */}
                         <div className="relative rounded-xl bg-background-card shadow-[0_0_0_1px_rgba(0,0,0,.04),0_4px_6px_rgba(0,0,0,.02),0_10px_15px_rgba(0,0,0,.015),0_20px_25px_rgba(0,0,0,.015),0_40px_50px_rgba(0,0,0,.01),0_100px_80px_rgba(0,0,0,.01)] overflow-hidden">
                             <img
-                                src="/scrsh.png"
+                                src="/hero.webp"
                                 alt="Series Screenshot"
                                 className="block w-full sm:max-w-[80vw] md:max-w-[90vw] lg:max-w-[80vw] h-auto"
                             />
