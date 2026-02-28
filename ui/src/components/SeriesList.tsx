@@ -13,12 +13,14 @@ interface SeriesListProps {
     isLoading?: boolean
     error?: Error | null
     pagination?: Pagination
+    limit?: number
 }
 
-export function SeriesList({ series, isLoading, error, pagination }: SeriesListProps) {
+export function SeriesList({ series, isLoading, error, pagination, limit }: SeriesListProps) {
     const navigate = useNavigate()
     const router = useRouter()
     const search = useSearch({ strict: false })
+    const skeletonCount = limit || 20
 
     const handleLoadMore = () => {
         if (pagination?.nc) {
@@ -41,16 +43,16 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
         return (
             <div className="w-full">
                 {/* Loading header with spinner */}
-                <div className="flex items-center justify-center h-16 mb-6">
+                <div className="flex items-center justify-center h-12 sm:h-16 mb-4 sm:mb-6">
                     <div className="flex items-center space-x-2">
                         <Spinner size="lg" />
-                        <span className="text-foreground-muted">Loading series...</span>
+                        <span className="text-sm sm:text-base text-foreground-muted">Loading series...</span>
                     </div>
                 </div>
 
                 {/* Skeleton cards matching the grid layout */}
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-6">
-                    {Array.from({ length: 15 }).map((_, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-4 sm:gap-6">
+                    {Array.from({ length: skeletonCount }).map((_, i) => (
                         <SeriesCardSkeleton key={i} />
                     ))}
                 </div>
@@ -60,33 +62,32 @@ export function SeriesList({ series, isLoading, error, pagination }: SeriesListP
 
     if (!series || series.length === 0) {
         return (
-            <EmptyState
-                icon="🤕"
-                title="No series found"
-                description="Try adjusting your filters to find what you're looking for."
-            />
+            <div className="flex items-center justify-center min-h-[50vh]">
+                <EmptyState
+                    icon="🤕"
+                    title="No series found"
+                    description="Try adjusting your filters to find what you're looking for."
+                />
+            </div>
         )
     }
 
     return (
         <div className="w-full">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-4 sm:gap-6">
                 {series.map(s => (
                     <SeriesCard key={s.series_id} series={s} />
                 ))}
             </div>
 
-            <div className="flex items-center justify-center gap-4 mt-6">
-                <Button
-                    onClick={handlePrevious}
-                    variant="cool-outline"
-                    disabled={isLoading || !search.c}
-                >
+            <div className="flex items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6">
+                <Button onClick={handlePrevious} variant="cool-outline" size="sm" disabled={isLoading || !search.c}>
                     Previous
                 </Button>
                 <Button
                     onClick={handleLoadMore}
                     variant="cool-outline"
+                    size="sm"
                     disabled={isLoading || !pagination?.nc || !pagination?.has_more}
                 >
                     Next

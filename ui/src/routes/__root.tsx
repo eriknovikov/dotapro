@@ -7,7 +7,9 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 const RootLayout = () => (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
         <Navbar />
-        <Outlet />
+        <div className="pt-14 sm:pt-16 flex-1">
+            <Outlet />
+        </div>
         <Footer />
         <TanStackRouterDevtools />
     </div>

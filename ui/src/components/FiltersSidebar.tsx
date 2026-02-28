@@ -51,37 +51,60 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
     }
 
     return (
-        <aside
-            className={`
-                fixed top-16 left-0 z-40
-                w-72 h-[calc(100vh-4rem)]
-                bg-background border-r border-border
-                shrink-0
-                transform transition-transform duration-300 ease-in-out
-                ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-            `}
-        >
-            <div className="h-full overflow-y-auto p-6">
-                {/* Mobile close button */}
-                <div className="flex items-center justify-between mb-6 md:hidden">
-                    <h2 className="text-lg font-semibold text-foreground">Filters</h2>
-                    <Button variant="ghost" size="icon" onClick={onMobileClose} aria-label="Close filters">
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </Button>
-                </div>
+        <>
+            {/* Backdrop overlay for mobile/tablet */}
+            {isMobileOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+                    onClick={onMobileClose}
+                    aria-hidden="true"
+                />
+            )}
 
-                {/* Desktop title */}
-                <div className="hidden md:flex items-center gap-2 mb-6">
-                    <Funnel className="h-5 w-5 text-foreground" />
-                    <h2 className="text-lg font-semibold text-foreground">Filters</h2>
-                </div>
+            <aside
+                className={`
+                    fixed z-50
+                    ${isMobileOpen ? "translate-y-0" : "translate-y-full"}
+                    lg:fixed lg:top-16 lg:left-0 lg:translate-x-0 lg:translate-y-0
+                    lg:w-72 lg:h-[calc(100vh-4rem)]
+                    bottom-0 left-0 right-0
+                    h-[90vh]
+                    bg-background border-t lg:border-r border-border
+                    rounded-t-2xl lg:rounded-none
+                    shadow-2xl
+                    transition-transform duration-300 ease-in-out
+                `}
+            >
+                <div className="h-full overflow-y-auto p-6">
+                    {/* Mobile close button */}
+                    <div className="flex items-center justify-between mb-6 lg:hidden">
+                        <div className="flex items-center gap-2">
+                            <Funnel className="h-5 w-5 text-foreground" />
+                            <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={onMobileClose}
+                            aria-label="Close filters"
+                            className="h-12 w-12"
+                        >
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </Button>
+                    </div>
+
+                    {/* Desktop title */}
+                    <div className="hidden lg:flex items-center gap-2 mb-6">
+                        <Funnel className="h-5 w-5 text-foreground" />
+                        <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+                    </div>
 
                 <div className="space-y-12">
                     {/* League Filter */}
@@ -142,6 +165,9 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                                 <SelectValue placeholder="20" />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="10" disabled={filters.limit === 10}>
+                                    10
+                                </SelectItem>
                                 <SelectItem value="20" disabled={!filters.limit || filters.limit === 20}>
                                     20
                                 </SelectItem>
@@ -156,19 +182,29 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-1">
                         <Button
                             onClick={handleClear}
-                            variant="cool-outline"
+                            variant="outline"
                             size="sm"
                             className="text-sm"
                             aria-label="Reset defaults"
                         >
                             Reset defaults
                         </Button>
+                        <Button
+                            onClick={onMobileClose}
+                            variant="primary"
+                            size="sm"
+                            className="text-sm lg:hidden"
+                            aria-label="Close filters"
+                        >
+                            Done
+                        </Button>
                     </div>
                 </div>
             </div>
         </aside>
+        </>
     )
 }
