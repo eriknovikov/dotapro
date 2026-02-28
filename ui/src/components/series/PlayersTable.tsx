@@ -2,7 +2,7 @@ import { Crown, Trophy } from "lucide-react"
 import type { SeriesMatchDetail, PlayerData, TeamInfo } from "@/api/api"
 import { getHeroImageUrl, getItemImageUrl, cn } from "@/lib"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip } from "@/components/ui/tooltip"
 import { HeroTooltipContent } from "./HeroTooltipContent"
 import { ItemTooltipContent } from "./ItemTooltipContent"
 
@@ -63,8 +63,8 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
     return (
         <div className="bg-background-accent rounded-lg p-4">
             <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm font-semibold">{teamInfo.name}</span>
-                <span className="text-foreground-muted text-sm">{score}</span>
+                <span className="text-base sm:text-sm font-semibold">{teamInfo.name}</span>
+                <span className="text-foreground-muted text-base sm:text-sm">{score}</span>
                 {isWinner && (
                     <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white font-semibold">
                         <Trophy className="size-5 text-secondary" />
@@ -72,102 +72,101 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                 )}
             </div>
 
-            <Table className="table-fixed">
-                <TableHeader>
-                    <TableRow className="border-border hover:bg-transparent">
-                        <TableHead className="w-7 px-2 text-xs text-foreground-muted uppercase tracking-wider">
-                            Hero
-                        </TableHead>
-                        <TableHead className="w-16 px-2 text-xs text-foreground-muted uppercase tracking-wider">
-                            Player
-                        </TableHead>
-                        <TableHead className="w-28 px-2 text-xs text-foreground-muted uppercase tracking-wider">
-                            Items
-                        </TableHead>
-                        <TableHead className="w-12 px-2 text-right text-xs text-secondary-500 uppercase tracking-wider">
-                            NET
-                        </TableHead>
-                        <TableHead className="w-20 px-2 text-center text-xs text-foreground-muted uppercase tracking-wider">
-                            <span className="text-success-200">K</span>
-                            <span className="text-foreground-muted mx-0.5">/</span>
-                            <span className="text-error-300">D</span>
-                            <span className="text-foreground-muted mx-0.5">/</span>
-                            <span className="text-foreground">A</span>
-                        </TableHead>
-                        <TableHead className="w-12 px-2 text-center text-xs text-foreground-muted uppercase tracking-wider">
-                            LH
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {players.map(player => {
-                        const isCaptain = captain === player.player_id
-                        return (
-                            <TableRow
-                                key={player.player_id}
-                                className="border-border hover:bg-background/50 border-b-2 "
-                            >
-                                {/* Hero */}
-                                <TableCell className="px-2">
-                                    <TooltipProvider delayDuration={100}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <img
-                                                    src={getHeroImageUrl(player.hero_id)}
-                                                    className="h-8 cursor-pointer"
-                                                />
-                                            </TooltipTrigger>
-                                            <TooltipContent className="p-0 border-none bg-transparent" side="right">
-                                                <HeroTooltipContent heroId={player.hero_id} />
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </TableCell>
-                                {/* Player */}
-                                <TableCell className="px-2 py-0">
-                                    <div className="flex items-center gap-1 min-w-0">
-                                        <span
-                                            className={cn("text-md truncate", player.name ?? "")}
-                                            title={player.name ?? "unknown"}
+            <div className="overflow-x-auto">
+                <Table className="table-fixed min-w-[900px]">
+                    <TableHeader>
+                        <TableRow className="border-border hover:bg-transparent">
+                            <TableHead className="w-20 px-3 text-xs text-foreground-muted uppercase tracking-wider">
+                                Hero
+                            </TableHead>
+                            <TableHead className="w-48 px-3 text-xs text-foreground-muted uppercase tracking-wider">
+                                Player
+                            </TableHead>
+                            <TableHead className="w-80 px-3 text-xs text-foreground-muted uppercase tracking-wider">
+                                Items
+                            </TableHead>
+                            <TableHead className="w-24 px-3 text-right text-xs text-secondary-500 uppercase tracking-wider">
+                                NET
+                            </TableHead>
+                            <TableHead className="w-32 px-3 text-center text-xs text-foreground-muted uppercase tracking-wider">
+                                <span className="text-success-200">K</span>
+                                <span className="text-foreground-muted mx-0.5">/</span>
+                                <span className="text-error-300">D</span>
+                                <span className="text-foreground-muted mx-0.5">/</span>
+                                <span className="text-foreground">A</span>
+                            </TableHead>
+                            <TableHead className="w-20 px-3 text-center text-xs text-foreground-muted uppercase tracking-wider">
+                                LH
+                            </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {players.map(player => {
+                            const isCaptain = captain === player.player_id
+                            return (
+                                <TableRow
+                                    key={player.player_id}
+                                    className="border-border hover:bg-background/50 border-b-2 "
+                                >
+                                    {/* Hero */}
+                                    <TableCell className="px-3">
+                                        <Tooltip
+                                            content={<HeroTooltipContent heroId={player.hero_id} />}
+                                            side="right"
+                                            contentClassName="p-0 border-none bg-transparent"
                                         >
-                                            {player.name ?? "unknown"}
-                                        </span>
-                                        {isCaptain && (
-                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-secondary/20 shrink-0 text-secondary">
-                                                <Crown className="w-3 h-3" />
+                                            <img
+                                                src={getHeroImageUrl(player.hero_id)}
+                                                className="h-7 w-auto sm:h-8 cursor-pointer"
+                                            />
+                                        </Tooltip>
+                                    </TableCell>
+                                    {/* Player */}
+                                    <TableCell className="px-3 py-0">
+                                        <div className="flex items-center gap-1">
+                                            <span
+                                                className={cn("text-md", player.name ?? "")}
+                                                title={player.name ?? "unknown"}
+                                            >
+                                                {player.name ?? "unknown"}
                                             </span>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                {/* Items */}
-                                <TableCell className="px-2 py-1">
-                                    <PlayerItems player={player} />
-                                </TableCell>
-                                {/* NET */}
-                                <TableCell className="px-2 py-0 text-right">
-                                    <span className="text-sm text-secondary-500">
-                                        {formatNetWorth(player.net_worth)}
-                                    </span>
-                                </TableCell>
-                                {/* KDA */}
-                                <TableCell className="px-2 py-0 text-center">
-                                    <span className="text-sm">
-                                        <span className="text-success-200">{player.kills}</span>
-                                        <span className="text-foreground-muted mx-0.5">/</span>
-                                        <span className="text-error-300">{player.deaths}</span>
-                                        <span className="text-foreground-muted mx-0.5">/</span>
-                                        <span className="text-foreground">{player.assists}</span>
-                                    </span>
-                                </TableCell>
-                                {/* LH */}
-                                <TableCell className="px-2 py-0 text-center">
-                                    <span className="text-sm text-foreground-muted">{player.last_hits}</span>
-                                </TableCell>
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-            </Table>
+                                            {isCaptain && (
+                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-secondary/20 shrink-0 text-secondary">
+                                                    <Crown className="w-3 h-3" />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    {/* Items */}
+                                    <TableCell className="px-3 py-1">
+                                        <PlayerItems player={player} />
+                                    </TableCell>
+                                    {/* NET */}
+                                    <TableCell className="px-3 py-0 text-right">
+                                        <span className="text-sm text-secondary-500">
+                                            {formatNetWorth(player.net_worth)}
+                                        </span>
+                                    </TableCell>
+                                    {/* KDA */}
+                                    <TableCell className="px-3 py-0 text-center">
+                                        <span className="text-sm">
+                                            <span className="text-success-200">{player.kills}</span>
+                                            <span className="text-foreground-muted mx-0.5">/</span>
+                                            <span className="text-error-300">{player.deaths}</span>
+                                            <span className="text-foreground-muted mx-0.5">/</span>
+                                            <span className="text-foreground">{player.assists}</span>
+                                        </span>
+                                    </TableCell>
+                                    {/* LH */}
+                                    <TableCell className="px-3 py-0 text-center">
+                                        <span className="text-sm text-foreground-muted">{player.last_hits}</span>
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }
@@ -230,37 +229,31 @@ function ItemSlot({ itemId, itemUrl, widthClass, heightClass, emptyBgClass }: It
     const isEmpty = itemId === 0 || itemUrl === ""
 
     return (
-        <TooltipProvider delayDuration={100}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
-                        {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
-                    </div>
-                </TooltipTrigger>
-                <TooltipContent className="p-0 border-none bg-transparent" side="left">
-                    <ItemTooltipContent itemId={itemId} />
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <Tooltip
+            content={<ItemTooltipContent itemId={itemId} />}
+            side="left"
+            contentClassName="p-0 border-none bg-transparent"
+        >
+            <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
+                {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
+            </div>
+        </Tooltip>
     )
 }
 
 function NeutralItemSlot({ itemId }: { itemId: number }) {
     return (
-        <TooltipProvider delayDuration={100}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <div className="w-10.5 h-7 rounded bg-black border border-border">
-                        {itemId > 0 && (
-                            <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />
-                        )}
-                    </div>
-                </TooltipTrigger>
-                <TooltipContent className="p-0 border-none bg-transparent" side="right">
-                    <ItemTooltipContent itemId={itemId} />
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <Tooltip
+            content={<ItemTooltipContent itemId={itemId} />}
+            side="right"
+            contentClassName="p-0 border-none bg-transparent"
+        >
+            <div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
+                {itemId > 0 && (
+                    <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />
+                )}
+            </div>
+        </Tooltip>
     )
 }
 
@@ -280,8 +273,8 @@ function getInventorySlots(player: PlayerData): ItemSlotProps[] {
             key: `item-${slot}`,
             itemId: player[`item_${slot}` as keyof PlayerData] as number,
             itemUrl: getItemImageUrl(player[`item_${slot}` as keyof PlayerData] as number),
-            widthClass: "w-9",
-            heightClass: "h-6",
+            widthClass: "w-8 sm:w-9",
+            heightClass: "h-6 sm:h-7",
             emptyBgClass: "bg-black border border-border",
         }))
         .map(slot => ({ ...slot, isEmpty: slot.itemId === 0 }))
@@ -294,8 +287,8 @@ function getBackpackSlots(player: PlayerData): ItemSlotProps[] {
             key: `backpack-${slot}`,
             itemId: player[`backpack_${slot}` as keyof PlayerData] as number,
             itemUrl: getItemImageUrl(player[`backpack_${slot}` as keyof PlayerData] as number),
-            widthClass: "w-7.5",
-            heightClass: "h-5",
+            widthClass: "w-7 sm:w-8",
+            heightClass: "h-5 sm:h-6",
             emptyBgClass: "bg-background border border-border",
         }))
         .map(slot => ({ ...slot, isEmpty: slot.itemUrl === "" }))

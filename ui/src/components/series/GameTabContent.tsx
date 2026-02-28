@@ -2,7 +2,7 @@ import * as React from "react"
 import { Check, Clock, Copy, ExternalLink } from "lucide-react"
 import type { SeriesMatchDetail, TeamInfo } from "@/api/api"
 import { Button } from "@/components/ui"
-import { PlayersTable } from "./PlayersTable"
+import { PlayersTable } from "./index"
 import { formatDuration, copyToClipboard } from "@/lib"
 
 interface GameTabContentProps {
@@ -12,12 +12,7 @@ interface GameTabContentProps {
     direTeam: TeamInfo
 }
 
-export function GameTabContent({
-    match,
-    gameNumber,
-    radiantTeam,
-    direTeam,
-}: GameTabContentProps) {
+export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: GameTabContentProps) {
     const [copied, setCopied] = React.useState(false)
 
     const handleCopyId = async () => {
@@ -38,7 +33,38 @@ export function GameTabContent({
                             <Clock size={15} /> {formatDuration(match.duration)}
                         </p>
                     </div>
-                    <div className="flex gap-2">
+                    {/* Mobile: Icon-only buttons */}
+                    <div className="flex gap-2 sm:hidden justify-center">
+                        <Button variant="outline" size="sm" onClick={handleCopyId} className="p-2" aria-label="Copy ID">
+                            {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                        </Button>
+
+                        <Button variant="outline" size="sm" asChild className="p-2" aria-label="OpenDota">
+                            <a
+                                href={`https://opendota.com/matches/${match.match_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex gap-1 items-center"
+                            >
+                                OD
+                                <ExternalLink className="w-3 h-3" />
+                            </a>
+                        </Button>
+
+                        <Button variant="outline" size="sm" asChild className="p-2" aria-label="Stratz">
+                            <a
+                                href={`https://stratz.com/matches/${match.match_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex gap-1 items-center"
+                            >
+                                Stratz
+                                <ExternalLink className="w-3 h-3" />
+                            </a>
+                        </Button>
+                    </div>
+                    {/* Desktop: Full text buttons */}
+                    <div className="hidden sm:flex gap-2">
                         <Button variant="outline" size="sm" onClick={handleCopyId} className="gap-2 leading-relaxed">
                             {copied ? "Copied!" : "Copy ID"}
                             {!copied ? <Copy className="w-4 h-4" /> : <Check className="w-4 h-4 text-green-600" />}
@@ -70,11 +96,7 @@ export function GameTabContent({
                 </div>
             </div>
             <div className="px-6 pb-6">
-                <PlayersTable
-                    match={match}
-                    radiantTeam={radiantTeam}
-                    direTeam={direTeam}
-                />
+                <PlayersTable match={match} radiantTeam={radiantTeam} direTeam={direTeam} />
             </div>
         </div>
     )

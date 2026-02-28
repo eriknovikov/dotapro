@@ -52,15 +52,22 @@ function SeriesDetailPage() {
     }
 
     return (
-        <div className="py-6 max-w-7xl mx-auto">
+        <div className="py-6 px-2 max-w-7xl mx-auto">
             <SeriesHeader series={data} />
 
             {data.matches.length > 0 ? (
                 <Tabs defaultValue="game-1">
                     <TabsList className="max-w-full overflow-x-auto overflow-y-hidden mb-4">
                         {data.matches.map((_, i) => (
-                            <TabsTrigger key={i} value={`game-${i + 1}`}>
-                                Game {i + 1}
+                            <TabsTrigger key={i} value={`game-${i + 1}`} className="px-2 sm:px-4 text-sm sm:text-base">
+                                {data.matches.length >= 4 ? (
+                                    <>
+                                        <span className="hidden sm:inline">Game {i + 1}</span>
+                                        <span className="sm:hidden">G{i + 1}</span>
+                                    </>
+                                ) : (
+                                    <>Game {i + 1}</>
+                                )}
                             </TabsTrigger>
                         ))}
                     </TabsList>

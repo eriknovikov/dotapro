@@ -6,7 +6,7 @@ export function HeroTooltipContent({ heroId }: { heroId: number }) {
     if (!hero) return null
 
     return (
-        <div className="w-80 bg-[#1c1d21] text-[#a1aab3] text-sm border border-[#30303f] shadow-xl rounded-md overflow-hidden font-sans">
+        <div className="w-80 bg-[#1c1d21] text-[#a1aab3] text-sm border border-[#30303f] shadow-xl rounded-md overflow-hidden font-sans focus-visible:outline-none">
             {/* Header */}
             <div className="flex items-center gap-3 p-3 bg-linear-to-r from-[#282836] to-[#1c1d21] border-b border-[#30303f]">
                 <img src={getHeroImageUrl(hero.id)} alt="" className="w-16 h-10.5 rounded shadow-md" />

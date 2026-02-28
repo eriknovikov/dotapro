@@ -6,7 +6,7 @@ export function ItemTooltipContent({ itemId }: { itemId: number }) {
     if (!item || item.id === 0) return null
 
     return (
-        <div className="w-72 bg-[#1c1d21] text-[#a1aab3] text-sm border border-[#30303f] shadow-xl rounded-md overflow-hidden font-sans">
+        <div className="w-72 bg-[#1c1d21] text-[#a1aab3] text-sm border border-[#30303f] shadow-xl rounded-md overflow-hidden font-sans focus-visible:outline-none">
             {/* Header */}
             <div className="flex items-center gap-3 p-3 bg-linear-to-r from-[#282836] to-[#1c1d21] border-b border-[#30303f]">
                 <img src={getItemImageUrl(item.id)!} alt={item.displayName} className="w-14 h-10 rounded shadow-md" />
