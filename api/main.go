@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"dotapro-lambda-api/config"
+	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/filtersmetadata"
 	"dotapro-lambda-api/matches"
 	"dotapro-lambda-api/series"
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -19,48 +19,60 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/uptrace/bun"
 )
 
-const DB_CREATION_TIMEOUT = time.Second * 5
-const SSM_TIMEOUT = time.Second * 5
-
+// Request and Response types for Lambda
 type Request = events.APIGatewayV2HTTPRequest
 type Response = events.APIGatewayV2HTTPResponse
 
-var (
-	MATCH_MODEL           *matches.Model
-	SERIES_MODEL          *series.Model
-	FILTERS_METADATA_MODEL *filtersmetadata.Model
-	ADAPTER               *httpadapter.HandlerAdapterV2
-)
-
-func init() {
-	if err := config.LoadEnvs(); err != nil {
-		log.Fatal().Err(err).Msg("err loading envs")
-	}
-	if err := config.Validate(); err != nil {
-		log.Fatal().Err(err).Msg("err invalid config")
-	}
-	if config.IsLocal() {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
+// App holds the application state and dependencies
+type App struct {
+	db                      *bun.DB
+	matchModel              *matches.Model
+	seriesModel             *series.Model
+	filtersMetadataModel    *filtersmetadata.Model
+	matchController         *matches.Controller
+	seriesController        *series.Controller
+	filtersMetadataController *filtersmetadata.Controller
+	adapter                 *httpadapter.HandlerAdapterV2
 }
 
-func main() {
+// NewApp creates and initializes a new application instance
+func NewApp() (*App, error) {
 	db, err := setupDB()
 	if err != nil {
-		log.Fatal().Err(err).Msg("err setting up DB")
+		return nil, fmt.Errorf("failed to setup database: %w", err)
 	}
-	defer db.Close()
-	MATCH_MODEL = matches.NewModel(db)
-	matchController := matches.NewController(MATCH_MODEL)
-	SERIES_MODEL = series.NewModel(db)
-	seriesController := series.NewController(SERIES_MODEL)
-	FILTERS_METADATA_MODEL = filtersmetadata.NewModel(db)
-	filtersMetadataController := filtersmetadata.NewController(FILTERS_METADATA_MODEL)
 
+	matchModel := matches.NewModel(db)
+	seriesModel := series.NewModel(db)
+	filtersMetadataModel := filtersmetadata.NewModel(db)
+
+	return &App{
+		db:                      db,
+		matchModel:              matchModel,
+		seriesModel:             seriesModel,
+		filtersMetadataModel:    filtersMetadataModel,
+		matchController:         matches.NewController(matchModel),
+		seriesController:        series.NewController(seriesModel),
+		filtersMetadataController: filtersmetadata.NewController(filtersMetadataModel),
+	}, nil
+}
+
+// Close cleans up application resources
+func (a *App) Close() error {
+	if a.db != nil {
+		return a.db.Close()
+	}
+	return nil
+}
+
+// setupRouter configures and returns the HTTP router with all routes and middleware
+func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
+	
+	// Middleware
 	r.Use(middleware.Logger, middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -68,42 +80,82 @@ func main() {
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           300,
+		MaxAge:           constants.CORSMaxAge,
 	}))
+
+	// Routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })
-	r.Get("/matches", matchController.GetMany)
-	r.Get("/matches/{id}", matchController.GetOne)
-	r.Get("/series", seriesController.GetMany)
-	r.Get("/series/{id}", seriesController.GetOne)
-	r.Get("/filtersmetadata/teams", filtersMetadataController.SearchTeams)
-	r.Get("/filtersmetadata/leagues", filtersMetadataController.SearchLeagues)
-	if config.IsLocal() {
-		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running api locally")
-		err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r)
-		if err != nil {
-			log.Fatal().Err(err)
-		}
-	} else if config.IsProd() {
-		ADAPTER = httpadapter.NewV2(r)
-		lambda.Start(Handler)
-	}
+	r.Get("/matches", a.matchController.GetMany)
+	r.Get("/matches/{id}", a.matchController.GetOne)
+	r.Get("/series", a.seriesController.GetMany)
+	r.Get("/series/{id}", a.seriesController.GetOne)
+	r.Get("/filtersmetadata/teams", a.filtersMetadataController.SearchTeams)
+	r.Get("/filtersmetadata/leagues", a.filtersMetadataController.SearchLeagues)
+
+	return r
 }
 
-func Handler(ctx context.Context, req Request) (Response, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	if MATCH_MODEL.DB == nil || MATCH_MODEL.DB.PingContext(ctx) != nil {
+// ensureDBConnection checks if the database connection is alive and reconnects if needed
+func (a *App) ensureDBConnection(ctx context.Context) error {
+	if a.matchModel.DB == nil || a.matchModel.DB.PingContext(ctx) != nil {
 		log.Warn().Msg("DB connection lost, re-initializing db pool...")
 		db, err := setupDB()
 		if err != nil {
-			log.Error().Err(err).Msg("failed to re-initialize db pool")
-			return Response{StatusCode: 500}, nil
+			return fmt.Errorf("failed to re-initialize db pool: %w", err)
 		}
-		MATCH_MODEL.DB.Close()
-		MATCH_MODEL.DB = db
-		SERIES_MODEL.DB = db
-		FILTERS_METADATA_MODEL.DB = db
+		a.matchModel.DB.Close()
+		a.matchModel.DB = db
+		a.seriesModel.DB = db
+		a.filtersMetadataModel.DB = db
+		a.db = db
 	}
-	return ADAPTER.ProxyWithContext(ctx, req)
+	return nil
+}
 
+// Handler is the Lambda entry point
+func (a *App) Handler(ctx context.Context, req Request) (Response, error) {
+	ctx, cancel := context.WithTimeout(ctx, constants.LambdaHandlerTimeout)
+	defer cancel()
+
+	if err := a.ensureDBConnection(ctx); err != nil {
+		log.Error().Err(err).Msg("failed to ensure DB connection")
+		return Response{StatusCode: 500}, nil
+	}
+
+	return a.adapter.ProxyWithContext(ctx, req)
+}
+
+// init initializes the application configuration and logging
+func init() {
+	if err := config.LoadEnvs(); err != nil {
+		log.Fatal().Err(err).Msg("failed to load environment variables")
+	}
+	if err := config.Validate(); err != nil {
+		log.Fatal().Err(err).Msg("invalid configuration")
+	}
+	if config.IsLocal() {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+}
+
+// main is the application entry point
+func main() {
+	app, err := NewApp()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to initialize application")
+	}
+	defer app.Close()
+
+	r := app.setupRouter()
+
+	if config.IsLocal() {
+		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running API locally")
+		if err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r); err != nil {
+			log.Fatal().Err(err).Msg("failed to start server")
+		}
+	} else if config.IsProd() {
+		app.adapter = httpadapter.NewV2(r)
+		lambda.Start(app.Handler)
+	}
 }

@@ -2,9 +2,9 @@ package filtersmetadata
 
 import (
 	"context"
+	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/utils"
 	"net/http"
-	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -18,12 +18,12 @@ func NewController(model *Model) *Controller {
 }
 
 func (c *Controller) SearchTeams(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	ctx, cancel := context.WithTimeout(r.Context(), constants.ShortRequestTimeout)
 	defer cancel()
 
-	query := r.URL.Query().Get("q")
-	if query == "" {
-		utils.WriteError(w, "missing query parameter 'q'", http.StatusBadRequest)
+	query, err := utils.ParseRequiredStringParam(r.URL.Query(), "q")
+	if err != nil {
+		utils.WriteError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -46,12 +46,12 @@ func (c *Controller) SearchTeams(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Controller) SearchLeagues(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	ctx, cancel := context.WithTimeout(r.Context(), constants.ShortRequestTimeout)
 	defer cancel()
 
-	query := r.URL.Query().Get("q")
-	if query == "" {
-		utils.WriteError(w, "missing query parameter 'q'", http.StatusBadRequest)
+	query, err := utils.ParseRequiredStringParam(r.URL.Query(), "q")
+	if err != nil {
+		utils.WriteError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"dotapro-lambda-api/config"
+	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/db"
 	"fmt"
 
@@ -11,56 +12,66 @@ import (
 	"github.com/uptrace/bun"
 )
 
+// setupDB initializes and returns a database connection pool.
+// It retrieves the database URL from either local config or AWS SSM.
 func setupDB() (*bun.DB, error) {
-	dbUrl, err := getDBUrl()
+	dbURL, err := getDBURL()
 	if err != nil {
-		return nil, fmt.Errorf("err getting db url: %w", err)
+		return nil, fmt.Errorf("failed to get database URL: %w", err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), DB_CREATION_TIMEOUT)
+	
+	ctx, cancel := context.WithTimeout(context.Background(), constants.DBConnectionTimeout)
 	defer cancel()
-	db, err := db.CreatePool(ctx, dbUrl)
+	
+	db, err := db.CreatePool(ctx, dbURL)
 	if err != nil {
-		return nil, fmt.Errorf("error creating dbpool: %w", err)
+		return nil, fmt.Errorf("failed to create database pool: %w", err)
 	}
 
 	return db, nil
 }
 
-func getDBUrlFromSSM(ctx context.Context) (string, error) {
+// getDBURLFromSSM retrieves the database URL from AWS SSM Parameter Store.
+// The parameter is decrypted automatically.
+func getDBURLFromSSM(ctx context.Context) (string, error) {
 	cfg, err := awsConfig.LoadDefaultConfig(ctx)
 	if err != nil {
-		return "", fmt.Errorf("err loading aws default config: %w", err)
+		return "", fmt.Errorf("failed to load AWS config: %w", err)
 	}
 
 	ssmClient := ssm.NewFromConfig(cfg)
-	decrpytion := true
+	decryption := true
+	
 	output, err := ssmClient.GetParameter(ctx, &ssm.GetParameterInput{
 		Name:           &config.CONFIG.DB_URL_PARAM_NAME,
-		WithDecryption: &decrpytion,
+		WithDecryption: &decryption,
 	})
-
 	if err != nil {
-		return "", fmt.Errorf("err getting ssm parameter: %w", err)
+		return "", fmt.Errorf("failed to get SSM parameter: %w", err)
 	}
+	
 	if output.Parameter.Value == nil {
-		return "", fmt.Errorf("parameter value is nil")
+		return "", fmt.Errorf("SSM parameter value is nil")
 	}
 
 	return *output.Parameter.Value, nil
 }
 
-func getDBUrl() (string, error) {
-	var dbUrl string
+// getDBURL returns the database URL based on the current environment.
+// For local environment, it uses the LOCAL_DB_URL config.
+// For production, it retrieves the URL from AWS SSM Parameter Store.
+func getDBURL() (string, error) {
 	if config.IsLocal() {
-		dbUrl = config.CONFIG.LOCAL_DB_URL
-	} else {
-		ctx, cancel := context.WithTimeout(context.Background(), SSM_TIMEOUT)
-		defer cancel()
-		url, err := getDBUrlFromSSM(ctx)
-		if err != nil {
-			return "", fmt.Errorf("err retrieving db url from SSM PS: %w", err)
-		}
-		dbUrl = url
+		return config.CONFIG.LOCAL_DB_URL, nil
 	}
-	return dbUrl, nil
+	
+	ctx, cancel := context.WithTimeout(context.Background(), constants.SSMTimeout)
+	defer cancel()
+	
+	url, err := getDBURLFromSSM(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve database URL from SSM: %w", err)
+	}
+	
+	return url, nil
 }

@@ -2,13 +2,13 @@ package series
 
 import (
 	"context"
+	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/errs"
 	"dotapro-lambda-api/types"
 	"dotapro-lambda-api/utils"
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
@@ -28,48 +28,44 @@ func NewController(model *Model) *Controller {
 }
 
 func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	ctx, cancel := context.WithTimeout(r.Context(), constants.ShortRequestTimeout)
 	defer cancel()
 
 	filter := types.GetSeriesFilter{}
 	params := r.URL.Query()
 
-	if leagueIDStr := params.Get("league"); leagueIDStr != "" {
-		leagueID, err := strconv.ParseInt(leagueIDStr, 10, 64)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid league_id: %v", err.Error()), http.StatusBadRequest)
-			return
-		}
-		filter.LeagueID = &leagueID
+	// Parse optional filter parameters
+	if leagueID, err := utils.ParseInt64Param(params, "league"); err != nil {
+		utils.WriteParamError(w, "league_id", err)
+		return
+	} else {
+		filter.LeagueID = leagueID
 	}
 
-	if teamIDStr := params.Get("team"); teamIDStr != "" {
-		teamID, err := strconv.ParseInt(teamIDStr, 10, 64)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid team_id: %v", err.Error()), http.StatusBadRequest)
-			return
-		}
-		filter.TeamID = &teamID
+	if teamID, err := utils.ParseInt64Param(params, "team"); err != nil {
+		utils.WriteParamError(w, "team_id", err)
+		return
+	} else {
+		filter.TeamID = teamID
 	}
 
-	filter.Sort = params.Get("sort")
+	// Parse sort parameter
+	filter.Sort = utils.ParseStringParam(params, "sort")
 
-	if limitStr := params.Get("limit"); limitStr != "" {
-		limit, err := strconv.Atoi(limitStr)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid limit: %v", err.Error()), http.StatusBadRequest)
-			return
-		}
+	// Parse limit parameter
+	if limit, err := utils.ParseIntParam(params, "limit"); err != nil {
+		utils.WriteParamError(w, "limit", err)
+		return
+	} else {
 		filter.Limit = limit
 	}
 
-	if cursorStr := params.Get("c"); cursorStr != "" {
-		cursor, err := strconv.ParseInt(cursorStr, 10, 64)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid cursor: %v", err.Error()), http.StatusBadRequest)
-			return
-		}
-		filter.Cursor = &cursor
+	// Parse cursor parameter
+	if cursor, err := utils.ParseInt64Param(params, "c"); err != nil {
+		utils.WriteParamError(w, "cursor", err)
+		return
+	} else {
+		filter.Cursor = cursor
 	}
 
 	series, paginationData, err := c.model.GetMany(ctx, filter)
@@ -93,9 +89,13 @@ func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
+	if idStr == "" {
+		utils.WriteError(w, "missing id parameter", http.StatusBadRequest)
+		return
+	}
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("missing or invalid id: %v", err.Error()), http.StatusBadRequest)
+		utils.WriteError(w, fmt.Sprintf("invalid id: %v", err), http.StatusBadRequest)
 		return
 	}
 	series, err := c.model.GetOne(r.Context(), id)

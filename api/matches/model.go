@@ -6,6 +6,7 @@ import (
 
 	"dotapro-lambda-api/errs"
 	"dotapro-lambda-api/types"
+	"dotapro-lambda-api/utils"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog/log"
@@ -20,11 +21,6 @@ func NewModel(db *bun.DB) *Model { return &Model{DB: db} }
 
 func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]types.MatchSummary, types.PaginationData, error) {
 	var res []types.MatchSummary
-
-	limit := filter.Limit
-	if limit <= 0 {
-		limit = 20
-	}
 
 	q := m.DB.NewSelect().
 		ColumnExpr("m.match_id").
@@ -79,7 +75,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 			q = q.Where("m.match_id < ?", *filter.Cursor)
 		}
 	}
-	q = q.Limit(limit + 1)
+	q = q.Limit(filter.Limit + 1)
 
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -88,21 +84,14 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 		return nil, types.PaginationData{}, err
 	}
 
-	var nextCursor *int64
-	hasMore := false
+	// Process pagination using the helper
+	results, paginationData := utils.ProcessPagination(res, filter.Limit, func(m types.MatchSummary) int64 {
+		return m.MatchID
+	})
 
-	if len(res) > limit {
-		hasMore = true
-		res = res[:limit]
-		if len(res) > 0 {
-			lastID := res[len(res)-1].MatchID
-			nextCursor = &lastID
-		}
-	}
-
-	return res, types.PaginationData{
-		NextCursor: nextCursor,
-		HasMore:    hasMore,
+	return results, types.PaginationData{
+		NextCursor: paginationData.NextCursor,
+		HasMore:    paginationData.HasMore,
 	}, nil
 }
 
