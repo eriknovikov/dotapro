@@ -6,6 +6,7 @@ import { getSeries, type Filters, type GetSeriesResponse } from "@/api/api"
 import { FiltersSidebar } from "@/components/FiltersSidebar"
 import { SeriesList } from "@/components/SeriesList"
 import { Button } from "@/components/ui"
+import { SEO } from "@/components/SEO"
 
 export const Route = createFileRoute("/series/")({
     component: Series,
@@ -83,6 +84,10 @@ function Series() {
 
     return (
         <>
+            <SEO
+                title="Series"
+                description="Browse professional Dota 2 series and matches. Filter by league, team, and more."
+            />
             {/* Mobile/Tablet Filters Toggle Button */}
             <div className="lg:hidden fixed bottom-4 right-4 z-50">
                 <Button
@@ -96,25 +101,23 @@ function Series() {
                 </Button>
             </div>
 
-            <div className="flex relative min-h-[calc(100vh-4rem)]">
-                {/* Sidebar - Filters */}
-                <FiltersSidebar
-                    filters={search}
-                    isMobileOpen={isMobileFiltersOpen}
-                    onMobileClose={() => setIsMobileFiltersOpen(false)}
-                />
+            {/* Sidebar - Filters (absolute positioned to not affect footer width) */}
+            <FiltersSidebar
+                filters={search}
+                isMobileOpen={isMobileFiltersOpen}
+                onMobileClose={() => setIsMobileFiltersOpen(false)}
+            />
 
-                {/* Main Content - Results */}
-                <main className={`flex-1 h-full py-6 px-2 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-                    <SeriesList
-                        series={data?.series || []}
-                        isLoading={isLoading}
-                        error={error as Error | null}
-                        pagination={data?.pagination}
-                        limit={search.limit}
-                    />
-                </main>
-            </div>
+            {/* Main Content - Results */}
+            <main className={`min-h-[calc(100vh-4rem)] py-6 px-2 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+                <SeriesList
+                    series={data?.series || []}
+                    isLoading={isLoading}
+                    error={error as Error | null}
+                    pagination={data?.pagination}
+                    limit={search.limit}
+                />
+            </main>
         </>
     )
 }

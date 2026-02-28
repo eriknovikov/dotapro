@@ -19,6 +19,9 @@ export function Spinner({ size = "md", className, ...props }: SpinnerProps) {
                 sizeClasses[size],
                 className,
             )}
+            role="status"
+            aria-label="Loading"
+            aria-live="polite"
             {...props}
         />
     )

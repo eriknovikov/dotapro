@@ -58,6 +58,7 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                     className="fixed inset-0 bg-black/60 z-40 lg:hidden"
                     onClick={onMobileClose}
                     aria-hidden="true"
+                    role="presentation"
                 />
             )}
 
@@ -74,6 +75,8 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                     shadow-2xl
                     transition-transform duration-300 ease-in-out
                 `}
+                role="complementary"
+                aria-label="Filters"
             >
                 <div className="h-full overflow-y-auto p-6">
                     {/* Mobile close button */}

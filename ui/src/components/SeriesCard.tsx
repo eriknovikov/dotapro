@@ -36,7 +36,7 @@ export function SeriesCard({ series }: { series: Series }) {
     const navigate = useNavigate()
 
     return (
-        <Card>
+        <Card role="article" aria-label={`Match: ${series.team_a.name} vs ${series.team_b.name}`}>
             <CardContent className="p-4 flex flex-col flex-1">
                 {/* Teams and Score */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4 border-b border-border mb-3 pb-3">
@@ -46,6 +46,7 @@ export function SeriesCard({ series }: { series: Series }) {
                             {series.team_a.logo_url && (
                                 <img
                                     src={series.team_a.logo_url}
+                                    alt={`${series.team_a.name} logo`}
                                     className="h-6 sm:h-7 w-auto max-w-8 sm:max-w-11 rounded shrink-0 select-none"
                                 />
                             )}
@@ -74,6 +75,7 @@ export function SeriesCard({ series }: { series: Series }) {
                             {series.team_b.logo_url && (
                                 <img
                                     src={series.team_b.logo_url}
+                                    alt={`${series.team_b.name} logo`}
                                     className="h-6 sm:h-7 w-auto max-w-8 sm:max-w-11 rounded shrink-0 select-none"
                                 />
                             )}
@@ -98,6 +100,7 @@ export function SeriesCard({ series }: { series: Series }) {
                         size="sm"
                         className="px-2 group/btn text-xs"
                         onClick={() => navigate({ to: `/series/${series.series_id}` })}
+                        aria-label={`View details for ${series.team_a.name} vs ${series.team_b.name}`}
                     >
                         View series
                         <div className="flex justify-center items-center w-5 sm:w-6 h-4">

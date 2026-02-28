@@ -5,6 +5,7 @@ import { Spinner } from "@/components/Spinner"
 import { ErrorState } from "@/components/ErrorState"
 import { SeriesHeader, GameTabContent } from "@/components/series"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui"
+import { SEO } from "@/components/SEO"
 
 export const Route = createFileRoute("/series/$id")({
     component: SeriesDetailPage,
@@ -52,7 +53,12 @@ function SeriesDetailPage() {
     }
 
     return (
-        <div className="py-6 px-2 max-w-7xl mx-auto">
+        <>
+            <SEO
+                title={`${data.team_a.name} vs ${data.team_b.name} - ${data.league.name}`}
+                description={`View match details for ${data.team_a.name} vs ${data.team_b.name} in ${data.league.name}. Score: ${data.team_a_score} - ${data.team_b_score}`}
+            />
+            <div className="py-6 px-2 max-w-7xl mx-auto">
             <SeriesHeader series={data} />
 
             {data.matches.length > 0 ? (
@@ -86,5 +92,6 @@ function SeriesDetailPage() {
                 <div className="text-center py-12 text-foreground-muted">No matches available for this series.</div>
             )}
         </div>
+        </>
     )
 }

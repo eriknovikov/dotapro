@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
+import { SEO } from "@/components/SEO"
 
 export const Route = createFileRoute("/about")({
     component: About,
@@ -6,7 +7,12 @@ export const Route = createFileRoute("/about")({
 
 function About() {
     return (
-        <div className="py-6 min-h-[calc(100vh-4rem)] max-w-4xl mx-auto">
+        <>
+            <SEO
+                title="About dotapro"
+                description="Learn about dotapro - an open source, completely free-to-use platform about professional Dota 2 analytics."
+            />
+            <div className="py-6 min-h-[calc(100vh-4rem)] max-w-4xl mx-auto">
             <div className="space-y-8">
                 {/* What's dotapro */}
                 <div className="shadow-md shadow-gray-900 p-10">
@@ -90,5 +96,6 @@ function About() {
                 </div>
             </div>
         </div>
+        </>
     )
 }

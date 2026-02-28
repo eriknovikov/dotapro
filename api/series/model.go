@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/errs"
 	"dotapro-lambda-api/types"
 	"dotapro-lambda-api/utils"
@@ -20,6 +21,12 @@ func NewModel(db *bun.DB) *Model { return &Model{DB: db} }
 
 func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]types.SeriesSummary, types.PaginationData, error) {
 	var res []types.SeriesSummary
+
+	// Apply default limit if not specified
+	limit := filter.Limit
+	if limit <= 0 {
+		limit = constants.DefaultLimit
+	}
 
 	q := m.DB.NewSelect().
 		ColumnExpr("s.series_id").
@@ -61,7 +68,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]ty
 			q = q.Where("s.series_id < ?", *filter.Cursor)
 		}
 	}
-	q = q.Limit(filter.Limit + 1)
+	q = q.Limit(limit + 1)
 
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -71,7 +78,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]ty
 	}
 
 	// Process pagination using the helper
-	results, paginationData := utils.ProcessPagination(res, filter.Limit, func(s types.SeriesSummary) int64 {
+	results, paginationData := utils.ProcessPagination(res, limit, func(s types.SeriesSummary) int64 {
 		return s.SeriesID
 	})
 

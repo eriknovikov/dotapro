@@ -1,8 +1,7 @@
 import { ChevronLeft, Swords } from "lucide-react"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import type { SeriesDetail } from "@/api/api"
 import { formatRelativeTime } from "@/lib"
-import { Button } from "@/components/ui"
 
 interface SeriesHeaderProps {
     series: SeriesDetail
@@ -12,11 +11,12 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
     const { team_a, team_b, league, team_a_score, team_b_score, start_time } = series
 
     return (
-        <div className="rounded-xl pb-2">
+        <div className="rounded-xl pb-2" role="region" aria-label="Series header">
             {/* Back Button */}
             <Link
                 className="mb-4 text-foreground-muted hover:text-foreground flex items-center gap-2 w-fit"
                 to="/series"
+                aria-label="Back to series list"
             >
                 <ChevronLeft className="h-4 w-4" />
                 Back to Series
@@ -30,7 +30,7 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                         {team_a.logo_url && (
                             <img
                                 src={team_a.logo_url}
-                                alt={team_a.name}
+                                alt={`${team_a.name} logo`}
                                 className="h-8 w-auto rounded-lg object-contain shrink-0"
                             />
                         )}
@@ -50,7 +50,7 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                         {team_b.logo_url && (
                             <img
                                 src={team_b.logo_url}
-                                alt={team_b.name}
+                                alt={`${team_b.name} logo`}
                                 className="h-8 w-auto rounded-lg object-contain shrink-0"
                             />
                         )}
@@ -75,7 +75,7 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                         {team_a.logo_url && (
                             <img
                                 src={team_a.logo_url}
-                                alt={team_a.name}
+                                alt={`${team_a.name} logo`}
                                 className="h-16 md:h-24 w-auto rounded-lg object-contain"
                             />
                         )}
@@ -93,7 +93,7 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                         {team_b.logo_url && (
                             <img
                                 src={team_b.logo_url}
-                                alt={team_b.name}
+                                alt={`${team_b.name} logo`}
                                 className="h-16 md:h-24 w-auto rounded-lg object-contain"
                             />
                         )}

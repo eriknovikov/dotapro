@@ -24,13 +24,13 @@ export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: Gam
     }
 
     return (
-        <div className="rounded-xl border border-white/10 bg-background-card focus:outline-none overflow-hidden">
+        <div className="rounded-xl border border-white/10 bg-background-card focus:outline-none overflow-hidden" role="region" aria-label={`Game ${gameNumber} details`}>
             <div className="p-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h3 className="text-md">{match.match_id}</h3>
+                        <h3 className="text-md" id={`match-${match.match_id}`}>Match ID: {match.match_id}</h3>
                         <p className="text-sm text-foreground-muted flex gap-1 items-center select-none">
-                            <Clock size={15} /> {formatDuration(match.duration)}
+                            <Clock size={15} aria-hidden="true" /> <span aria-label={`Duration: ${formatDuration(match.duration)}`}>{formatDuration(match.duration)}</span>
                         </p>
                     </div>
                     {/* Mobile: Icon-only buttons */}
@@ -39,7 +39,7 @@ export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: Gam
                             {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                         </Button>
 
-                        <Button variant="outline" size="sm" asChild className="p-2" aria-label="OpenDota">
+                        <Button variant="outline" size="sm" asChild className="p-2" aria-label="View on OpenDota">
                             <a
                                 href={`https://opendota.com/matches/${match.match_id}`}
                                 target="_blank"
@@ -47,11 +47,11 @@ export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: Gam
                                 className="flex gap-1 items-center"
                             >
                                 OD
-                                <ExternalLink className="w-3 h-3" />
+                                <ExternalLink className="w-3 h-3" aria-hidden="true" />
                             </a>
                         </Button>
 
-                        <Button variant="outline" size="sm" asChild className="p-2" aria-label="Stratz">
+                        <Button variant="outline" size="sm" asChild className="p-2" aria-label="View on Stratz">
                             <a
                                 href={`https://stratz.com/matches/${match.match_id}`}
                                 target="_blank"
@@ -59,7 +59,7 @@ export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: Gam
                                 className="flex gap-1 items-center"
                             >
                                 Stratz
-                                <ExternalLink className="w-3 h-3" />
+                                <ExternalLink className="w-3 h-3" aria-hidden="true" />
                             </a>
                         </Button>
                     </div>
@@ -76,9 +76,10 @@ export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: Gam
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex gap-2 items-center leading-relaxed"
+                                aria-label="View match on OpenDota"
                             >
                                 <p>OpenDota</p>
-                                <ExternalLink className="w-4 h-4" />
+                                <ExternalLink className="w-4 h-4" aria-hidden="true" />
                             </a>
                         </Button>
                         <Button variant="outline" size="sm" asChild>
@@ -87,9 +88,10 @@ export function GameTabContent({ match, gameNumber, radiantTeam, direTeam }: Gam
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex gap-2 items-center leading-relaxed"
+                                aria-label="View match on Stratz"
                             >
                                 <p>Stratz</p>
-                                <ExternalLink className="w-4 h-4" />
+                                <ExternalLink className="w-4 h-4" aria-hidden="true" />
                             </a>
                         </Button>
                     </div>

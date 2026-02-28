@@ -20,9 +20,11 @@ export function ErrorState({ error, title = "Error", action, size = "md", classN
     return (
         <div
             className={cn("flex flex-col items-center justify-center text-center", sizeClasses[size], className)}
+            role="alert"
+            aria-live="assertive"
             {...props}
         >
-            <div className="mb-4 text-error-500">
+            <div className="mb-4 text-error-500" aria-hidden="true">
                 <AlertCircle className="w-12 h-12" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>

@@ -19,7 +19,7 @@ export function PlayersTable({ match, radiantTeam, direTeam }: PlayersTableProps
     const direPlayers = players_data.filter(p => !p.is_radiant)
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3" role="region" aria-label="Match players statistics">
             <TeamPlayersTable
                 players={radiantPlayers}
                 team="Radiant"
@@ -61,19 +61,28 @@ const formatNetWorth = (netWorth: number) => {
 
 function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamPlayersTableProps) {
     return (
-        <div className="bg-background-accent rounded-lg p-4">
+        <div
+            className="bg-background-accent rounded-lg p-4"
+            role="region"
+            aria-label={`${teamInfo.name} team statistics`}
+        >
             <div className="flex items-center gap-2 mb-3">
                 <span className="text-base sm:text-sm font-semibold">{teamInfo.name}</span>
-                <span className="text-foreground-muted text-base sm:text-sm">{score}</span>
+                <span className="text-foreground-muted text-base sm:text-sm" aria-label={`Score: ${score}`}>
+                    {score}
+                </span>
                 {isWinner && (
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white font-semibold">
-                        <Trophy className="size-5 text-secondary" />
+                    <div
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white font-semibold"
+                        aria-label="Winner"
+                    >
+                        <Trophy className="size-5 text-secondary" aria-hidden="true" />
                     </div>
                 )}
             </div>
 
             <div className="overflow-x-auto">
-                <Table className="table-fixed min-w-[900px]">
+                <Table className="table-fixed min-w-225">
                     <TableHeader>
                         <TableRow className="border-border hover:bg-transparent">
                             <TableHead className="w-20 px-3 text-xs text-foreground-muted uppercase tracking-wider">
@@ -249,9 +258,7 @@ function NeutralItemSlot({ itemId }: { itemId: number }) {
             contentClassName="p-0 border-none bg-transparent"
         >
             <div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
-                {itemId > 0 && (
-                    <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />
-                )}
+                {itemId > 0 && <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />}
             </div>
         </Tooltip>
     )
