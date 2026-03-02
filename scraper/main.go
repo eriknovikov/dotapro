@@ -109,7 +109,7 @@ func handler(ctx context.Context) error {
 	defer cancel()
 
 	// Execute the scraping
-	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.SCRAPING_LIMIT)
+	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.MAX_BATCHES)
 	if err != nil {
 		if errors.Is(err, ErrNoNewMatches) {
 			log.Info().Msg("no new matches have been inserted since last scrape")

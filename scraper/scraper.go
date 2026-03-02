@@ -15,10 +15,10 @@ import (
 
 // ScraperConfig holds configuration for the scraper
 type ScraperConfig struct {
-	BatchSize     int
-	MaxRetries    int
-	HTTPTimeout   time.Duration
-	DBTimeout     time.Duration
+	BatchSize   int // default 800
+	MaxRetries  int
+	HTTPTimeout time.Duration
+	DBTimeout   time.Duration
 }
 
 // DefaultScraperConfig returns a sensible default scraper configuration
@@ -122,7 +122,7 @@ func (bp *BatchProcessor) clear() {
 }
 
 // ScrapeMatches is the main entry point for scraping matches
-func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
+func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 	config := DefaultScraperConfig()
 	metrics := NewMetrics()
 	defer metrics.Log()
@@ -137,7 +137,8 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, limit int) error {
 		return fmt.Errorf("error getting last_fetched_match_id: %w", err)
 	}
 
-	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, limit, metrics)
+	matchesToFetchLimit := maxBatches * config.BatchSize
+	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, matchesToFetchLimit, metrics)
 	if err != nil {
 		return fmt.Errorf("error fetching match ids: %w", err)
 	}

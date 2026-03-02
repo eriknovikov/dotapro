@@ -13,7 +13,7 @@ const RootLayout = () => (
                 <Outlet />
             </div>
             <Footer />
-            <TanStackRouterDevtools />
+            {import.meta.env.DEV && <TanStackRouterDevtools />}
         </div>
     </ErrorBoundary>
 )

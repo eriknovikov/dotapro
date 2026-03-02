@@ -29,7 +29,7 @@ export function ItemTooltipContent({ itemId }: { itemId: number }) {
 
             <div className="p-3 flex flex-col gap-3">
                 {/* Attributes */}
-                {item.attrib.length > 0 && (
+                {item.attrib && item.attrib.length > 0 && (
                     <div className="flex flex-col gap-0.5">
                         {item.attrib.map((attr, idx) => {
                             if (!attr.display) return null
@@ -46,7 +46,7 @@ export function ItemTooltipContent({ itemId }: { itemId: number }) {
                 )}
 
                 {/* Abilities */}
-                {item.abilities.map((ability, idx) => (
+                {item.abilities && item.abilities.map((ability, idx) => (
                     <div key={idx} className="bg-[#141518] rounded border border-[#23242b] overflow-hidden">
                         <div className="bg-[#23242b] px-2 py-1 flex justify-between items-center text-white font-semibold">
                             <span>

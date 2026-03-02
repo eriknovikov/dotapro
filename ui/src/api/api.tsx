@@ -29,7 +29,7 @@ export type {
     TeamSearchResult,
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 function buildUrl(path: string, params: Record<string, string | number | undefined>): URL {
     const url = new URL(`${API_BASE_URL}${path}`)

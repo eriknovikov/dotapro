@@ -48,15 +48,15 @@ function Series() {
             // Save current scroll position
             scrollPositionRef.current = window.scrollY
             // Lock scroll
-            document.body.style.overflow = 'hidden'
+            document.body.style.overflow = "hidden"
         } else {
             // Unlock scroll
-            document.body.style.overflow = ''
+            document.body.style.overflow = ""
             // Restore scroll position
             window.scrollTo(0, scrollPositionRef.current)
         }
         return () => {
-            document.body.style.overflow = ''
+            document.body.style.overflow = ""
         }
     }, [isMobileFiltersOpen])
 
@@ -68,9 +68,9 @@ function Series() {
             }
         }
 
-        window.addEventListener('navbar-menu-open', handleNavbarMenuOpen)
+        window.addEventListener("navbar-menu-open", handleNavbarMenuOpen)
         return () => {
-            window.removeEventListener('navbar-menu-open', handleNavbarMenuOpen)
+            window.removeEventListener("navbar-menu-open", handleNavbarMenuOpen)
         }
     }, [isMobileFiltersOpen])
 
@@ -109,7 +109,9 @@ function Series() {
             />
 
             {/* Main Content - Results */}
-            <main className={`min-h-[calc(100vh-4rem)] py-6 px-2 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+            <main
+                className={`min-h-[calc(100vh-4rem)] py-6 px-2 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? "overflow-hidden" : "overflow-y-auto"}`}
+            >
                 <SeriesList
                     series={data?.series || []}
                     isLoading={isLoading}

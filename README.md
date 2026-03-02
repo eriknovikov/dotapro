@@ -5,155 +5,61 @@
 ![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript)
 
-> A professional Dota 2 match data aggregation and visualization platform.
+> Professional Dota 2 match data platform. Scrapes from OpenDota, stores in PostgreSQL, serves via API with a React frontend.
 
-## Overview
+## What it does
 
-Dotapro is an open-source platform that aggregates professional Dota 2 match data from the OpenDota API and provides a clean, modern interface for analyzing matches, series, player statistics, and team performance. Built with a serverless architecture on AWS, it's designed to be cost-effective, scalable, and easy to deploy.
+- Track series with match-by-match breakdowns
+- Browse matches with filters (league, team, player, hero)
+- Auto-updates every minute
+- Beautiful dark-themed UI
 
-## Features
+## Stack
 
-- **Series Tracking**: View complete series with match-by-match breakdowns
-- **Match Browser** (on the way): Browse professional matches with advanced filtering by league, team, player, and hero
-- **Real-time Updates**: Automated and bulk-optimized scraping keeps data fresh (every minute)
-- **Responsive Design**: Beautiful dark-themed UI optimized for desktop and mobile
-- **Fast Performance**: Optimized queries and caching for quick data retrieval
+**Backend**: Go + PostgreSQL + AWS Lambda
+**Frontend**: React + TypeScript + Tailwind
 
-## Tech Stack
+## Quick start
 
-### Backend
+```bash
+# Clone
+git clone https://github.com/E-nkv/dotapro.git
+cd dotapro
 
-- **Language**: Go 1.25+
-- **Framework**: Chi router
-- **ORM**: Bun with pgx driver
-- **Database**: PostgreSQL 16
-- **Logging**: zerolog
-- **Infrastructure**: AWS Lambda, API Gateway, RDS, S3, CloudFront, EventBridge
+# Set up env
+source .env.local
 
-### Frontend
+# Set up database
+cd database && make migrate-up
 
-- **Framework**: React 18+ with TypeScript
-- **Build Tool**: Vite
-- **Routing**: TanStack Router
-- **Data Fetching**: TanStack Query
-- **UI Components**: shadcn/ui
-- **Styling**: Tailwind CSS v4
-- **Package Manager**: pnpm
+# Run API
+cd ../api && go run main.go
 
-## Quick Start
+# Run scraper (optional, for data)
+cd ../scraper && MAX_BATCHES=10 go run main.go
 
-### Prerequisites
+# Run frontend
+cd ../ui && pnpm install && pnpm dev
+```
 
-- Go 1.25+
-- Node.js 20+
-- pnpm 9+
-- PostgreSQL 16+
+Then open `http://localhost:5173`
 
-### Local Development
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/E-nkv/dotapro.git
-   cd dotapro
-   ```
-
-2. **Set up environment variables**
-
-   The `.env.local` file is included in the repository. Review and modify it as needed for your local setup.
-
-3. **Set up the database**
-
-   First, source the environment variables:
-
-   ```bash
-   set -a; source .env.local; set +a
-   ```
-
-   Then run the migrations:
-
-   ```bash
-   cd database
-   make migrate-up
-   ```
-
-   Initialize the scraper metadata (run this in your preferred DB editor like DBeaver, or via psql):
-
-   ```sql
-   INSERT INTO scraper_metadata (id, last_fetched_match_id) VALUES (1, 7944311818);
-   ```
-
-4. **Start the API**
-
-   ```bash
-   cd ../api
-   go run main.go
-   ```
-
-5. **Start the scraper** (for data ingestion)
-
-   Set the scraping limit to avoid hitting the OpenDota rate limit:
-
-   ```bash
-   cd ../scraper
-   SCRAPING_LIMIT=35000 go run main.go
-   ```
-
-6. **Start the frontend**
-
-   ```bash
-   cd ../ui
-   pnpm install
-   pnpm dev
-   ```
-
-7. **Open your browser**
-   Navigate to `http://localhost:5173`
-
-### Using Docker Compose
+## Or use Docker
 
 ```bash
 docker-compose up -d
 ```
 
-This will start PostgreSQL, the API, and the UI with hot-reload enabled.
-
-## Project Structure
+## Project structure
 
 ```
-dotapro/
-├── api/              # REST API Lambda
-│   ├── matches/      # Match endpoints
-│   ├── series/       # Series endpoints
-│   ├── config/       # Configuration
-│   ├── db/           # Database connection
-│   ├── errs/         # Error handling
-│   ├── types/        # Shared types
-│   └── utils/        # Utilities
-├── scraper/          # Data scraper Lambda
-│   ├── config/       # Configuration
-│   └── *.go          # Scraper logic
-├── database/         # Database schemas and migrations
-│   ├── migrations/   # SQL migrations
-│   └── queries/      # SQL queries
-├── ui/               # React frontend
-│   ├── src/
-│   │   ├── components/  # React components
-│   │   ├── routes/      # Page routes
-│   │   ├── api/         # API client
-│   │   ├── hooks/       # Custom hooks
-│   │   └── lib/         # Utilities
-│   └── public/          # Static assets
-├── ARCHITECTURE.md   # Architecture documentation
-├── CONTRIBUTING.md   # Contribution guidelines
-└── docs/             # Additional documentation
+api/       - Go backend (REST API)
+scraper/   - Go scraper (data ingestion)
+database/  - SQL schemas and migrations
+ui/        - React frontend
 ```
 
-## API Documentation
-
-For detailed API documentation, see [docs/api.md](docs/api.md).
-
-### Quick API Reference
+## API
 
 | Endpoint       | Method | Description               |
 | -------------- | ------ | ------------------------- |
@@ -164,66 +70,18 @@ For detailed API documentation, see [docs/api.md](docs/api.md).
 
 ## Deployment
 
-Dotapro is designed for AWS deployment using serverless architecture. See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed infrastructure information.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for infrastructure details.
 
-### Manual Deployment
-
-1. Build the Lambda functions
-2. Deploy to AWS Lambda
-3. Configure API Gateway
-4. Build and deploy the React app to S3
-5. Set up CloudFront distribution
-
-### CI/CD
-
-The project includes GitHub Actions workflows for automated deployment on push to main.
-
-## Development
-
-### Running Tests
-
-```bash
-# API tests
-cd api && go test ./...
-
-# Frontend tests
-cd ui && pnpm test
-```
-
-### Code Style
-
-- **Go**: Follow standard Go conventions, use `gofmt`
-- **TypeScript**: ESLint + Prettier configuration included
-- **React**: Functional components with hooks, TypeScript throughout
+- [MANUAL_DEPLOYMENT.md](MANUAL_DEPLOYMENT.md) - First-time AWS setup
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Automated CI/CD setup
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [OpenDota](https://www.opendota.com/) for providing the Dota 2 API
-- [Valve](https://www.valvesoftware.com/) for Dota 2
-
-## Roadmap
-
-- [ ] User authentication and preferences
-- [ ] Custom filters and saved searches
-- [ ] Data export functionality
-- [ ] Mobile app (React Native)
-- [ ] Real-time match updates
-- [ ] Advanced analytics and insights
-- [ ] Team comparison tools
-
-## Support
-
-- 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/E-nkv/dotapro/issues)
-- 💬 [Discussions](https://github.com/E-nkv/dotapro/discussions)
+MIT
 
 ---
 

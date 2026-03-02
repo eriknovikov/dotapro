@@ -73,15 +73,21 @@ func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
 	
 	// Middleware
-	r.Use(middleware.Logger, middleware.Recoverer)
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           constants.CORSMaxAge,
-	}))
+	// Only use Logger in local development to reduce CloudWatch costs
+	if config.IsLocal() {
+		r.Use(middleware.Logger)
+		// CORS only needed for local development
+		// In production, API Gateway handles CORS
+		r.Use(cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"*"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: false,
+			MaxAge:           constants.CORSMaxAge,
+		}))
+	}
+	r.Use(middleware.Recoverer)
 
 	// Routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })

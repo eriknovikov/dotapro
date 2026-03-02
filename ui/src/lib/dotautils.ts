@@ -25,14 +25,14 @@ export interface Item {
     id: number
     name: string
     displayName: string
-    cost: number
-    mc: number | boolean
-    hc: number | boolean
-    cd: number | boolean
-    abilities: ItemAbility[]
-    attrib: ItemAttribute[]
-    components: string[] | null
-    tier: number | null
+    cost?: number
+    mc?: number | boolean
+    hc?: number | boolean
+    cd?: number | boolean
+    abilities?: ItemAbility[]
+    attrib?: ItemAttribute[]
+    components?: string[] | null
+    tier?: number | null
 }
 
 export interface PopularLeague {

@@ -11,11 +11,11 @@ import (
 var CONFIG = &Config{}
 
 type Config struct {
-	LOCAL_DB_URL      string `env:"LOCAL_DB_URL" env-default:"postgres://postgres:admin@172.17.0.1:15432/dotapro"`
-	LOCAL_ADDR        string `env:"LOCAL_ADDR" env-default:"localhost:8080"`
+	LOCAL_DB_URL      string `env:"LOCAL_DB_URL" env-default:"postgres://postgres:admin@localhost:5432/dotapro"`
+	LOCAL_ADDR        string `env:"LOCAL_ADDR" env-default:"http://localhost:8080"`
 	DB_URL_PARAM_NAME string `env:"DB_URL_PARAM_NAME"`
-	ENVIRON           string `env:"ENVIRON" env-default:"prod"`
-	
+	ENVIRON           string `env:"ENVIRON"`
+
 	// Database pool configuration
 	DBMaxConns        int           `env:"DB_MAX_CONNS" env-default:"2"`
 	DBMinConns        int           `env:"DB_MIN_CONNS" env-default:"1"`
@@ -29,7 +29,9 @@ func LoadEnvs() error {
 
 func Validate() error {
 	errs := []string{}
-	if CONFIG.ENVIRON != "local" && CONFIG.ENVIRON != "prod" {
+	if CONFIG.ENVIRON == "" {
+		errs = append(errs, "ENVIRON is required (must be 'local' or 'prod')")
+	} else if CONFIG.ENVIRON != "local" && CONFIG.ENVIRON != "prod" {
 		errs = append(errs, "ENVIRON can only be local or prod")
 	}
 	if CONFIG.ENVIRON == "local" {

@@ -1,10 +1,13 @@
+import { lazy, Suspense } from "react"
 import { Crown, Trophy } from "lucide-react"
 import type { SeriesMatchDetail, PlayerData, TeamInfo } from "@/api/api"
 import { getHeroImageUrl, getItemImageUrl, cn } from "@/lib"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui"
 import { Tooltip } from "@/components/ui/tooltip"
-import { HeroTooltipContent } from "./HeroTooltipContent"
-import { ItemTooltipContent } from "./ItemTooltipContent"
+
+// Lazy load tooltip components to reduce initial bundle size
+const HeroTooltipContent = lazy(() => import("./HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })))
+const ItemTooltipContent = lazy(() => import("./ItemTooltipContent").then(m => ({ default: m.ItemTooltipContent })))
 
 interface PlayersTableProps {
     match: SeriesMatchDetail
@@ -119,16 +122,18 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                                 >
                                     {/* Hero */}
                                     <TableCell className="px-3">
-                                        <Tooltip
-                                            content={<HeroTooltipContent heroId={player.hero_id} />}
-                                            side="right"
-                                            contentClassName="p-0 border-none bg-transparent"
-                                        >
-                                            <img
-                                                src={getHeroImageUrl(player.hero_id)}
-                                                className="h-7 w-auto sm:h-8 cursor-pointer"
-                                            />
-                                        </Tooltip>
+                                        <Suspense fallback={<img src={getHeroImageUrl(player.hero_id)} className="h-7 w-auto sm:h-8" />}>
+                                            <Tooltip
+                                                content={<HeroTooltipContent heroId={player.hero_id} />}
+                                                side="right"
+                                                contentClassName="p-0 border-none bg-transparent"
+                                            >
+                                                <img
+                                                    src={getHeroImageUrl(player.hero_id)}
+                                                    className="h-7 w-auto sm:h-8 cursor-pointer"
+                                                />
+                                            </Tooltip>
+                                        </Suspense>
                                     </TableCell>
                                     {/* Player */}
                                     <TableCell className="px-3 py-0">
@@ -238,29 +243,37 @@ function ItemSlot({ itemId, itemUrl, widthClass, heightClass, emptyBgClass }: It
     const isEmpty = itemId === 0 || itemUrl === ""
 
     return (
-        <Tooltip
-            content={<ItemTooltipContent itemId={itemId} />}
-            side="left"
-            contentClassName="p-0 border-none bg-transparent"
-        >
-            <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
-                {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
-            </div>
-        </Tooltip>
+        <Suspense fallback={<div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
+            {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
+        </div>}>
+            <Tooltip
+                content={<ItemTooltipContent itemId={itemId} />}
+                side="left"
+                contentClassName="p-0 border-none bg-transparent"
+            >
+                <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
+                    {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
+                </div>
+            </Tooltip>
+        </Suspense>
     )
 }
 
 function NeutralItemSlot({ itemId }: { itemId: number }) {
     return (
-        <Tooltip
-            content={<ItemTooltipContent itemId={itemId} />}
-            side="right"
-            contentClassName="p-0 border-none bg-transparent"
-        >
-            <div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
-                {itemId > 0 && <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />}
-            </div>
-        </Tooltip>
+        <Suspense fallback={<div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
+            {itemId > 0 && <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />}
+        </div>}>
+            <Tooltip
+                content={<ItemTooltipContent itemId={itemId} />}
+                side="right"
+                contentClassName="p-0 border-none bg-transparent"
+            >
+                <div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
+                    {itemId > 0 && <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />}
+                </div>
+            </Tooltip>
+        </Suspense>
     )
 }
 
@@ -298,6 +311,6 @@ function getBackpackSlots(player: PlayerData): ItemSlotProps[] {
             heightClass: "h-5 sm:h-6",
             emptyBgClass: "bg-background border border-border",
         }))
-        .map(slot => ({ ...slot, isEmpty: slot.itemUrl === "" }))
+        .map(slot => ({ ...slot, isEmpty: slot.itemId === 0 }))
         .sort(emptyLast)
 }

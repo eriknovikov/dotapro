@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from "react"
+import React, { Component, type ErrorInfo, type ReactNode } from "react"
 import { ErrorState } from "./ErrorState"
 import { Button } from "./ui"
 

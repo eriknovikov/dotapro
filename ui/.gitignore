@@ -25,3 +25,8 @@ dist-ssr
 
 .tanstack
 plans/*
+
+.env.development
+.env.production
+
+src/routeTree.gen.ts

@@ -23,12 +23,12 @@ function Index() {
                             </p>
 
                             {/* CTA Buttons */}
-                            <div className="flex flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
+                            <div className="flex flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto items-center">
                                 <Button
                                     asChild
                                     variant="primary"
                                     size="sm"
-                                    className="text-sm sm:text-sm md:text-sm lg:text-base px-6 sm:px-6 md:px-6 lg:px-8 flex-1 sm:flex-none"
+                                    className="text-sm sm:text-sm md:text-sm lg:text-base px-6 sm:px-6 md:px-6 lg:px-8 "
                                 >
                                     <Link to="/series">View Series</Link>
                                 </Button>
@@ -36,7 +36,7 @@ function Index() {
                                     asChild
                                     variant="outline"
                                     size="sm"
-                                    className="text-sm sm:text-sm md:text-sm lg:text-base px-6 sm:px-6 md:px-6 lg:px-8 flex-1 sm:flex-none"
+                                    className="text-sm sm:text-sm md:text-sm lg:text-base px-6 sm:px-6 md:px-6 lg:px-8"
                                 >
                                     <Link to="/about">About dotapro</Link>
                                 </Button>

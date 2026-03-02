@@ -73,7 +73,7 @@ export function SeriesList({ series, isLoading, error, pagination, limit }: Seri
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full lg:px-3">
             <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-4 sm:gap-6">
                 {series.map(s => (
                     <SeriesCard key={s.series_id} series={s} />

@@ -1,4 +1,4 @@
-.PHONY: build deploy clean help
+.PHONY: build deploy clean help run-api run-ui build-ui-local
 
 # Lambda function names
 API_FUNCTION_NAME := dotapro-lambda-api
@@ -13,6 +13,9 @@ help:
 	@echo "  make build      - Build and zip both Lambda functions"
 	@echo "  make deploy     - Deploy both Lambda functions to AWS"
 	@echo "  make clean      - Remove build artifacts"
+	@echo "  make run-api    - Run API locally (requires .env.local)"
+	@echo "  make run-ui     - Run UI locally (requires ui/.env.local)"
+	@echo "  make build-ui-local - Build UI for local testing (uses ui/.env.production.local)"
 	@echo ""
 	@echo "Individual targets:"
 	@echo "  make build-api      - Build and zip API function"
@@ -27,21 +30,21 @@ $(BUILD_DIR):
 # Build API function
 build-api: $(BUILD_DIR)
 	@echo "🔨 Building API function..."
-	@cd api/src && \
-		GOOS=linux GOARCH=amd64 go build -o bootstrap . && \
-		cd ../../ && \
-		zip -j $(BUILD_DIR)/api.zip api/src/bootstrap && \
-		rm api/src/bootstrap && \
+	@cd api && \
+		GOOS=linux GOARCH=arm64 go build -o bootstrap . && \
+		cd .. && \
+		zip -j $(BUILD_DIR)/api.zip api/bootstrap && \
+		rm api/bootstrap && \
 		echo "✅ API function built and zipped"
 
 # Build Scraper function
 build-scraper: $(BUILD_DIR)
 	@echo "🔨 Building Scraper function..."
-	@cd scraper/src && \
-		GOOS=linux GOARCH=amd64 go build -o bootstrap . && \
-		cd ../../ && \
-		zip -j $(BUILD_DIR)/scraper.zip scraper/src/bootstrap && \
-		rm scraper/src/bootstrap && \
+	@cd scraper && \
+		GOOS=linux GOARCH=arm64 go build -o bootstrap . && \
+		cd .. && \
+		zip -j $(BUILD_DIR)/scraper.zip scraper/bootstrap && \
+		rm scraper/bootstrap && \
 		echo "✅ Scraper function built and zipped"
 
 # Build both functions
@@ -80,3 +83,19 @@ clean:
 	@echo "🧹 Cleaning build artifacts..."
 	@rm -rf $(BUILD_DIR)
 	@echo "✅ Clean complete"
+
+# Run API locally
+run-api:
+	@echo "🚀 Running API locally..."
+	@cd api && $(MAKE) run
+
+# Run UI locally
+run-ui:
+	@echo "🚀 Running UI locally..."
+	@cd ui && pnpm dev
+
+# Build UI for local testing (uses localhost API)
+build-ui-local:
+	@echo "🔨 Building UI for local testing..."
+	@cd ui && pnpm build
+	@echo "✅ UI built successfully (using localhost API from .env.production.local)"

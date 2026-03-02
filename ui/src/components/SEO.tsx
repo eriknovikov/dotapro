@@ -112,7 +112,7 @@ export function SEO({
 export function useSEO() {
     const location = useLocation()
 
-    const updateSEO = (props: SEOProps) => {
+    const updateSEO = (_props: SEOProps) => {
         // This is a no-op in the hook, the SEO component handles the updates
         // This hook is provided for type safety and future extensibility
     }
