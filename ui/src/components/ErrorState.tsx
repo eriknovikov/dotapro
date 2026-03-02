@@ -15,7 +15,12 @@ const sizeClasses = {
 }
 
 export function ErrorState({ error, title = "Error", action, size = "md", className, ...props }: ErrorStateProps) {
-    const errorMessage = typeof error === "string" ? error : error?.message || "An unexpected error occurred"
+    const rawErrorMessage = typeof error === "string" ? error : error?.message || "An unexpected error occurred"
+    
+    // Provide a more user-friendly message for network errors
+    const errorMessage = rawErrorMessage.toLowerCase().includes("failed to fetch")
+        ? "Unable to connect to the server. Please check your internet connection or try again later."
+        : rawErrorMessage
 
     return (
         <div

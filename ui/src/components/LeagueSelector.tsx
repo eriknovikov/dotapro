@@ -29,7 +29,7 @@ interface League {
 
 const DEBOUNCE_MS = 250
 const STALE_TIME_MS = 5000
-const NAVIGATION_KEYS = ["ArrowDown", "ArrowUp", "Enter"] as const
+const NAVIGATION_KEYS = ["ArrowDown", "ArrowUp", "Enter"]
 
 // ============================================================================
 // Icons
@@ -83,7 +83,6 @@ export function LeagueSelector({
     const itemRefs = useRef<(HTMLLIElement | null)[]>([])
     const isSelectingRef = useRef(false)
     const isExternalUpdateRef = useRef(false)
-    const hasSetInitialValueRef = useRef(false)
     const selectedLeagueIdRef = useRef<number | undefined>(undefined)
     const selectedLeagueNameRef = useRef<string | undefined>(undefined)
 
@@ -158,13 +157,14 @@ export function LeagueSelector({
     // ---------------------------------------------------------------------------
 
     // Set initial value when component mounts or initialValue changes
-    useEffect(() => {
-        if (initialValue !== undefined && !hasSetInitialValueRef.current) {
+    // Using useLayoutEffect to avoid visual flicker when updating the input
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useLayoutEffect(() => {
+        if (initialValue !== undefined) {
             const initialItem = items.find(l => l.id === initialValue)
-            if (initialItem) {
+            if (initialItem && inputValue !== initialItem.name) {
                 isExternalUpdateRef.current = true
                 setInputValue(initialItem.name)
-                hasSetInitialValueRef.current = true
                 selectedLeagueIdRef.current = initialValue
                 selectedLeagueNameRef.current = initialItem.name
             }
@@ -175,12 +175,8 @@ export function LeagueSelector({
             selectedLeagueIdRef.current = undefined
             selectedLeagueNameRef.current = undefined
         }
-    }, [initialValue, items])
-
-    // Reset hasSetInitialValueRef when initialValue changes
-    useEffect(() => {
-        hasSetInitialValueRef.current = false
-    }, [initialValue])
+    }, [initialValue, items, inputValue])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -194,13 +190,16 @@ export function LeagueSelector({
     }, [closeDropdown])
 
     // Reset highlighted index when items change
-    useEffect(() => {
+    // Using useLayoutEffect to avoid visual flicker when resetting the highlighted index
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useLayoutEffect(() => {
         setHighlightedIndex(-1)
         // Only reset itemRefs if the length changed significantly to avoid disrupting scroll-into-view
         if (itemRefs.current.length !== items.length) {
             itemRefs.current = new Array(items.length).fill(null)
         }
     }, [items])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Scroll highlighted item into view
     useEffect(() => {
@@ -213,6 +212,7 @@ export function LeagueSelector({
     }, [highlightedIndex])
 
     // Sync div content with inputValue when it changes externally (e.g., from selection)
+    // Using useLayoutEffect to avoid visual flicker when updating the DOM
     useLayoutEffect(() => {
         if (inputRef.current) {
             // Always clear the div content when inputValue is empty to ensure placeholder shows
@@ -313,7 +313,7 @@ export function LeagueSelector({
         (e: React.KeyboardEvent) => {
             // Open dropdown on navigation keys when closed
             if (!isOpen) {
-                if (NAVIGATION_KEYS.includes(e.key as any)) {
+                if (NAVIGATION_KEYS.includes(e.key as string)) {
                     // Prevent newline insertion when pressing Enter to open dropdown
                     if (e.key === "Enter") {
                         e.preventDefault()

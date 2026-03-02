@@ -105,21 +105,3 @@ export function SEO({
 
     return null // This component doesn't render anything
 }
-
-/**
- * Hook to programmatically update SEO metadata
- */
-export function useSEO() {
-    const location = useLocation()
-
-    const updateSEO = (_props: SEOProps) => {
-        // This is a no-op in the hook, the SEO component handles the updates
-        // This hook is provided for type safety and future extensibility
-    }
-
-    return {
-        updateSEO,
-        currentPath: location.pathname,
-        currentUrl: `${SITE_URL}${location.pathname}`,
-    }
-}

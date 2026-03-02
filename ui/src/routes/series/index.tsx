@@ -31,6 +31,8 @@ function Series() {
     const scrollPositionRef = useRef(0)
 
     // Set default limit to 10 on mobile (for better performance)
+    // Using useEffect since we're not measuring layout
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (!hasSetMobileDefault && search.limit === undefined && window.innerWidth < 1024) {
             navigate({
@@ -41,6 +43,7 @@ function Series() {
             setHasSetMobileDefault(true)
         }
     }, [search, navigate, hasSetMobileDefault])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Lock body scroll when filter modal is open
     useEffect(() => {
@@ -89,14 +92,14 @@ function Series() {
                 description="Browse professional Dota 2 series and matches. Filter by league, team, and more."
             />
             {/* Mobile/Tablet Filters Toggle Button */}
-            <div className="lg:hidden fixed bottom-4 right-4 z-50">
+            <div className="fixed right-4 bottom-4 z-50 lg:hidden">
                 <Button
                     onClick={() => setIsMobileFiltersOpen(true)}
                     size="lg"
                     className="shadow-lg"
                     aria-label="Open filters"
                 >
-                    <Funnel className="h-5 w-5 mr-2" />
+                    <Funnel className="mr-2 h-5 w-5" />
                     Filters
                 </Button>
             </div>
@@ -110,7 +113,7 @@ function Series() {
 
             {/* Main Content - Results */}
             <main
-                className={`min-h-[calc(100vh-4rem)] py-6 px-2 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? "overflow-hidden" : "overflow-y-auto"}`}
+                className={`px-2 py-6 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? "overflow-hidden" : "overflow-y-auto"}`}
             >
                 <SeriesList
                     series={data?.series || []}

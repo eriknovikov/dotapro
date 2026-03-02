@@ -166,10 +166,10 @@ export function TooltipProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
-export function TooltipTrigger({ children, asChild, ...props }: { children: React.ReactNode; asChild?: boolean } & React.HTMLAttributes<HTMLDivElement>) {
+export function TooltipTrigger({ children, ...props }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
     return <div {...props}>{children}</div>
 }
 
-export function TooltipContent({ children, className, side, sideOffset, ...props }: { children: React.ReactNode; className?: string; side?: "top" | "right" | "bottom" | "left"; sideOffset?: number } & React.HTMLAttributes<HTMLDivElement>) {
+export function TooltipContent({ children, className, ...props }: { children: React.ReactNode; className?: string } & React.HTMLAttributes<HTMLDivElement>) {
     return <div className={className} {...props}>{children}</div>
 }

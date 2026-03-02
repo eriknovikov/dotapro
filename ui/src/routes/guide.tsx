@@ -12,10 +12,10 @@ function Guide() {
                 title="Guide"
                 description="Learn how to get the most out of dotapro's professional Dota 2 analytics."
             />
-            <div className="py-6 min-h-[calc(100vh-4rem)] max-w-4xl mx-auto">
-                <div className="shadow-md shadow-gray-900 p-10">
-                    <h2 className="text-2xl font-bold text-foreground mb-6">How to get the most out of dotapro</h2>
-                    <div className="text-foreground-muted leading-relaxed space-y-4">
+            <div className="mx-auto max-w-4xl py-6">
+                <div className="p-10 shadow-md shadow-gray-900">
+                    <h2 className="text-foreground mb-6 text-2xl font-bold">How to get the most out of dotapro</h2>
+                    <div className="text-foreground-muted space-y-4 leading-relaxed">
                         <p>If you want to get just the recent series, go to the series pages.</p>
                         <p>
                             In most cases you just want to see series from a specific league (TI15, or Dreamleague

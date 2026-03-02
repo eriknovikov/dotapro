@@ -2,7 +2,6 @@ import type { Series, Pagination } from "../api/api"
 import { SeriesCard } from "./SeriesCard"
 import { EmptyState } from "./EmptyState"
 import { ErrorState } from "./ErrorState"
-import { Spinner } from "./Spinner"
 import { SeriesCardSkeleton } from "./Skeleton"
 import { Button } from "./ui"
 import { useNavigate, useRouter } from "@tanstack/react-router"
@@ -41,17 +40,9 @@ export function SeriesList({ series, isLoading, error, pagination, limit }: Seri
 
     if (isLoading) {
         return (
-            <div className="w-full">
-                {/* Loading header with spinner */}
-                <div className="flex items-center justify-center h-12 sm:h-16 mb-4 sm:mb-6">
-                    <div className="flex items-center space-x-2">
-                        <Spinner size="lg" />
-                        <span className="text-sm sm:text-base text-foreground-muted">Loading series...</span>
-                    </div>
-                </div>
-
+            <div className="w-full px-2">
                 {/* Skeleton cards matching the grid layout */}
-                <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] sm:gap-6">
                     {Array.from({ length: skeletonCount }).map((_, i) => (
                         <SeriesCardSkeleton key={i} />
                     ))}
@@ -62,7 +53,7 @@ export function SeriesList({ series, isLoading, error, pagination, limit }: Seri
 
     if (!series || series.length === 0) {
         return (
-            <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="flex min-h-[50vh] items-center justify-center">
                 <EmptyState
                     icon="🤕"
                     title="No series found"
@@ -73,14 +64,14 @@ export function SeriesList({ series, isLoading, error, pagination, limit }: Seri
     }
 
     return (
-        <div className="w-full lg:px-3">
-            <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-4 sm:gap-6">
+        <div className="w-full px-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] sm:gap-6">
                 {series.map(s => (
                     <SeriesCard key={s.series_id} series={s} />
                 ))}
             </div>
 
-            <div className="flex items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6">
+            <div className="mt-4 flex items-center justify-center gap-3 sm:mt-6 sm:gap-4">
                 <Button onClick={handlePrevious} variant="cool-outline" size="sm" disabled={isLoading || !search.c}>
                     Previous
                 </Button>
