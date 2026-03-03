@@ -15,7 +15,7 @@ type Config struct {
 	LOCAL_ADDR        string `env:"LOCAL_ADDR" env-default:"http://localhost:8080"`
 	DB_URL_PARAM_NAME string `env:"DB_URL_PARAM_NAME"`
 	ENVIRON           string `env:"ENVIRON"`
-
+	CLOUDFRONT_URL    string `env:"CLOUDFRONT_URL"`
 	// Database pool configuration
 	DBMaxConns        int           `env:"DB_MAX_CONNS" env-default:"2"`
 	DBMinConns        int           `env:"DB_MIN_CONNS" env-default:"1"`

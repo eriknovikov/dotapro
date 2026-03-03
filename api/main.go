@@ -28,14 +28,14 @@ type Response = events.APIGatewayV2HTTPResponse
 
 // App holds the application state and dependencies
 type App struct {
-	db                      *bun.DB
-	matchModel              *matches.Model
-	seriesModel             *series.Model
-	filtersMetadataModel    *filtersmetadata.Model
-	matchController         *matches.Controller
-	seriesController        *series.Controller
+	db                        *bun.DB
+	matchModel                *matches.Model
+	seriesModel               *series.Model
+	filtersMetadataModel      *filtersmetadata.Model
+	matchController           *matches.Controller
+	seriesController          *series.Controller
 	filtersMetadataController *filtersmetadata.Controller
-	adapter                 *httpadapter.HandlerAdapterV2
+	adapter                   *httpadapter.HandlerAdapterV2
 }
 
 // NewApp creates and initializes a new application instance
@@ -50,12 +50,12 @@ func NewApp() (*App, error) {
 	filtersMetadataModel := filtersmetadata.NewModel(db)
 
 	return &App{
-		db:                      db,
-		matchModel:              matchModel,
-		seriesModel:             seriesModel,
-		filtersMetadataModel:    filtersMetadataModel,
-		matchController:         matches.NewController(matchModel),
-		seriesController:        series.NewController(seriesModel),
+		db:                        db,
+		matchModel:                matchModel,
+		seriesModel:               seriesModel,
+		filtersMetadataModel:      filtersMetadataModel,
+		matchController:           matches.NewController(matchModel),
+		seriesController:          series.NewController(seriesModel),
 		filtersMetadataController: filtersmetadata.NewController(filtersMetadataModel),
 	}, nil
 }
@@ -71,25 +71,24 @@ func (a *App) Close() error {
 // setupRouter configures and returns the HTTP router with all routes and middleware
 func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
-	
-	// Middleware
-	// Only use Logger in local development to reduce CloudWatch costs
+
+	//cors
+	allowedOrigins := getAllowedOrigins(config.IsLocal(), config.CONFIG.CLOUDFRONT_URL)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   allowedOrigins,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           constants.CORSMaxAge,
+	}))
 	if config.IsLocal() {
 		r.Use(middleware.Logger)
-		// CORS only needed for local development
-		// In production, API Gateway handles CORS
-		r.Use(cors.Handler(cors.Options{
-			AllowedOrigins:   []string{"*"},
-			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-			ExposedHeaders:   []string{"Link"},
-			AllowCredentials: false,
-			MaxAge:           constants.CORSMaxAge,
-		}))
+
 	}
 	r.Use(middleware.Recoverer)
 
-	// Routes
+	// routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })
 	r.Get("/matches", a.matchController.GetMany)
 	r.Get("/matches/{id}", a.matchController.GetOne)
