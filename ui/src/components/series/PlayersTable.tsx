@@ -69,45 +69,45 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
             role="region"
             aria-label={`${teamInfo.name} team statistics`}
         >
-            <div className="flex items-center gap-2 mb-3">
-                <span className="text-base sm:text-sm font-semibold">{teamInfo.name}</span>
+            <div className="mb-3 flex items-center gap-2">
+                <span className="text-base font-semibold sm:text-sm">{teamInfo.name}</span>
                 <span className="text-foreground-muted text-base sm:text-sm" aria-label={`Score: ${score}`}>
                     {score}
                 </span>
                 {isWinner && (
                     <div
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs text-white font-semibold"
+                        className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-semibold text-white"
                         aria-label="Winner"
                     >
-                        <Trophy className="size-5 text-secondary" aria-hidden="true" />
+                        <Trophy className="text-secondary size-5" aria-hidden="true" />
                     </div>
                 )}
             </div>
 
             <div className="overflow-x-auto">
-                <Table className="table-fixed min-w-225">
+                <Table className="min-w-225 table-fixed">
                     <TableHeader>
                         <TableRow className="border-border hover:bg-transparent">
-                            <TableHead className="w-20 px-3 text-xs text-foreground-muted uppercase tracking-wider">
+                            <TableHead className="text-foreground-muted w-20 px-3 text-xs tracking-wider uppercase">
                                 Hero
                             </TableHead>
-                            <TableHead className="w-48 px-3 text-xs text-foreground-muted uppercase tracking-wider">
+                            <TableHead className="text-foreground-muted w-48 px-3 text-xs tracking-wider uppercase">
                                 Player
                             </TableHead>
-                            <TableHead className="w-80 px-3 text-xs text-foreground-muted uppercase tracking-wider">
+                            <TableHead className="text-foreground-muted w-80 px-3 text-xs tracking-wider uppercase">
                                 Items
                             </TableHead>
-                            <TableHead className="w-24 px-3 text-right text-xs text-secondary-500 uppercase tracking-wider">
+                            <TableHead className="text-secondary-500 w-24 px-3 text-right text-xs tracking-wider uppercase">
                                 NET
                             </TableHead>
-                            <TableHead className="w-32 px-3 text-center text-xs text-foreground-muted uppercase tracking-wider">
+                            <TableHead className="text-foreground-muted w-32 px-3 text-center text-xs tracking-wider uppercase">
                                 <span className="text-success-200">K</span>
                                 <span className="text-foreground-muted mx-0.5">/</span>
                                 <span className="text-error-300">D</span>
                                 <span className="text-foreground-muted mx-0.5">/</span>
                                 <span className="text-foreground">A</span>
                             </TableHead>
-                            <TableHead className="w-20 px-3 text-center text-xs text-foreground-muted uppercase tracking-wider">
+                            <TableHead className="text-foreground-muted w-20 px-3 text-center text-xs tracking-wider uppercase">
                                 LH
                             </TableHead>
                         </TableRow>
@@ -118,11 +118,18 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                             return (
                                 <TableRow
                                     key={player.player_id}
-                                    className="border-border hover:bg-background/50 border-b-2 "
+                                    className="border-border hover:bg-background/50 border-b-2"
                                 >
                                     {/* Hero */}
                                     <TableCell className="px-3">
-                                        <Suspense fallback={<img src={getHeroImageUrl(player.hero_id)} className="h-7 w-auto sm:h-8" />}>
+                                        <Suspense
+                                            fallback={
+                                                <img
+                                                    src={getHeroImageUrl(player.hero_id)}
+                                                    className="h-7 w-auto sm:h-8"
+                                                />
+                                            }
+                                        >
                                             <Tooltip
                                                 content={<HeroTooltipContent heroId={player.hero_id} />}
                                                 side="right"
@@ -130,7 +137,7 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                                             >
                                                 <img
                                                     src={getHeroImageUrl(player.hero_id)}
-                                                    className="h-7 w-auto sm:h-8 cursor-pointer"
+                                                    className="h-7 w-auto cursor-pointer sm:h-8"
                                                 />
                                             </Tooltip>
                                         </Suspense>
@@ -145,8 +152,8 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                                                 {player.name ?? "unknown"}
                                             </span>
                                             {isCaptain && (
-                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-secondary/20 shrink-0 text-secondary">
-                                                    <Crown className="w-3 h-3" />
+                                                <span className="bg-secondary/20 text-secondary inline-flex shrink-0 items-center gap-0.5 rounded px-1.5 py-0.5 text-xs">
+                                                    <Crown className="h-3 w-3" />
                                                 </span>
                                             )}
                                         </div>
@@ -157,7 +164,7 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                                     </TableCell>
                                     {/* NET */}
                                     <TableCell className="px-3 py-0 text-right">
-                                        <span className="text-sm text-secondary-500">
+                                        <span className="text-secondary-500 text-sm">
                                             {formatNetWorth(player.net_worth)}
                                         </span>
                                     </TableCell>
@@ -173,7 +180,7 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                                     </TableCell>
                                     {/* LH */}
                                     <TableCell className="px-3 py-0 text-center">
-                                        <span className="text-sm text-foreground-muted">{player.last_hits}</span>
+                                        <span className="text-foreground-muted text-sm">{player.last_hits}</span>
                                     </TableCell>
                                 </TableRow>
                             )
@@ -195,7 +202,7 @@ interface PlayerItemsProps {
 
 function PlayerItems({ player }: PlayerItemsProps) {
     return (
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
             {/* Inventory items */}
             <div className="flex flex-col gap-1">
                 <div className="flex gap-1">
@@ -243,16 +250,20 @@ function ItemSlot({ itemId, itemUrl, widthClass, heightClass, emptyBgClass }: It
     const isEmpty = itemId === 0 || itemUrl === ""
 
     return (
-        <Suspense fallback={<div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
-            {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
-        </div>}>
+        <Suspense
+            fallback={
+                <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
+                    {!isEmpty && <img src={itemUrl} className="h-full w-full rounded object-cover" />}
+                </div>
+            }
+        >
             <Tooltip
                 content={<ItemTooltipContent itemId={itemId} />}
                 side="left"
                 contentClassName="p-0 border-none bg-transparent"
             >
                 <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
-                    {!isEmpty && <img src={itemUrl} className="rounded w-full h-full object-cover" />}
+                    {!isEmpty && <img src={itemUrl} className="h-full w-full rounded object-cover" />}
                 </div>
             </Tooltip>
         </Suspense>
@@ -261,16 +272,20 @@ function ItemSlot({ itemId, itemUrl, widthClass, heightClass, emptyBgClass }: It
 
 function NeutralItemSlot({ itemId }: { itemId: number }) {
     return (
-        <Suspense fallback={<div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
-            {itemId > 0 && <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />}
-        </div>}>
+        <Suspense
+            fallback={
+                <div className="border-border h-7 w-10 min-w-10 shrink-0 rounded border bg-black sm:h-8 sm:w-11 sm:min-w-11">
+                    {itemId > 0 && <img src={getItemImageUrl(itemId)} className="h-full w-full rounded object-cover" />}
+                </div>
+            }
+        >
             <Tooltip
                 content={<ItemTooltipContent itemId={itemId} />}
                 side="right"
                 contentClassName="p-0 border-none bg-transparent"
             >
-                <div className="w-10 h-7 min-w-10 sm:w-11 sm:h-8 sm:min-w-11 rounded bg-black border border-border shrink-0">
-                    {itemId > 0 && <img src={getItemImageUrl(itemId)} className="w-full h-full object-cover rounded" />}
+                <div className="border-border h-7 w-10 min-w-10 shrink-0 rounded border bg-black sm:h-8 sm:w-11 sm:min-w-11">
+                    {itemId > 0 && <img src={getItemImageUrl(itemId)} className="h-full w-full rounded object-cover" />}
                 </div>
             </Tooltip>
         </Suspense>

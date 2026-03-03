@@ -14,8 +14,7 @@ const buttonVariants = cva(
                 // Secondary - Secondary actions (solid secondary/gold)
                 secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md",
                 // Outline - Tertiary actions (subtle hover, no border)
-                outline:
-                    "bg-background shadow-sm hover:text-primary-foreground hover:bg-primary-500/10",
+                outline: "bg-background shadow-sm hover:text-primary-foreground hover:bg-primary-500/10",
                 // Destructive - Destructive actions (solid error/red)
                 destructive: "bg-error-500 text-white shadow-sm hover:bg-error-600 hover:shadow-md",
                 // Destructive Outline - Destructive tertiary actions (border only)

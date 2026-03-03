@@ -25,7 +25,7 @@ function SeriesDetailPage() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+            <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
                 <Spinner />
             </div>
         )
@@ -35,7 +35,7 @@ function SeriesDetailPage() {
         const errorMessage = (error as Error).message
         const isNotFound = errorMessage.includes("404")
         return (
-            <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+            <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
                 <ErrorState
                     title={isNotFound ? "Series Not Found" : "Error Loading Series"}
                     error={isNotFound ? `Series with ID ${seriesId} could not be found.` : errorMessage}
@@ -46,7 +46,7 @@ function SeriesDetailPage() {
 
     if (!data) {
         return (
-            <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+            <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
                 <ErrorState title="Series Not Found" error={`Series with ID ${seriesId} could not be found.`} />
             </div>
         )
@@ -58,17 +58,17 @@ function SeriesDetailPage() {
                 title={`dotapro.com |  ${data.team_a.name} vs ${data.team_b.name}`}
                 description={`View match details for ${data.team_a.name} vs ${data.team_b.name} in ${data.league.name}. Score: ${data.team_a_score} - ${data.team_b_score}`}
             />
-            <div className="py-6 px-2 max-w-7xl mx-auto">
+            <div className="mx-auto max-w-7xl px-2 py-6">
                 <SeriesHeader series={data} />
 
                 {data.matches.length > 0 ? (
                     <Tabs defaultValue="game-1">
-                        <TabsList className="max-w-full overflow-x-auto overflow-y-hidden mb-4">
+                        <TabsList className="mb-4 max-w-full overflow-x-auto overflow-y-hidden">
                             {data.matches.map((_, i) => (
                                 <TabsTrigger
                                     key={i}
                                     value={`game-${i + 1}`}
-                                    className="px-2 sm:px-4 text-sm sm:text-base"
+                                    className="px-2 text-sm sm:px-4 sm:text-base"
                                 >
                                     {data.matches.length >= 4 ? (
                                         <>
@@ -93,7 +93,7 @@ function SeriesDetailPage() {
                         ))}
                     </Tabs>
                 ) : (
-                    <div className="text-center py-12 text-foreground-muted">No matches available for this series.</div>
+                    <div className="text-foreground-muted py-12 text-center">No matches available for this series.</div>
                 )}
             </div>
         </>

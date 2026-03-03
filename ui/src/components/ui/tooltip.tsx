@@ -10,7 +10,14 @@ interface TooltipProps {
     contentClassName?: string
 }
 
-export function Tooltip({ children, content, side = "right", sideOffset = 4, className, contentClassName }: TooltipProps) {
+export function Tooltip({
+    children,
+    content,
+    side = "right",
+    sideOffset = 4,
+    className,
+    contentClassName,
+}: TooltipProps) {
     const [open, setOpen] = React.useState(false)
     const [position, setPosition] = React.useState<{ top: number; left: number } | null>(null)
     const triggerRef = React.useRef<HTMLDivElement>(null)
@@ -141,17 +148,21 @@ export function Tooltip({ children, content, side = "right", sideOffset = 4, cla
                 <div
                     ref={contentRef}
                     className={cn(
-                        "fixed z-50 animate-in fade-in-0 zoom-in-95",
-                        !position && "opacity-0 pointer-events-none",
-                        contentClassName
+                        "animate-in fade-in-0 zoom-in-95 fixed z-50",
+                        !position && "pointer-events-none opacity-0",
+                        contentClassName,
                     )}
-                    style={position ? {
-                        top: `${position.top}px`,
-                        left: `${position.left}px`,
-                    } : {
-                        top: "0",
-                        left: "0",
-                    }}
+                    style={
+                        position
+                            ? {
+                                  top: `${position.top}px`,
+                                  left: `${position.left}px`,
+                              }
+                            : {
+                                  top: "0",
+                                  left: "0",
+                              }
+                    }
                     onMouseEnter={handleContentMouseEnter}
                     onMouseLeave={handleContentMouseLeave}
                 >
@@ -166,10 +177,21 @@ export function TooltipProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
-export function TooltipTrigger({ children, ...props }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
+export function TooltipTrigger({
+    children,
+    ...props
+}: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
     return <div {...props}>{children}</div>
 }
 
-export function TooltipContent({ children, className, ...props }: { children: React.ReactNode; className?: string } & React.HTMLAttributes<HTMLDivElement>) {
-    return <div className={className} {...props}>{children}</div>
+export function TooltipContent({
+    children,
+    className,
+    ...props
+}: { children: React.ReactNode; className?: string } & React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <div className={className} {...props}>
+            {children}
+        </div>
+    )
 }

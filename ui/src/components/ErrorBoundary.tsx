@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             // Default error UI
             return (
-                <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="flex min-h-screen items-center justify-center p-4">
                     <ErrorState
                         title="Something went wrong"
                         error={this.state.error?.message || "An unexpected error occurred"}
@@ -74,7 +74,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
  */
 export function withErrorBoundary<P extends object>(
     Component: React.ComponentType<P>,
-    errorBoundaryProps?: Omit<ErrorBoundaryProps, "children">
+    errorBoundaryProps?: Omit<ErrorBoundaryProps, "children">,
 ): React.ComponentType<P> {
     const WrappedComponent = (props: P) => (
         <ErrorBoundary {...errorBoundaryProps}>

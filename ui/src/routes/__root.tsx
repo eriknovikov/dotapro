@@ -7,9 +7,9 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 
 const RootLayout = () => (
     <ErrorBoundary>
-        <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+        <div className="bg-background flex min-h-screen flex-col overflow-x-hidden">
             <Navbar />
-            <div className="pt-14 sm:pt-16 flex-1">
+            <div className="flex-1 pt-14 sm:pt-16">
                 <Outlet />
             </div>
             <Footer />

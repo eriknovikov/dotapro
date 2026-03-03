@@ -9,20 +9,20 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
         ref={ref}
         className={cn(
-            "group relative rounded-xl bg-background-card/80 text-card-foreground shadow-xl transition-all duration-200 ease-in-out hover:shadow-2xl overflow-hidden backdrop-blur-sm",
+            "group bg-background-card/80 text-card-foreground relative overflow-hidden rounded-xl shadow-xl backdrop-blur-sm transition-all duration-200 ease-in-out hover:shadow-2xl",
             className,
         )}
         {...props}
     >
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute inset-0 bg-linear-to-br from-primary-500/20 via-primary-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="from-primary-500/20 via-primary-500/10 absolute inset-0 bg-linear-to-br to-transparent opacity-0 transition-opacity duration-200 ease-in-out group-hover:opacity-100" />
         </div>
 
-        <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 bg-linear-to-t from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out" />
+        <div className="pointer-events-none absolute inset-0">
+            <div className="from-primary-500/5 absolute inset-0 bg-linear-to-t to-transparent opacity-0 transition-opacity duration-200 ease-in-out group-hover:opacity-100" />
         </div>
 
-        <div className="relative z-10 flex flex-col h-full">{props.children}</div>
+        <div className="relative z-10 flex h-full flex-col">{props.children}</div>
     </div>
 ))
 Card.displayName = "Card"
@@ -37,52 +37,52 @@ export function SeriesCard({ series }: { series: Series }) {
 
     return (
         <Card role="article" aria-label={`Match: ${series.team_a.name} vs ${series.team_b.name}`}>
-            <CardContent className="p-4 flex flex-col flex-1">
+            <CardContent className="flex flex-1 flex-col p-4">
                 {/* Teams and Score */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4 border-b border-border mb-3 pb-3">
+                <div className="border-border mb-3 flex flex-col gap-1 border-b pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     {/* Team A */}
-                    <div className="flex items-center justify-center min-w-0 flex-1 sm:justify-start">
-                        <div className="flex min-w-0 gap-1 sm:gap-2 items-center">
+                    <div className="flex min-w-0 flex-1 items-center justify-center sm:justify-start">
+                        <div className="flex min-w-0 items-center gap-1 sm:gap-2">
                             {series.team_a.logo_url && (
                                 <img
                                     src={series.team_a.logo_url}
                                     alt={`${series.team_a.name} logo`}
-                                    className="h-6 sm:h-7 w-auto max-w-8 sm:max-w-11 rounded shrink-0 select-none"
+                                    className="h-6 w-auto max-w-8 shrink-0 rounded select-none sm:h-7 sm:max-w-11"
                                 />
                             )}
-                            <span className="font-bold text-foreground text-sm sm:text-md font-shantell truncate text-center sm:text-left">
+                            <span className="text-foreground sm:text-md font-shantell truncate text-center text-sm font-bold sm:text-left">
                                 {series.team_a.name}
                             </span>
-                            <span className="font-bold text-xs text-foreground-muted sm:hidden">
+                            <span className="text-foreground-muted text-xs font-bold sm:hidden">
                                 ({series.team_a_score})
                             </span>
                         </div>
                     </div>
 
                     {/* VS Icon (mobile) / Score (desktop) */}
-                    <div className="flex items-center justify-center shrink-0 select-none py-0.5 sm:py-0 sm:px-2">
-                        <Swords className="h-4 w-4 text-foreground-muted sm:hidden" />
-                        <div className="hidden sm:flex items-center">
-                            <span className="font-bold text-xs text-foreground-muted">{series.team_a_score}</span>
+                    <div className="flex shrink-0 items-center justify-center py-0.5 select-none sm:px-2 sm:py-0">
+                        <Swords className="text-foreground-muted h-4 w-4 sm:hidden" />
+                        <div className="hidden items-center sm:flex">
+                            <span className="text-foreground-muted text-xs font-bold">{series.team_a_score}</span>
                             <span className="mx-2 text-gray-400">{"-"}</span>
-                            <span className="font-bold text-xs text-foreground-muted">{series.team_b_score}</span>
+                            <span className="text-foreground-muted text-xs font-bold">{series.team_b_score}</span>
                         </div>
                     </div>
 
                     {/* Team B */}
-                    <div className="flex items-center justify-center min-w-0 flex-1 sm:justify-end">
-                        <div className="flex min-w-0 gap-1 sm:gap-2 items-center">
+                    <div className="flex min-w-0 flex-1 items-center justify-center sm:justify-end">
+                        <div className="flex min-w-0 items-center gap-1 sm:gap-2">
                             {series.team_b.logo_url && (
                                 <img
                                     src={series.team_b.logo_url}
                                     alt={`${series.team_b.name} logo`}
-                                    className="h-6 sm:h-7 w-auto max-w-8 sm:max-w-11 rounded shrink-0 select-none"
+                                    className="h-6 w-auto max-w-8 shrink-0 rounded select-none sm:h-7 sm:max-w-11"
                                 />
                             )}
-                            <span className="font-bold text-foreground text-sm sm:text-md font-shantell truncate text-center sm:text-right">
+                            <span className="text-foreground sm:text-md font-shantell truncate text-center text-sm font-bold sm:text-right">
                                 {series.team_b.name}
                             </span>
-                            <span className="font-bold text-xs text-foreground-muted sm:hidden">
+                            <span className="text-foreground-muted text-xs font-bold sm:hidden">
                                 ({series.team_b_score})
                             </span>
                         </div>
@@ -90,20 +90,20 @@ export function SeriesCard({ series }: { series: Series }) {
                 </div>
 
                 {/* League and Date */}
-                <div className="text-xs text-foreground-muted flex flex-col flex-1">
+                <div className="text-foreground-muted flex flex-1 flex-col text-xs">
                     <span>{series.league.name}</span>
                     <span>~{formatRelativeTime(series.start_time)} ago</span>
                 </div>
-                <div className="flex justify-end items-center mt-auto px-1 sm:px-2">
+                <div className="mt-auto flex items-center justify-end px-1 sm:px-2">
                     <Button
                         variant="cool-outline"
                         size="sm"
-                        className="px-2 group/btn text-xs"
+                        className="group/btn px-2 text-xs"
                         onClick={() => navigate({ to: `/series/${series.series_id}` })}
                         aria-label={`View details for ${series.team_a.name} vs ${series.team_b.name}`}
                     >
                         View series
-                        <div className="flex justify-center items-center w-5 sm:w-6 h-4">
+                        <div className="flex h-4 w-5 items-center justify-center sm:w-6">
                             <Eye className="size-3 transition-all duration-300 group-hover/btn:size-5" />
                         </div>
                     </Button>

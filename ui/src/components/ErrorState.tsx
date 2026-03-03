@@ -16,7 +16,7 @@ const sizeClasses = {
 
 export function ErrorState({ error, title = "Error", action, size = "md", className, ...props }: ErrorStateProps) {
     const rawErrorMessage = typeof error === "string" ? error : error?.message || "An unexpected error occurred"
-    
+
     // Provide a more user-friendly message for network errors
     const errorMessage = rawErrorMessage.toLowerCase().includes("failed to fetch")
         ? "Unable to connect to the server. Please check your internet connection or try again later."
@@ -29,11 +29,11 @@ export function ErrorState({ error, title = "Error", action, size = "md", classN
             aria-live="assertive"
             {...props}
         >
-            <div className="mb-4 text-error-500" aria-hidden="true">
-                <AlertCircle className="w-12 h-12" />
+            <div className="text-error-500 mb-4" aria-hidden="true">
+                <AlertCircle className="h-12 w-12" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-            <p className="text-foreground-muted max-w-sm mb-4">{errorMessage}</p>
+            <h3 className="text-foreground mb-2 text-lg font-semibold">{title}</h3>
+            <p className="text-foreground-muted mb-4 max-w-sm">{errorMessage}</p>
             {action}
         </div>
     )

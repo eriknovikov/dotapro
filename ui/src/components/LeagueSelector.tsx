@@ -43,7 +43,7 @@ const ClearIcon = () => (
 
 const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
     <svg
-        className={cn("h-4 w-4 text-foreground-muted transition-transform duration-300", isOpen && "rotate-180")}
+        className={cn("text-foreground-muted h-4 w-4 transition-transform duration-300", isOpen && "rotate-180")}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -357,7 +357,7 @@ export function LeagueSelector({
     const renderInput = () => (
         <div className="relative">
             {inputValue === "" && (
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-foreground-muted pointer-events-none select-none">
+                <span className="text-foreground-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm select-none">
                     Type to search leagues...
                 </span>
             )}
@@ -379,11 +379,11 @@ export function LeagueSelector({
                 aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
                 role="combobox"
                 className={cn(
-                    "min-h-10 w-full rounded-lg border px-3 py-2 text-sm pr-10",
+                    "min-h-10 w-full rounded-lg border px-3 py-2 pr-10 text-sm",
                     "bg-background border-border text-foreground",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-800/50",
+                    "focus-visible:ring-2 focus-visible:ring-red-800/50 focus-visible:outline-none",
                     "transition-all duration-200 ease-in-out",
-                    "whitespace-pre-wrap wrap-break-word",
+                    "wrap-break-word whitespace-pre-wrap",
                     inputClassName,
                 )}
             />
@@ -391,7 +391,7 @@ export function LeagueSelector({
     )
 
     const renderInputSuffix = () => (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1">
             {showSpinner && <Spinner size="sm" aria-label="Loading leagues" />}
             {showClearButton && (
                 <button
@@ -421,7 +421,7 @@ export function LeagueSelector({
     )
 
     const renderEmptyState = () => (
-        <li role="option" aria-selected="false" className="px-4 py-3 text-sm text-foreground-muted">
+        <li role="option" aria-selected="false" className="text-foreground-muted px-4 py-3 text-sm">
             No leagues found
         </li>
     )
@@ -449,7 +449,7 @@ export function LeagueSelector({
             id={listboxId}
             role="listbox"
             aria-label={ariaLabel || "Leagues"}
-            className="absolute z-50 max-h-72 overflow-auto rounded-lg border border-border-accent bg-background-card shadow-xl w-full top-full mt-1"
+            className="border-border-accent bg-background-card absolute top-full z-50 mt-1 max-h-72 w-full overflow-auto rounded-lg border shadow-xl"
         >
             {showEmptyState ? renderEmptyState() : items.map(renderLeagueItem)}
         </ul>

@@ -30,11 +30,15 @@ export function EmptyState({
             aria-live="polite"
             {...props}
         >
-            <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-                {icon && <span className="text-foreground-muted" aria-hidden="true">{icon}</span>}
+            <div className="mb-2 flex items-center gap-2">
+                <h3 className="text-foreground text-lg font-semibold">{title}</h3>
+                {icon && (
+                    <span className="text-foreground-muted" aria-hidden="true">
+                        {icon}
+                    </span>
+                )}
             </div>
-            {description && <p className="text-foreground-muted max-w-sm mb-4 whitespace-nowrap">{description}</p>}
+            {description && <p className="text-foreground-muted mb-4 max-w-sm whitespace-nowrap">{description}</p>}
             {action}
         </div>
     )

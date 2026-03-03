@@ -15,7 +15,7 @@ export function Spinner({ size = "md", className, ...props }: SpinnerProps) {
     return (
         <div
             className={cn(
-                "rounded-full border-solid border-transparent spinner-gradient",
+                "spinner-gradient rounded-full border-solid border-transparent",
                 sizeClasses[size],
                 className,
             )}

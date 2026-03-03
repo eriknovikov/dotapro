@@ -12,12 +12,12 @@ function About() {
                 title="About"
                 description="Learn about dotapro - an open source, completely free-to-use platform about professional Dota 2 analytics."
             />
-            <div className="py-6 min-h-[calc(100vh-4rem)] max-w-4xl mx-auto">
+            <div className="mx-auto min-h-[calc(100vh-4rem)] max-w-4xl py-6">
                 <div className="space-y-8">
                     {/* What's dotapro */}
-                    <div className="shadow-md shadow-gray-900 p-10">
-                        <h2 className="text-2xl font-bold text-foreground mb-4">What's dotapro?</h2>
-                        <p className="text-foreground-muted leading-relaxed mb-4">
+                    <div className="p-10 shadow-md shadow-gray-900">
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">What's dotapro?</h2>
+                        <p className="text-foreground-muted mb-4 leading-relaxed">
                             It's an open source, completely free-to-use platform about professional{" "}
                             <span className="text-nowrap">Dota 2</span>. No random pub games here – just the good stuff
                             from the pro scene.
@@ -32,12 +32,12 @@ function About() {
                     </div>
 
                     {/* Who is dotapro for */}
-                    <div className="shadow-md shadow-gray-900 p-10">
-                        <h2 className="text-2xl font-bold text-foreground mb-4">Who is dotapro for?</h2>
-                        <p className="text-foreground-muted leading-relaxed mb-4">
+                    <div className="p-10 shadow-md shadow-gray-900">
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">Who is dotapro for?</h2>
+                        <p className="text-foreground-muted mb-4 leading-relaxed">
                             Pretty much anyone who likes watching pro Dota. But specifically:
                         </p>
-                        <ul className="text-foreground-muted space-y-2 ml-6 list-disc">
+                        <ul className="text-foreground-muted ml-6 list-disc space-y-2">
                             <li>
                                 <em>Casual fans</em> – Just want to see what your favorite teams are up to without
                                 drowning in stats
@@ -57,8 +57,8 @@ function About() {
                     </div>
 
                     {/* Disclaimer */}
-                    <div className="shadow-md shadow-gray-900 p-10">
-                        <h2 className="text-2xl font-bold text-foreground mb-4">Disclaimer</h2>
+                    <div className="p-10 shadow-md shadow-gray-900">
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">Disclaimer</h2>
                         <p className="text-foreground-muted leading-relaxed">
                             Gotta give credit where it's due – dotapro is built on top of the amazing OpenDota API.
                             Those folks have done incredible work making <span className="text-nowrap">Dota 2</span>{" "}
@@ -68,9 +68,9 @@ function About() {
                     </div>
 
                     {/* About the Developer */}
-                    <div className="shadow-md shadow-gray-900 p-10">
-                        <h2 className="text-2xl font-bold text-foreground mb-4">About the Developer</h2>
-                        <p className="text-foreground-muted leading-relaxed mb-4">
+                    <div className="p-10 shadow-md shadow-gray-900">
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">About the Developer</h2>
+                        <p className="text-foreground-muted mb-4 leading-relaxed">
                             Hi there! I'm Erik, the creator of dotapro.
                         </p>
                         <p className="text-foreground-muted leading-relaxed">
@@ -83,13 +83,13 @@ function About() {
                     </div>
 
                     {/* Contributing */}
-                    <div className="shadow-md shadow-gray-900 p-10">
-                        <h2 className="text-2xl font-bold text-foreground mb-4">Contributing</h2>
-                        <p className="text-foreground-muted leading-relaxed mb-4">
+                    <div className="p-10 shadow-md shadow-gray-900">
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">Contributing</h2>
+                        <p className="text-foreground-muted mb-4 leading-relaxed">
                             dotapro.com is open source, and I would appreciate your help greatly! You could:
                         </p>
 
-                        <ul className="text-foreground-muted space-y-2 ml-6 list-disc mb-4">
+                        <ul className="text-foreground-muted mb-4 ml-6 list-disc space-y-2">
                             <li>Submit pull requests for bug fixes or new features</li>
                             <li>Open issues for bugs you find or features you'd like to see</li>
                             <li>Share feedback and suggestions (I'm always open to ideas!)</li>

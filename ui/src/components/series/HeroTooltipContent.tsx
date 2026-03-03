@@ -6,12 +6,12 @@ export function HeroTooltipContent({ heroId }: { heroId: number }) {
     if (!hero) return null
 
     return (
-        <div className="w-80 bg-[#1c1d21] text-[#a1aab3] text-sm border border-[#30303f] shadow-xl rounded-md overflow-hidden font-sans focus-visible:outline-none">
+        <div className="w-80 overflow-hidden rounded-md border border-[#30303f] bg-[#1c1d21] font-sans text-sm text-[#a1aab3] shadow-xl focus-visible:outline-none">
             {/* Header */}
-            <div className="flex items-center gap-3 p-3 bg-linear-to-r from-[#282836] to-[#1c1d21] border-b border-[#30303f]">
-                <img src={getHeroImageUrl(hero.id)} alt="" className="w-16 h-10.5 rounded shadow-md" />
+            <div className="flex items-center gap-3 border-b border-[#30303f] bg-linear-to-r from-[#282836] to-[#1c1d21] p-3">
+                <img src={getHeroImageUrl(hero.id)} alt="" className="h-10.5 w-16 rounded shadow-md" />
                 <div>
-                    <div className="text-white font-bold text-base">{hero.displayName}</div>
+                    <div className="text-base font-bold text-white">{hero.displayName}</div>
                 </div>
             </div>
             {/* Lore */}

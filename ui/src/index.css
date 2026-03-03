@@ -1,25 +1,24 @@
-
 @import "tailwindcss";
 
 @font-face {
-    font-family: 'Shantell Sans';
-    src: url('/fonts/shantell-sans-regular.woff2') format('woff2');
+    font-family: "Shantell Sans";
+    src: url("/fonts/shantell-sans-regular.woff2") format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'Shantell Sans';
-    src: url('/fonts/shantell-sans-700.woff2') format('woff2');
+    font-family: "Shantell Sans";
+    src: url("/fonts/shantell-sans-700.woff2") format("woff2");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'Teko';
-    src: url('/fonts/teko-v23-latin-regular.woff2') format('woff2');
+    font-family: "Teko";
+    src: url("/fonts/teko-v23-latin-regular.woff2") format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -118,7 +117,9 @@
     --shadow-2xl: 0 25px 50px -12px hsl(0, 0%, 0% / 0.5);
     --shadow-inner: inset 0 2px 4px 0 hsl(0, 0%, 0% / 0.3);
     --shadow-none: 0 0 #0000;
-    --shadow-linear: 0 0 0 1px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.04), 0 10px 15px rgba(0,0,0,.03), 0 20px 25px rgba(0,0,0,.03), 0 40px 50px rgba(0,0,0,.02), 0 100px 80px rgba(0,0,0,.02);
+    --shadow-linear:
+        0 0 0 1px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.03),
+        0 20px 25px rgba(0, 0, 0, 0.03), 0 40px 50px rgba(0, 0, 0, 0.02), 0 100px 80px rgba(0, 0, 0, 0.02);
 
     --duration-150: 150ms;
     --duration-200: 200ms;
@@ -128,12 +129,12 @@
     --animate-spin: spin 1s linear infinite;
 
     --font-size-xxs: 0.625rem;
-    --font-shantell: 'Shantell Sans', system-ui, sans-serif;
-    --font-orbitron: 'Orbitron', sans-serif;
-    --font-russo-one: 'Russo One', sans-serif;
-    --font-exo-2: 'Exo 2', sans-serif;
-    --font-teko: 'Teko', sans-serif;
-    --font-chakra-petch: 'Chakra Petch', sans-serif;
+    --font-shantell: "Shantell Sans", system-ui, sans-serif;
+    --font-orbitron: "Orbitron", sans-serif;
+    --font-russo-one: "Russo One", sans-serif;
+    --font-exo-2: "Exo 2", sans-serif;
+    --font-teko: "Teko", sans-serif;
+    --font-chakra-petch: "Chakra Petch", sans-serif;
 }
 
 :root {
@@ -170,7 +171,15 @@ html {
 }
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
     line-height: 1.5;
     color: hsl(0, 0%, 98%);
     background-color: hsl(0, 0%, 4%);
@@ -217,11 +226,26 @@ body {
 }
 
 @keyframes spinner-gradient {
-    0% { border-top-color: hsl(38, 92%, 50%); transform: rotate(0deg); }
-    25% { border-top-color: hsl(0, 84%, 50%); transform: rotate(90deg); }
-    50% { border-top-color: hsl(38, 92%, 50%); transform: rotate(180deg); }
-    75% { border-top-color: hsl(0, 84%, 50%); transform: rotate(270deg); }
-    100% { border-top-color: hsl(38, 92%, 50%); transform: rotate(360deg); }
+    0% {
+        border-top-color: hsl(38, 92%, 50%);
+        transform: rotate(0deg);
+    }
+    25% {
+        border-top-color: hsl(0, 84%, 50%);
+        transform: rotate(90deg);
+    }
+    50% {
+        border-top-color: hsl(38, 92%, 50%);
+        transform: rotate(180deg);
+    }
+    75% {
+        border-top-color: hsl(0, 84%, 50%);
+        transform: rotate(270deg);
+    }
+    100% {
+        border-top-color: hsl(38, 92%, 50%);
+        transform: rotate(360deg);
+    }
 }
 
 .spinner-gradient {
