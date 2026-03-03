@@ -55,7 +55,7 @@ function SeriesDetailPage() {
     return (
         <>
             <SEO
-                title={`dotapro.com |  ${data.team_a.name} vs ${data.team_b.name}`}
+                title={`dotapro.org |  ${data.team_a.name} vs ${data.team_b.name}`}
                 description={`View match details for ${data.team_a.name} vs ${data.team_b.name} in ${data.league.name}. Score: ${data.team_a_score} - ${data.team_b_score}`}
             />
             <div className="mx-auto max-w-7xl px-2 py-6">

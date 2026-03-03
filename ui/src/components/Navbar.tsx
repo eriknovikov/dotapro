@@ -80,7 +80,7 @@ export function Navbar() {
                                 to="/"
                                 className="font-teko from-foreground to-foreground bg-linear-to-r bg-clip-text text-2xl text-transparent hover:from-[hsl(38,92%,50%)] hover:to-[hsl(0,84%,50%)] sm:text-3xl"
                             >
-                                dotapro.com
+                                dotapro.org
                             </Link>
                         </div>
 

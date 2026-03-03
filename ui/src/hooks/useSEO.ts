@@ -1,6 +1,6 @@
 import { useLocation } from "@tanstack/react-router"
 
-const SITE_URL = "https://dotapro.com"
+const SITE_URL = "https://dotapro.org"
 
 /**
  * Hook to programmatically update SEO metadata

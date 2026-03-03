@@ -52,7 +52,7 @@ func HandleError(w http.ResponseWriter, err error) {
 	}
 
 	// Handle context errors
-	if err == errs.NOT_FOUND {
+	if err == errs.ErrNotFound {
 		WriteError(w, err.Error(), http.StatusNotFound)
 		return
 	}

@@ -43,7 +43,7 @@ func getDBURLFromSSM(ctx context.Context) (string, error) {
 	decryption := true
 
 	output, err := ssmClient.GetParameter(ctx, &ssm.GetParameterInput{
-		Name:           &config.CONFIG.DB_URL_PARAM_NAME,
+		Name:           &config.CONFIG.DBURLParamName,
 		WithDecryption: &decryption,
 	})
 	if err != nil {
@@ -62,7 +62,7 @@ func getDBURLFromSSM(ctx context.Context) (string, error) {
 // For production, it retrieves the URL from AWS SSM Parameter Store.
 func getDBURL() (string, error) {
 	if config.IsLocal() {
-		return config.CONFIG.LOCAL_DB_URL, nil
+		return config.CONFIG.LocalDBURL, nil
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), constants.SSMTimeout)
@@ -76,9 +76,9 @@ func getDBURL() (string, error) {
 	return url, nil
 }
 
-func getAllowedOrigins(isLocal bool, cloudfrontUrl string) []string {
+func getAllowedOrigins(isLocal bool, cloudfrontURL string) []string {
 	if isLocal {
 		return []string{"http://localhost:5173", "http://localhost:3000"}
 	}
-	return []string{cloudfrontUrl}
+	return []string{cloudfrontURL}
 }

@@ -34,7 +34,7 @@ func getDBUrlFromSSM(ctx context.Context) (string, error) {
 	decryption := true
 
 	output, err := ssmClient.GetParameter(ctx, &ssm.GetParameterInput{
-		Name:           &config.CONFIG.DB_URL_PARAM_NAME,
+		Name:           &config.CONFIG.DBURLParamName,
 		WithDecryption: &decryption,
 	})
 	if err != nil {
@@ -48,40 +48,40 @@ func getDBUrlFromSSM(ctx context.Context) (string, error) {
 	return *output.Parameter.Value, nil
 }
 
-// getDBUrl retrieves the database URL from the appropriate source
-func getDBUrl() (string, error) {
-	var dbUrl string
+// getDBURL retrieves the database URL from the appropriate source
+func getDBURL() (string, error) {
+	var dbURL string
 	var err error
 
 	if config.IsLocal() {
-		dbUrl = config.CONFIG.LOCAL_DB_URL
-		if dbUrl == "" {
+		dbURL = config.CONFIG.LocalDBURL
+		if dbURL == "" {
 			return "", fmt.Errorf("LOCAL_DB_URL is not set")
 		}
 	} else {
-		ctx, cancel := context.WithTimeout(context.Background(), SSM_TIMEOUT)
+		ctx, cancel := context.WithTimeout(context.Background(), ssmTimeout)
 		defer cancel()
 
-		dbUrl, err = getDBUrlFromSSM(ctx)
+		dbURL, err = getDBUrlFromSSM(ctx)
 		if err != nil {
 			return "", fmt.Errorf("failed to retrieve DB URL from SSM: %w", err)
 		}
 	}
 
-	return dbUrl, nil
+	return dbURL, nil
 }
 
 // setupDB creates and initializes a database connection pool
 func setupDB() (*bun.DB, error) {
-	dbUrl, err := getDBUrl()
+	dbURL, err := getDBURL()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get DB URL: %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), DB_CREATION_TIMEOUT)
+	ctx, cancel := context.WithTimeout(context.Background(), dbCreationTimeout)
 	defer cancel()
 
-	db, err := CreatePool(ctx, dbUrl)
+	db, err := CreatePool(ctx, dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create DB pool: %w", err)
 	}
@@ -90,8 +90,8 @@ func setupDB() (*bun.DB, error) {
 }
 
 // CreatePool creates a new database connection pool with pgxpool
-func CreatePool(ctx context.Context, connStr string) (*bun.DB, error) {
-	cfg, err := pgxpool.ParseConfig(connStr)
+func CreatePool(ctx context.Context, dbURL string) (*bun.DB, error) {
+	cfg, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse connection string: %w", err)
 	}

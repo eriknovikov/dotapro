@@ -102,7 +102,7 @@ func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		switch err {
-		case errs.NOT_FOUND:
+		case errs.ErrNotFound:
 			utils.WriteError(w, err.Error(), http.StatusNotFound)
 		default:
 			utils.WriteError(w, err.Error(), http.StatusInternalServerError)

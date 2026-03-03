@@ -118,7 +118,7 @@ func writeTestErrorResponse(w http.ResponseWriter, err string, statusCode int) {
 func writeTestResponse(w http.ResponseWriter, resp any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // TestController_SearchTeams_Success tests successful team search

@@ -72,7 +72,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetSeriesFilter) ([]ty
 
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, types.PaginationData{}, errs.NOT_FOUND
+			return nil, types.PaginationData{}, errs.ErrNotFound
 		}
 		return nil, types.PaginationData{}, err
 	}
@@ -142,7 +142,7 @@ func (m *Model) GetOne(ctx context.Context, id int64) (*types.SeriesDetail, erro
 
 	if err := q.Scan(ctx, res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NOT_FOUND
+			return nil, errs.ErrNotFound
 		}
 		return nil, err
 	}

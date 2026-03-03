@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	DB_CREATION_TIMEOUT = 5 * time.Second
-	SSM_TIMEOUT         = 5 * time.Second
-	LAMBDA_TIMEOUT      = 4 * time.Minute // Leave 1 minute buffer for cleanup
+	dbCreationTimeout = 5 * time.Second
+	ssmTimeout         = 5 * time.Second
+	lambdaTimeout      = 4 * time.Minute // Leave 1 minute buffer for cleanup
 )
 
 var DB *bun.DB
@@ -61,7 +61,7 @@ func main() {
 		lambda.Start(handler)
 	} else if config.IsLocal() {
 		// Run handler once (aka: invoke the 'lambda' locally)
-		ctx, cancel := context.WithTimeout(context.Background(), LAMBDA_TIMEOUT)
+		ctx, cancel := context.WithTimeout(context.Background(), lambdaTimeout)
 		defer cancel()
 
 		err := handler(ctx)
@@ -94,7 +94,7 @@ func handler(ctx context.Context) error {
 	}
 
 	// Create a context with timeout for DB operations
-	dbCtx, cancel := context.WithTimeout(ctx, DB_CREATION_TIMEOUT)
+	dbCtx, cancel := context.WithTimeout(ctx, dbCreationTimeout)
 	defer cancel()
 
 	// Check DB connection
@@ -105,11 +105,11 @@ func handler(ctx context.Context) error {
 	}
 
 	// Create a context with timeout for the entire scraping operation
-	scrapeCtx, cancel := context.WithTimeout(ctx, LAMBDA_TIMEOUT)
+	scrapeCtx, cancel := context.WithTimeout(ctx, lambdaTimeout)
 	defer cancel()
 
 	// Execute the scraping
-	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.MAX_BATCHES)
+	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.MaxBatches)
 	if err != nil {
 		return fmt.Errorf("scraping failed: %w", err)
 	}

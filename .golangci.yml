@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+version: "2"
+
+run:
+  timeout: 5m
+  concurrency: 4
+
+linters:
+  # CHANGE 1: 'default: none' replaces 'disable-all: true'
+  default: none
+  enable:
+    - errcheck
+    - goconst
+    - govet
+    - revive
+    - staticcheck
+    - unused
+
+  # CHANGE 2: 'settings' is now a sub-key of 'linters'
+  settings:
+    staticcheck:
+      checks: ["all", "-ST1000", "-ST1005"]
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true
+        - name: exported
+          disabled: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

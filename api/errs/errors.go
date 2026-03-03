@@ -6,16 +6,11 @@ import (
 	"net/http"
 )
 
-// Base error types
 var (
-	// UNIMPLEMENTED is returned for features that are not yet implemented
-	UNIMPLEMENTED = errors.New("unimplemented")
-	
-	// NOT_FOUND is returned when a resource is not found
-	NOT_FOUND = errors.New("not found")
+	ErrUnimplemented = errors.New("unimplemented")
+	ErrNotFound      = errors.New("not found")
 )
 
-// AppError represents an application error with HTTP status code
 type AppError struct {
 	Err        error
 	StatusCode int
@@ -33,12 +28,10 @@ func (e *AppError) Error() string {
 	return "unknown error"
 }
 
-// Unwrap returns the underlying error
 func (e *AppError) Unwrap() error {
 	return e.Err
 }
 
-// NewAppError creates a new AppError
 func NewAppError(err error, statusCode int, message string) *AppError {
 	return &AppError{
 		Err:        err,
@@ -47,7 +40,6 @@ func NewAppError(err error, statusCode int, message string) *AppError {
 	}
 }
 
-// Common error constructors
 func NewBadRequestError(message string) *AppError {
 	return &AppError{
 		StatusCode: http.StatusBadRequest,
@@ -87,7 +79,7 @@ func WrapError(err error, message string) error {
 
 // IsNotFound checks if an error is a NOT_FOUND error
 func IsNotFound(err error) bool {
-	return errors.Is(err, NOT_FOUND)
+	return errors.Is(err, ErrNotFound)
 }
 
 // IsAppError checks if an error is an AppError

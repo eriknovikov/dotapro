@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"slices"
@@ -16,7 +17,7 @@ import (
 
 // Global HTTP client with connection pooling and timeout
 var httpClient = &http.Client{
-	Timeout: config.CONFIG.HTTP_TIMEOUT,
+	Timeout: config.CONFIG.HTTPTimeout,
 	Transport: &http.Transport{
 		MaxIdleConns:        10,
 		MaxIdleConnsPerHost: 10,
@@ -61,19 +62,28 @@ type BatchProcessor struct {
 	ids []int64
 }
 
+// closeBody safely closes an HTTP response body and logs any error
+func closeBody(body io.ReadCloser) {
+	if body != nil {
+		if err := body.Close(); err != nil {
+			log.Warn().Err(err).Msg("error closing response body")
+		}
+	}
+}
+
 // NewBatchProcessor creates a new BatchProcessor with pre-allocated capacity
 func NewBatchProcessor() *BatchProcessor {
 	return &BatchProcessor{
-		leagues:            make(map[int64]League, config.CONFIG.BATCH_SIZE),
-		teams:              make(map[int64]Team, config.CONFIG.BATCH_SIZE*2),
-		players:            make(map[int64]Player, config.CONFIG.BATCH_SIZE*10),
-		seriesMap:          make(map[int64]Series, config.CONFIG.BATCH_SIZE),
-		seriesScores:       make(map[int64]SeriesScore, config.CONFIG.BATCH_SIZE),
-		validMatches:       make([]Match, 0, config.CONFIG.BATCH_SIZE),
-		validMetadata:      make([]MatchMetadata, 0, config.CONFIG.BATCH_SIZE),
-		validSeriesMatches: make([]SeriesMatch, 0, config.CONFIG.BATCH_SIZE),
-		odMatches:          make([]ODMatch, 0, config.CONFIG.BATCH_SIZE),
-		ids:                make([]int64, 0, config.CONFIG.BATCH_SIZE),
+		leagues:            make(map[int64]League, config.CONFIG.BatchSize),
+		teams:              make(map[int64]Team, config.CONFIG.BatchSize*2),
+		players:            make(map[int64]Player, config.CONFIG.BatchSize*10),
+		seriesMap:          make(map[int64]Series, config.CONFIG.BatchSize),
+		seriesScores:       make(map[int64]SeriesScore, config.CONFIG.BatchSize),
+		validMatches:       make([]Match, 0, config.CONFIG.BatchSize),
+		validMetadata:      make([]MatchMetadata, 0, config.CONFIG.BatchSize),
+		validSeriesMatches: make([]SeriesMatch, 0, config.CONFIG.BatchSize),
+		odMatches:          make([]ODMatch, 0, config.CONFIG.BatchSize),
+		ids:                make([]int64, 0, config.CONFIG.BatchSize),
 	}
 }
 
@@ -115,32 +125,32 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 		return fmt.Errorf("context cancelled before scraping started: %w", err)
 	}
 
-	lastFetchedMatchId, err := fetchLastID(DB)
+	lastFetchedMatchID, err := fetchLastID(DB)
 	if err != nil {
 		return fmt.Errorf("error getting last_fetched_match_id: %w", err)
 	}
 
-	matchesToFetchLimit := maxBatches * config.CONFIG.BATCH_SIZE
-	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, matchesToFetchLimit)
+	matchesToFetchLimit := maxBatches * config.CONFIG.MaxBatches
+	matchIDs, err := fetchMatchIDs(ctx, lastFetchedMatchID, matchesToFetchLimit)
 	if err != nil {
 		errorCount++
 		return fmt.Errorf("error fetching match ids: %w", err)
 	}
 
-	N := len(matchIds)
+	N := len(matchIDs)
 
 	processor := NewBatchProcessor()
 	defer processor.clear()
 
-	for i := 0; i < N; i += config.CONFIG.BATCH_SIZE {
+	for i := 0; i < N; i += config.CONFIG.BatchSize {
 		// Check for context cancellation before each batch
 		if err := ctx.Err(); err != nil {
 			return fmt.Errorf("scraping cancelled: %w", err)
 		}
 
-		batchNum := i/config.CONFIG.BATCH_SIZE + 1
-		end := minInt(i+config.CONFIG.BATCH_SIZE, N)
-		currentBatchIDs := matchIds[i:end]
+		batchNum := i/config.CONFIG.BatchSize + 1
+		end := minInt(i+config.CONFIG.BatchSize, N)
+		currentBatchIDs := matchIDs[i:end]
 
 		if len(currentBatchIDs) == 0 {
 			continue
@@ -194,9 +204,9 @@ func maxInt64(slice []int64) int64 {
 // makeOpendotaRequestExplorer makes a request to the OpenDota explorer API
 func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Response, error) {
 	encodedQuery := url.PathEscape(query)
-	opendotaUrl := fmt.Sprintf("https://api.opendota.com/api/explorer?sql=%s", encodedQuery)
+	opendotaURL := fmt.Sprintf("https://api.opendota.com/api/explorer?sql=%s", encodedQuery)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", opendotaUrl, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", opendotaURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -207,7 +217,7 @@ func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Respo
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
+		closeBody(resp.Body)
 		return nil, fmt.Errorf("OpenDota explorer request failed with status: %s", resp.Status)
 	}
 
@@ -215,9 +225,9 @@ func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Respo
 }
 
 // fetchMatchIDs fetches match IDs from OpenDota with retry logic
-func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, error) {
+func fetchMatchIDs(ctx context.Context, lastFetchedMatchID int64, limit int) ([]int64, error) {
 	retryConfig := RetryConfig{
-		MaxAttempts: config.CONFIG.MAX_RETRIES,
+		MaxAttempts: config.CONFIG.MaxRetries,
 		BaseDelay:   500 * time.Millisecond,
 		MaxDelay:    10 * time.Second,
 		Multiplier:  2.0,
@@ -227,11 +237,11 @@ func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, 
 	var fetchErr error
 
 	err := RetryWithBackoff(ctx, retryConfig, func(ctx context.Context) error {
-		resp, err := makeOpendotaRequestExplorer(ctx, queryBuilder.GetIds(lastMatchID, limit))
+		resp, err := makeOpendotaRequestExplorer(ctx, queryBuilder.GetIds(lastFetchedMatchID, limit))
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
+		defer closeBody(resp.Body)
 
 		var opendotaResp OpendotaResponse
 		if err := json.NewDecoder(resp.Body).Decode(&opendotaResp); err != nil {
@@ -257,7 +267,7 @@ func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, 
 // fetchODMatches fetches match details from OpenDota with retry logic
 func fetchODMatches(ctx context.Context, matchIDs []int64) ([]json.RawMessage, error) {
 	retryConfig := RetryConfig{
-		MaxAttempts: config.CONFIG.MAX_RETRIES,
+		MaxAttempts: config.CONFIG.MaxRetries,
 		BaseDelay:   500 * time.Millisecond,
 		MaxDelay:    10 * time.Second,
 		Multiplier:  2.0,
@@ -271,7 +281,7 @@ func fetchODMatches(ctx context.Context, matchIDs []int64) ([]json.RawMessage, e
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
+		defer closeBody(resp.Body)
 
 		var opendotaMatchResp OpendotaMatchResponse
 		if err := json.NewDecoder(resp.Body).Decode(&opendotaMatchResp); err != nil {
@@ -351,6 +361,7 @@ func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams
 
 		var matchPlayers []ODPlayerShort
 		if err := json.Unmarshal(m.Players, &matchPlayers); err != nil {
+			log.Warn().Err(err).Int64("match_id", m.MatchID).Msg("failed to unmarshal players data")
 			continue
 		}
 
@@ -387,7 +398,9 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 	}
 
 	var matchPlayers []ODPlayerShort
-	json.Unmarshal(om.Players, &matchPlayers)
+	if err := json.Unmarshal(om.Players, &matchPlayers); err != nil {
+		log.Warn().Err(err).Int64("match_id", om.MatchID).Msg("failed to unmarshal players data")
+	}
 
 	for _, p := range matchPlayers {
 		if p.PlayerSlot < 128 {

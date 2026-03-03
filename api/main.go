@@ -73,7 +73,7 @@ func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
 	//cors
-	allowedOrigins := getAllowedOrigins(config.IsLocal(), config.CONFIG.CLOUDFRONT_URL)
+	allowedOrigins := getAllowedOrigins(config.IsLocal(), config.CONFIG.CloudfrontURL)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -88,7 +88,7 @@ func (a *App) setupRouter() *chi.Mux {
 	r.Use(middleware.Recoverer)
 
 	// routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprint(w, "hello from home") })
 	r.Get("/matches", a.matchController.GetMany)
 	r.Get("/matches/{id}", a.matchController.GetOne)
 	r.Get("/series", a.seriesController.GetMany)
@@ -106,7 +106,7 @@ func (a *App) ensureDBConnection(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed to re-initialize db pool: %w", err)
 		}
-		a.matchModel.DB.Close()
+		_ = a.matchModel.DB.Close()
 		a.matchModel.DB = db
 		a.seriesModel.DB = db
 		a.filtersMetadataModel.DB = db
@@ -148,12 +148,12 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("failed to initialize application: %w", err))
 	}
-	defer app.Close()
+	defer func() { _ = app.Close() }()
 
 	r := app.setupRouter()
 
 	if config.IsLocal() {
-		if err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r); err != nil {
+		if err := http.ListenAndServe(config.CONFIG.LocalAddr, r); err != nil {
 			panic(fmt.Errorf("failed to start server: %w", err))
 		}
 	} else if config.IsProd() {

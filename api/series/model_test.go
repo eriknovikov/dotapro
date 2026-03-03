@@ -28,7 +28,7 @@ func getTestDB(t *testing.T) *Model {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dbURL := config.CONFIG.LOCAL_DB_URL
+	dbURL := config.CONFIG.LocalDBURL
 	if dbURL == "" {
 		t.Skip("Skipping test: LOCAL_DB_URL not set")
 	}
@@ -39,7 +39,7 @@ func getTestDB(t *testing.T) *Model {
 	}
 
 	t.Cleanup(func() {
-		bunDB.Close()
+		_ = bunDB.Close()
 	})
 
 	return NewModel(bunDB)
@@ -89,7 +89,7 @@ func TestModel_GetMany_NotFound(t *testing.T) {
 	}
 
 	_, _, err := model.GetMany(ctx, filter)
-	if err != errs.NOT_FOUND {
+	if err != errs.ErrNotFound {
 		t.Logf("GetMany() error = %v (may be expected for non-existent league)", err)
 	}
 }
@@ -110,7 +110,7 @@ func TestModel_GetMany_DatabaseError(t *testing.T) {
 	}
 
 	_, _, err := model.GetMany(ctx, filter)
-	if err != nil && err != errs.NOT_FOUND {
+	if err != nil && err != errs.ErrNotFound {
 		t.Errorf("GetMany() unexpected error = %v", err)
 	}
 }
@@ -135,7 +135,7 @@ func TestModel_GetMany_WithFilters(t *testing.T) {
 	}
 
 	series, _, err := model.GetMany(ctx, filter)
-	if err != nil && err != errs.NOT_FOUND {
+	if err != nil && err != errs.ErrNotFound {
 		t.Errorf("GetMany() error = %v", err)
 	}
 
@@ -200,9 +200,11 @@ func TestModel_GetOne_Success(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("GetOne() error = %v", err)
+		return
 	}
 	if seriesDetail == nil {
 		t.Error("GetOne() expected series, got nil")
+		return
 	}
 
 	if seriesDetail.SeriesID != seriesID {
@@ -224,7 +226,7 @@ func TestModel_GetOne_NotFound(t *testing.T) {
 
 	_, err := model.GetOne(ctx, seriesID)
 
-	if err != errs.NOT_FOUND {
+	if err != errs.ErrNotFound {
 		t.Logf("GetOne() error = %v (expected NOT_FOUND)", err)
 	}
 }
@@ -242,7 +244,7 @@ func TestModel_GetOne_InvalidID(t *testing.T) {
 	_, err := model.GetOne(ctx, seriesID)
 
 	// Should return NOT_FOUND for non-existent series
-	if err != errs.NOT_FOUND {
+	if err != errs.ErrNotFound {
 		t.Logf("GetOne() error = %v (expected NOT_FOUND)", err)
 	}
 }
@@ -364,8 +366,8 @@ func TestNewModel(t *testing.T) {
 // TestMain sets up the test environment
 func TestMain(m *testing.M) {
 	// Set test environment
-	os.Setenv("ENVIRON", "local")
-	os.Setenv("LOCAL_DB_URL", "postgres://postgres:admin@localhost:5432/dotapro?sslmode=disable")
+	_ = os.Setenv("ENVIRON", "local")
+	_ = os.Setenv("LOCAL_DB_URL", "postgres://postgres:admin@localhost:5432/dotapro?sslmode=disable")
 
 	// Run tests
 	code := m.Run()

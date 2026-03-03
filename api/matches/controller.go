@@ -29,7 +29,7 @@ func NewController(model *Model) *Controller {
 func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), constants.DefaultRequestTimeout)
 	defer cancel()
-	
+
 	filter := types.GetMatchesFilter{}
 	params := r.URL.Query()
 
@@ -121,7 +121,7 @@ func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		switch err {
-		case errs.NOT_FOUND:
+		case errs.ErrNotFound:
 			utils.WriteError(w, err.Error(), http.StatusNotFound)
 		default:
 			utils.WriteError(w, err.Error(), http.StatusInternalServerError)
