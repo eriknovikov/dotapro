@@ -72,8 +72,7 @@ jobs:
       - name: Build UI
         working-directory: ./ui
         env:
-          # IMPORTANT: Pass your production API URL here so Vite bakes it into the build
-          VITE_API_URL: ${{ secrets.VITE_PROD_API_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: pnpm build
 
       - name: Configure AWS Credentials
