@@ -1,8 +1,8 @@
-import { Github, DiscordIcon } from "./Icons"
+import { DiscordIcon } from "./Icons"
 
 export function Footer() {
     return (
-        <footer className="border-border/50 mt-auto border-t lg:ml-72">
+        <footer className="border-border/50 mt-auto w-full border-t">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <div className="text-foreground-muted text-center text-sm">
                     <p className="text-nowrap">
@@ -17,7 +17,7 @@ export function Footer() {
                             className="text-foreground-muted hover:text-foreground ml-4 inline-block align-middle transition-all duration-200 hover:scale-110"
                             aria-label="GitHub"
                         >
-                            <Github className="h-5 w-5" />
+                            <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
                         </a>
                         <a
                             href="https://discord.gg/h6sVtge8"

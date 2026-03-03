@@ -10,7 +10,7 @@ export default defineConfig({
         // Ensure proper handling for SPA routing
         rollupOptions: {
             output: {
-                manualChunks: (id) => {
+                manualChunks: id => {
                     // Vendor chunks
                     if (id.includes("node_modules")) {
                         // React and related

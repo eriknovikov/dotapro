@@ -22,10 +22,7 @@ export default defineConfig([
         rules: {
             // Prettier handles formatting, ESLint handles code quality
             // Note: Add "prettier/prettier": "warn" rule after installing eslint-plugin-prettier
-            "react-refresh/only-export-components": [
-                "warn",
-                { allowConstantExport: true },
-            ],
+            "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
         },
     },
 ])

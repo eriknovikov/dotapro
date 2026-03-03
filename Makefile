@@ -1,13 +1,12 @@
-.PHONY: build deploy clean help run-api run-ui build-ui-local
+.PHONY: build deploy clean help deploy-ui
 
-# Lambda function names
+#VARS
 API_FUNCTION_NAME := dotapro-lambda-api
 SCRAPER_FUNCTION_NAME := dotapro-lambda-scraper
-DB_URL := postgres://postgres:admin@172.17.0.1:15432/dotapro?sslmode=disable
-# Build directory
+CF_DISTRIBUTION_ID := E1WWIEAKQHKZ85
+S3_BUCKET_NAME := dotapro-ui
 BUILD_DIR := .build
 
-# Help target
 help:
 	@echo "Available targets:"
 	@echo "  make build      - Build and zip both Lambda functions"
@@ -72,30 +71,32 @@ deploy: deploy-api deploy-scraper
 	@echo "🎉 All functions deployed successfully"
 
 
-migrate-up: 
-	migrate -path database/migrations -database "$(DB_URL)" -verbose up
-
-migrate-down:
-	migrate -path database/migrations -database "$(DB_URL)" down
-
 # Clean build artifacts
 clean:
 	@echo "🧹 Cleaning build artifacts..."
 	@rm -rf $(BUILD_DIR)
 	@echo "✅ Clean complete"
 
-# Run API locally
-run-api:
-	@echo "🚀 Running API locally..."
-	@cd api && $(MAKE) run
-
-# Run UI locally
-run-ui:
-	@echo "🚀 Running UI locally..."
-	@cd ui && pnpm dev
-
-# Build UI for local testing (uses localhost API)
-build-ui-local:
-	@echo "🔨 Building UI for local testing..."
-	@cd ui && pnpm build
-	@echo "✅ UI built successfully (using localhost API from .env.production.local)"
+deploy-ui:
+	@echo "--- Building UI ---"
+	cd ui && pnpm build
+	
+	@echo "--- Uploading Assets (Cache Forever) ---"
+	# Syncs everything EXCEPT index.html with a 1-year cache
+	aws s3 sync ui/dist s3://$(S3_BUCKET_NAME) \
+		--delete \
+		--exclude "index.html" \
+		--cache-control "max-age=31536000, public, immutable"
+	
+	@echo "--- Uploading Entry Point (No Cache) ---"
+	# Uploads index.html specifically with headers to force re-validation
+	aws s3 cp ui/dist/index.html s3://$(S3_BUCKET_NAME)/index.html \
+		--cache-control "no-cache, no-store, must-revalidate"
+	
+	@echo "--- Invalidating CloudFront Cache ---"
+	# Tells CloudFront to clear its edge cache immediately
+	aws cloudfront create-invalidation \
+		--distribution-id $(CF_DISTRIBUTION_ID) \
+		--paths "/*"
+	
+	@echo "--- Deployment Complete! ---"
