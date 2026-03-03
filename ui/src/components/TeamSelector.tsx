@@ -224,9 +224,26 @@ export function TeamSelector({
             }
 
             if (isExternalUpdateRef.current) {
+                // Save the current selection/cursor position
+                const selection = window.getSelection()
+                const range = selection?.getRangeAt(0)
+                const cursorOffset = range?.startOffset ?? 0
+
                 inputRef.current.textContent = inputValue
-                // Don't manipulate selection range to avoid unwanted focus
-                // The cursor will be placed naturally when user interacts with the input
+
+                // Restore the cursor position if it was within the input
+                if (selection && range && inputRef.current.contains(range.commonAncestorContainer)) {
+                    const newRange = document.createRange()
+                    const textNode = inputRef.current.firstChild as Text
+                    if (textNode) {
+                        const newOffset = Math.min(cursorOffset, textNode.length)
+                        newRange.setStart(textNode, newOffset)
+                        newRange.setEnd(textNode, newOffset)
+                        selection.removeAllRanges()
+                        selection.addRange(newRange)
+                    }
+                }
+
                 isExternalUpdateRef.current = false
             }
         }
