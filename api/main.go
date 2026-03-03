@@ -84,7 +84,6 @@ func (a *App) setupRouter() *chi.Mux {
 	}))
 	if config.IsLocal() {
 		r.Use(middleware.Logger)
-
 	}
 	r.Use(middleware.Recoverer)
 
@@ -103,7 +102,6 @@ func (a *App) setupRouter() *chi.Mux {
 // ensureDBConnection checks if the database connection is alive and reconnects if needed
 func (a *App) ensureDBConnection(ctx context.Context) error {
 	if a.matchModel.DB == nil || a.matchModel.DB.PingContext(ctx) != nil {
-		log.Warn().Msg("DB connection lost, re-initializing db pool...")
 		db, err := setupDB()
 		if err != nil {
 			return fmt.Errorf("failed to re-initialize db pool: %w", err)
@@ -123,7 +121,6 @@ func (a *App) Handler(ctx context.Context, req Request) (Response, error) {
 	defer cancel()
 
 	if err := a.ensureDBConnection(ctx); err != nil {
-		log.Error().Err(err).Msg("failed to ensure DB connection")
 		return Response{StatusCode: 500}, nil
 	}
 
@@ -133,14 +130,15 @@ func (a *App) Handler(ctx context.Context, req Request) (Response, error) {
 // init initializes the application configuration and logging
 func init() {
 	if err := config.LoadEnvs(); err != nil {
-		log.Fatal().Err(err).Msg("failed to load environment variables")
+		panic(fmt.Errorf("failed to load environment variables: %w", err))
 	}
 	if err := config.Validate(); err != nil {
-		log.Fatal().Err(err).Msg("invalid configuration")
+		panic(fmt.Errorf("invalid configuration: %w", err))
 	}
 	if config.IsLocal() {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+
 	}
 }
 
@@ -148,16 +146,15 @@ func init() {
 func main() {
 	app, err := NewApp()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to initialize application")
+		panic(fmt.Errorf("failed to initialize application: %w", err))
 	}
 	defer app.Close()
 
 	r := app.setupRouter()
 
 	if config.IsLocal() {
-		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running API locally")
 		if err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r); err != nil {
-			log.Fatal().Err(err).Msg("failed to start server")
+			panic(fmt.Errorf("failed to start server: %w", err))
 		}
 	} else if config.IsProd() {
 		app.adapter = httpadapter.NewV2(r)

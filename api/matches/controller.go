@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog/log"
 )
 
 type Controller struct {
@@ -89,7 +88,6 @@ func (c *Controller) GetMany(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err == context.DeadlineExceeded {
-			log.Debug().Msg("Deadline exceeded ")
 			utils.WriteError(w, context.DeadlineExceeded.Error(), http.StatusGatewayTimeout)
 			return
 		}
@@ -120,7 +118,6 @@ func (c *Controller) GetOne(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// Handle context cancellation gracefully - client aborted the request
 		if err == context.Canceled || err == context.DeadlineExceeded {
-			log.Debug().Msg("Request canceled by client")
 			return
 		}
 		switch err {

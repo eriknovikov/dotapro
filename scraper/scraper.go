@@ -124,8 +124,10 @@ func (bp *BatchProcessor) clear() {
 // ScrapeMatches is the main entry point for scraping matches
 func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 	config := DefaultScraperConfig()
-	metrics := NewMetrics()
-	defer metrics.Log()
+
+	// Simple counters for logging
+	var matchesInserted int
+	var errorCount int
 
 	// Check for context cancellation early
 	if err := ctx.Err(); err != nil {
@@ -138,8 +140,9 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 	}
 
 	matchesToFetchLimit := maxBatches * config.BatchSize
-	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, matchesToFetchLimit, metrics)
+	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, matchesToFetchLimit)
 	if err != nil {
+		errorCount++
 		return fmt.Errorf("error fetching match ids: %w", err)
 	}
 
@@ -148,62 +151,50 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 		return ErrNoNewMatches
 	}
 
-	log.Info().
-		Int("total_matches", N).
-		Int64("last_fetched_id", lastFetchedMatchId).
-		Msg("starting to scrape matches")
-
 	processor := NewBatchProcessor(config)
 	defer processor.clear()
 
 	for i := 0; i < N; i += config.BatchSize {
 		// Check for context cancellation before each batch
 		if err := ctx.Err(); err != nil {
-			log.Warn().
-				Int("processed_batches", i/config.BatchSize).
-				Msg("scraping cancelled by context")
 			return fmt.Errorf("scraping cancelled: %w", err)
 		}
 
 		batchNum := i/config.BatchSize + 1
-		log.Debug().
-			Int("batch_num", batchNum).
-			Int("total_batches", (N+config.BatchSize-1)/config.BatchSize).
-			Msg("processing batch")
-
 		end := minInt(i+config.BatchSize, N)
 		currentBatchIDs := matchIds[i:end]
 
 		if len(currentBatchIDs) == 0 {
-			log.Warn().Msg("unexpected empty batch, skipping")
-			metrics.RecordBatchSkip()
 			continue
 		}
 
-		currentBatchMatches, err := fetchODMatches(ctx, currentBatchIDs, metrics)
+		currentBatchMatches, err := fetchODMatches(ctx, currentBatchIDs)
 		if err != nil {
-			metrics.RecordBatchFailure()
+			errorCount++
 			return fmt.Errorf("error scraping matches batch %d: %w", batchNum, err)
 		}
 
-		if err := processBatch(ctx, currentBatchMatches, DB, processor, config, metrics); err != nil {
-			metrics.RecordBatchFailure()
+		if err := processBatch(ctx, currentBatchMatches, DB, processor, config, &matchesInserted, &errorCount); err != nil {
+			errorCount++
 			return fmt.Errorf("error processing matches batch %d: %w", batchNum, err)
 		}
 
-		metrics.RecordBatchSuccess(len(currentBatchIDs))
+		matchesInserted += len(currentBatchIDs)
 
 		maxID := maxInt64(currentBatchIDs)
 		if err := updateLastID(ctx, DB, maxID); err != nil {
+			errorCount++
 			return fmt.Errorf("error updating last fetched match id: %w", err)
 		}
 
 		processor.clear()
-		log.Debug().
-			Int("batch_num", batchNum).
-			Int("matches_processed", len(currentBatchIDs)).
-			Msg("finished processing batch")
 	}
+
+	// Log final metrics
+	log.Info().
+		Int("matches_inserted", matchesInserted).
+		Int("error_count", errorCount).
+		Msg("scraping complete")
 
 	return nil
 }
@@ -246,7 +237,7 @@ func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Respo
 }
 
 // fetchMatchIDs fetches match IDs from OpenDota with retry logic
-func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int, metrics *Metrics) ([]int64, error) {
+func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, error) {
 	retryConfig := RetryConfig{
 		MaxAttempts: DefaultScraperConfig().MaxRetries,
 		BaseDelay:   500 * time.Millisecond,
@@ -258,21 +249,14 @@ func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int, metrics *M
 	var fetchErr error
 
 	err := RetryWithBackoff(ctx, retryConfig, func(ctx context.Context) error {
-		metrics.RecordHTTPRequest()
-
 		resp, err := makeOpendotaRequestExplorer(ctx, queryBuilder.GetIds(lastMatchID, limit))
 		if err != nil {
-			metrics.RecordHTTPFailure()
-			metrics.RecordHTTPRetry()
 			return err
 		}
 		defer resp.Body.Close()
 
-		metrics.RecordHTTPSuccess()
-
 		var opendotaResp OpendotaResponse
 		if err := json.NewDecoder(resp.Body).Decode(&opendotaResp); err != nil {
-			metrics.RecordHTTPFailure()
 			return fmt.Errorf("failed to decode OpenDota response: %w", err)
 		}
 
@@ -293,7 +277,7 @@ func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int, metrics *M
 }
 
 // fetchODMatches fetches match details from OpenDota with retry logic
-func fetchODMatches(ctx context.Context, matchIDs []int64, metrics *Metrics) ([]json.RawMessage, error) {
+func fetchODMatches(ctx context.Context, matchIDs []int64) ([]json.RawMessage, error) {
 	retryConfig := RetryConfig{
 		MaxAttempts: DefaultScraperConfig().MaxRetries,
 		BaseDelay:   500 * time.Millisecond,
@@ -305,21 +289,14 @@ func fetchODMatches(ctx context.Context, matchIDs []int64, metrics *Metrics) ([]
 	var fetchErr error
 
 	err := RetryWithBackoff(ctx, retryConfig, func(ctx context.Context) error {
-		metrics.RecordHTTPRequest()
-
 		resp, err := makeOpendotaRequestExplorer(ctx, queryBuilder.GetMatches(matchIDs))
 		if err != nil {
-			metrics.RecordHTTPFailure()
-			metrics.RecordHTTPRetry()
 			return err
 		}
 		defer resp.Body.Close()
 
-		metrics.RecordHTTPSuccess()
-
 		var opendotaMatchResp OpendotaMatchResponse
 		if err := json.NewDecoder(resp.Body).Decode(&opendotaMatchResp); err != nil {
-			metrics.RecordHTTPFailure()
 			return fmt.Errorf("failed to decode OpenDota match response: %w", err)
 		}
 
@@ -396,10 +373,6 @@ func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams
 
 		var matchPlayers []ODPlayerShort
 		if err := json.Unmarshal(m.Players, &matchPlayers); err != nil {
-			log.Warn().
-				Int64("match_id", m.MatchID).
-				Err(err).
-				Msg("failed to unmarshal players for match")
 			continue
 		}
 
@@ -481,24 +454,18 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 }
 
 // insertRelatedEntities inserts leagues, teams, players, and series into the database
-func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series, metrics *Metrics) error {
+func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series) error {
 	if len(leagues) > 0 {
 		lSlice := mapsToSlice(leagues)
 		// Validate leagues before insertion
 		for i := range lSlice {
 			if err := validator.ValidateLeague(lSlice[i]); err != nil {
-				log.Warn().
-					Err(err).
-					Int64("league_id", lSlice[i].LeagueID).
-					Msg("skipping invalid league")
 				continue
 			}
 		}
 		if _, err := tx.NewInsert().Model(&lSlice).On("CONFLICT (league_id) DO NOTHING").Exec(ctx); err != nil {
-			metrics.RecordDBInsertError()
 			return fmt.Errorf("failed to insert leagues: %w", err)
 		}
-		metrics.RecordDBInsert()
 	}
 
 	if len(teams) > 0 {
@@ -506,18 +473,12 @@ func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]Lea
 		// Validate teams before insertion
 		for i := range tSlice {
 			if err := validator.ValidateTeam(tSlice[i]); err != nil {
-				log.Warn().
-					Err(err).
-					Int64("team_id", tSlice[i].TeamID).
-					Msg("skipping invalid team")
 				continue
 			}
 		}
 		if _, err := tx.NewInsert().Model(&tSlice).On("CONFLICT (team_id) DO NOTHING").Exec(ctx); err != nil {
-			metrics.RecordDBInsertError()
 			return fmt.Errorf("failed to insert teams: %w", err)
 		}
-		metrics.RecordDBInsert()
 	}
 
 	if len(players) > 0 {
@@ -525,18 +486,12 @@ func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]Lea
 		// Validate players before insertion
 		for i := range pSlice {
 			if err := validator.ValidatePlayer(pSlice[i]); err != nil {
-				log.Warn().
-					Err(err).
-					Int64("player_id", pSlice[i].PlayerID).
-					Msg("skipping invalid player")
 				continue
 			}
 		}
 		if _, err := tx.NewInsert().Model(&pSlice).On("CONFLICT (player_id) DO NOTHING").Exec(ctx); err != nil {
-			metrics.RecordDBInsertError()
 			return fmt.Errorf("failed to insert players: %w", err)
 		}
-		metrics.RecordDBInsert()
 	}
 
 	if len(seriesMap) > 0 {
@@ -544,60 +499,38 @@ func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]Lea
 		// Validate series before insertion
 		for i := range sSlice {
 			if err := validator.ValidateSeries(sSlice[i]); err != nil {
-				log.Warn().
-					Err(err).
-					Int64("series_id", sSlice[i].SeriesID).
-					Msg("skipping invalid series")
 				continue
 			}
 		}
 		if _, err := tx.NewInsert().Model(&sSlice).On("CONFLICT (series_id) DO NOTHING").Exec(ctx); err != nil {
-			metrics.RecordDBInsertError()
 			return fmt.Errorf("failed to insert series: %w", err)
 		}
-		metrics.RecordDBInsert()
 	}
 
 	return nil
 }
 
 // insertBatch inserts matches, metadata, and series matches into the database
-func insertBatch(ctx context.Context, tx bun.Tx, matches []Match, metadata []MatchMetadata, seriesMatches []SeriesMatch, metrics *Metrics) error {
+func insertBatch(ctx context.Context, tx bun.Tx, matches []Match, metadata []MatchMetadata, seriesMatches []SeriesMatch) error {
 	// Validate matches and metadata before insertion
-	validCount, invalidCount, validationErrors := validator.ValidateBatch(matches, metadata)
-	if invalidCount > 0 {
-		log.Warn().
-			Int("valid", validCount).
-			Int("invalid", invalidCount).
-			Msg("validation results for batch")
-		for _, err := range validationErrors {
-			log.Debug().Err(err).Msg("validation error")
-		}
-	}
+	validCount, _, _ := validator.ValidateBatch(matches, metadata)
 
 	if validCount == 0 {
-		log.Warn().Msg("no valid matches in batch, skipping insertion")
 		return nil
 	}
 
 	if _, err := tx.NewInsert().Model(&matches).On("CONFLICT (match_id) DO NOTHING").Exec(ctx); err != nil {
-		metrics.RecordDBInsertError()
 		return fmt.Errorf("failed to insert matches: %w", err)
 	}
-	metrics.RecordDBInsert()
 
 	if _, err := tx.NewInsert().Model(&metadata).On("CONFLICT (match_id) DO NOTHING").Exec(ctx); err != nil {
-		metrics.RecordDBInsertError()
 		return fmt.Errorf("failed to insert match metadata: %w", err)
 	}
-	metrics.RecordDBInsert()
 
 	if len(seriesMatches) > 0 {
 		if _, err := tx.NewInsert().Model(&seriesMatches).On("CONFLICT (series_id, match_id) DO NOTHING").Exec(ctx); err != nil {
-			metrics.RecordDBInsertError()
 			return fmt.Errorf("failed to insert series matches: %w", err)
 		}
-		metrics.RecordDBInsert()
 	}
 
 	return nil
@@ -635,7 +568,7 @@ func calculateSeriesScores(odMatches []ODMatch, scores map[int64]SeriesScore) {
 }
 
 // updateSeriesScores updates series scores in the database
-func updateSeriesScores(ctx context.Context, tx bun.Tx, scores map[int64]SeriesScore, metrics *Metrics) error {
+func updateSeriesScores(ctx context.Context, tx bun.Tx, scores map[int64]SeriesScore) error {
 	if len(scores) == 0 {
 		return nil
 	}
@@ -648,20 +581,15 @@ func updateSeriesScores(ctx context.Context, tx bun.Tx, scores map[int64]SeriesS
 			Where("series_id = ?", seriesID).
 			Exec(ctx)
 		if err != nil {
-			metrics.RecordDBInsertError()
 			return fmt.Errorf("failed to update series score for series_id %d: %w", seriesID, err)
 		}
-		metrics.RecordDBInsert()
 	}
 
 	return nil
 }
 
 // processBatch processes a batch of raw match data
-func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor, config ScraperConfig, metrics *Metrics) error {
-	timer := NewBatchTimer(metrics, "process")
-	defer timer.Stop()
-
+func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor, config ScraperConfig, matchesInserted *int, errorCount *int) error {
 	odMatches, err := parseRawMatches(rawBatch, bp.odMatches)
 	if err != nil {
 		return fmt.Errorf("failed to parse raw matches: %w", err)
@@ -670,10 +598,6 @@ func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, b
 	// Validate OD matches before processing
 	for _, m := range odMatches {
 		if err := validator.ValidateODMatch(m); err != nil {
-			log.Warn().
-				Err(err).
-				Int64("match_id", m.MatchID).
-				Msg("skipping invalid match from OpenDota")
 			continue
 		}
 	}
@@ -694,25 +618,20 @@ func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, b
 	}
 
 	if len(bp.validMatches) == 0 {
-		log.Warn().Msg("no valid matches in batch, skipping insertion")
-		metrics.RecordBatchSkip()
 		return nil
 	}
 
-	dbTimer := NewBatchTimer(metrics, "db")
-	defer dbTimer.Stop()
-
 	err = db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
-		if err := insertRelatedEntities(ctx, tx, bp.leagues, bp.teams, bp.players, bp.seriesMap, metrics); err != nil {
+		if err := insertRelatedEntities(ctx, tx, bp.leagues, bp.teams, bp.players, bp.seriesMap); err != nil {
 			return err
 		}
 
-		if err := insertBatch(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches, metrics); err != nil {
+		if err := insertBatch(ctx, tx, bp.validMatches, bp.validMetadata, bp.validSeriesMatches); err != nil {
 			return err
 		}
 
 		calculateSeriesScores(odMatches, bp.seriesScores)
-		if err := updateSeriesScores(ctx, tx, bp.seriesScores, metrics); err != nil {
+		if err := updateSeriesScores(ctx, tx, bp.seriesScores); err != nil {
 			return err
 		}
 

@@ -23,7 +23,7 @@ const (
 var DB *bun.DB
 
 func initialize() {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+
 	if err := config.LoadEnvs(); err != nil {
 		log.Fatal().Err(err).Msg("failed to load environment variables")
 	}
@@ -31,10 +31,14 @@ func initialize() {
 		log.Fatal().Err(err).Msg("configuration validation failed")
 	}
 	if config.IsLocal() {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		log.Logger = log.Output(zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			TimeFormat: time.Kitchen,
 		})
+	} else {
+		// save those cloudwatch pennies !
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 }
 
