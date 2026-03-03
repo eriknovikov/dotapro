@@ -86,7 +86,6 @@ func setupDB() (*bun.DB, error) {
 		return nil, fmt.Errorf("failed to create DB pool: %w", err)
 	}
 
-	log.Info().Msg("database connection established successfully")
 	return db, nil
 }
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"scraper/config"
@@ -23,12 +22,11 @@ const (
 var DB *bun.DB
 
 func initialize() {
-
 	if err := config.LoadEnvs(); err != nil {
-		log.Fatal().Err(err).Msg("failed to load environment variables")
+		panic(fmt.Errorf("failed to load environment variables: %w", err))
 	}
 	if err := config.Validate(); err != nil {
-		log.Fatal().Err(err).Msg("configuration validation failed")
+		panic(fmt.Errorf("configuration validation failed: %w", err))
 	}
 	if config.IsLocal() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
@@ -38,7 +36,7 @@ func initialize() {
 		})
 	} else {
 		// save those cloudwatch pennies !
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	}
 }
 
@@ -46,7 +44,7 @@ func main() {
 	initialize()
 
 	if err := ensureDB(); err != nil {
-		log.Fatal().Err(err).Msg("failed to create or restart database connection")
+		panic(fmt.Errorf("failed to create or restart database connection: %w", err))
 	}
 	defer func() {
 		if DB != nil {
@@ -68,7 +66,7 @@ func main() {
 
 		err := handler(ctx)
 		if err != nil {
-			log.Fatal().Err(err).Msg("handler execution failed")
+			panic(fmt.Errorf("handler execution failed: %w", err))
 		}
 	}
 }
@@ -101,11 +99,9 @@ func handler(ctx context.Context) error {
 
 	// Check DB connection
 	if err := DB.PingContext(dbCtx); err != nil {
-		log.Warn().Err(err).Msg("database connection lost, attempting to reconnect...")
 		if err := ensureDB(); err != nil {
 			return fmt.Errorf("failed to reconnect to database: %w", err)
 		}
-		log.Info().Msg("successfully reconnected to database")
 	}
 
 	// Create a context with timeout for the entire scraping operation
@@ -115,13 +111,8 @@ func handler(ctx context.Context) error {
 	// Execute the scraping
 	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.MAX_BATCHES)
 	if err != nil {
-		if errors.Is(err, ErrNoNewMatches) {
-			log.Info().Msg("no new matches have been inserted since last scrape")
-			return nil
-		}
 		return fmt.Errorf("scraping failed: %w", err)
 	}
 
-	log.Info().Msg("scraping completed successfully")
 	return nil
 }

@@ -9,31 +9,14 @@ import (
 	"slices"
 	"time"
 
+	"scraper/config"
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 )
 
-// ScraperConfig holds configuration for the scraper
-type ScraperConfig struct {
-	BatchSize   int // default 800
-	MaxRetries  int
-	HTTPTimeout time.Duration
-	DBTimeout   time.Duration
-}
-
-// DefaultScraperConfig returns a sensible default scraper configuration
-func DefaultScraperConfig() ScraperConfig {
-	return ScraperConfig{
-		BatchSize:   800,
-		MaxRetries:  3,
-		HTTPTimeout: 30 * time.Second,
-		DBTimeout:   5 * time.Second,
-	}
-}
-
 // Global HTTP client with connection pooling and timeout
 var httpClient = &http.Client{
-	Timeout: DefaultScraperConfig().HTTPTimeout,
+	Timeout: config.CONFIG.HTTP_TIMEOUT,
 	Transport: &http.Transport{
 		MaxIdleConns:        10,
 		MaxIdleConnsPerHost: 10,
@@ -79,18 +62,18 @@ type BatchProcessor struct {
 }
 
 // NewBatchProcessor creates a new BatchProcessor with pre-allocated capacity
-func NewBatchProcessor(config ScraperConfig) *BatchProcessor {
+func NewBatchProcessor() *BatchProcessor {
 	return &BatchProcessor{
-		leagues:            make(map[int64]League, config.BatchSize),
-		teams:              make(map[int64]Team, config.BatchSize*2),
-		players:            make(map[int64]Player, config.BatchSize*10),
-		seriesMap:          make(map[int64]Series, config.BatchSize),
-		seriesScores:       make(map[int64]SeriesScore, config.BatchSize),
-		validMatches:       make([]Match, 0, config.BatchSize),
-		validMetadata:      make([]MatchMetadata, 0, config.BatchSize),
-		validSeriesMatches: make([]SeriesMatch, 0, config.BatchSize),
-		odMatches:          make([]ODMatch, 0, config.BatchSize),
-		ids:                make([]int64, 0, config.BatchSize),
+		leagues:            make(map[int64]League, config.CONFIG.BATCH_SIZE),
+		teams:              make(map[int64]Team, config.CONFIG.BATCH_SIZE*2),
+		players:            make(map[int64]Player, config.CONFIG.BATCH_SIZE*10),
+		seriesMap:          make(map[int64]Series, config.CONFIG.BATCH_SIZE),
+		seriesScores:       make(map[int64]SeriesScore, config.CONFIG.BATCH_SIZE),
+		validMatches:       make([]Match, 0, config.CONFIG.BATCH_SIZE),
+		validMetadata:      make([]MatchMetadata, 0, config.CONFIG.BATCH_SIZE),
+		validSeriesMatches: make([]SeriesMatch, 0, config.CONFIG.BATCH_SIZE),
+		odMatches:          make([]ODMatch, 0, config.CONFIG.BATCH_SIZE),
+		ids:                make([]int64, 0, config.CONFIG.BATCH_SIZE),
 	}
 }
 
@@ -123,8 +106,6 @@ func (bp *BatchProcessor) clear() {
 
 // ScrapeMatches is the main entry point for scraping matches
 func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
-	config := DefaultScraperConfig()
-
 	// Simple counters for logging
 	var matchesInserted int
 	var errorCount int
@@ -139,7 +120,7 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 		return fmt.Errorf("error getting last_fetched_match_id: %w", err)
 	}
 
-	matchesToFetchLimit := maxBatches * config.BatchSize
+	matchesToFetchLimit := maxBatches * config.CONFIG.BATCH_SIZE
 	matchIds, err := fetchMatchIDs(ctx, lastFetchedMatchId, matchesToFetchLimit)
 	if err != nil {
 		errorCount++
@@ -147,21 +128,18 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 	}
 
 	N := len(matchIds)
-	if N == 0 {
-		return ErrNoNewMatches
-	}
 
-	processor := NewBatchProcessor(config)
+	processor := NewBatchProcessor()
 	defer processor.clear()
 
-	for i := 0; i < N; i += config.BatchSize {
+	for i := 0; i < N; i += config.CONFIG.BATCH_SIZE {
 		// Check for context cancellation before each batch
 		if err := ctx.Err(); err != nil {
 			return fmt.Errorf("scraping cancelled: %w", err)
 		}
 
-		batchNum := i/config.BatchSize + 1
-		end := minInt(i+config.BatchSize, N)
+		batchNum := i/config.CONFIG.BATCH_SIZE + 1
+		end := minInt(i+config.CONFIG.BATCH_SIZE, N)
 		currentBatchIDs := matchIds[i:end]
 
 		if len(currentBatchIDs) == 0 {
@@ -174,7 +152,7 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 			return fmt.Errorf("error scraping matches batch %d: %w", batchNum, err)
 		}
 
-		if err := processBatch(ctx, currentBatchMatches, DB, processor, config, &matchesInserted, &errorCount); err != nil {
+		if err := processBatch(ctx, currentBatchMatches, DB, processor, &matchesInserted, &errorCount); err != nil {
 			errorCount++
 			return fmt.Errorf("error processing matches batch %d: %w", batchNum, err)
 		}
@@ -239,7 +217,7 @@ func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Respo
 // fetchMatchIDs fetches match IDs from OpenDota with retry logic
 func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, error) {
 	retryConfig := RetryConfig{
-		MaxAttempts: DefaultScraperConfig().MaxRetries,
+		MaxAttempts: config.CONFIG.MAX_RETRIES,
 		BaseDelay:   500 * time.Millisecond,
 		MaxDelay:    10 * time.Second,
 		Multiplier:  2.0,
@@ -279,7 +257,7 @@ func fetchMatchIDs(ctx context.Context, lastMatchID int64, limit int) ([]int64, 
 // fetchODMatches fetches match details from OpenDota with retry logic
 func fetchODMatches(ctx context.Context, matchIDs []int64) ([]json.RawMessage, error) {
 	retryConfig := RetryConfig{
-		MaxAttempts: DefaultScraperConfig().MaxRetries,
+		MaxAttempts: config.CONFIG.MAX_RETRIES,
 		BaseDelay:   500 * time.Millisecond,
 		MaxDelay:    10 * time.Second,
 		Multiplier:  2.0,
@@ -589,7 +567,7 @@ func updateSeriesScores(ctx context.Context, tx bun.Tx, scores map[int64]SeriesS
 }
 
 // processBatch processes a batch of raw match data
-func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor, config ScraperConfig, matchesInserted *int, errorCount *int) error {
+func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, bp *BatchProcessor, matchesInserted *int, errorCount *int) error {
 	odMatches, err := parseRawMatches(rawBatch, bp.odMatches)
 	if err != nil {
 		return fmt.Errorf("failed to parse raw matches: %w", err)

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -15,6 +16,11 @@ type Config struct {
 	DB_URL_PARAM_NAME string `env:"DB_URL_PARAM_NAME"`
 	ENVIRON           string `env:"ENVIRON" env-default:"prod"`
 	MAX_BATCHES       int    `env:"MAX_BATCHES" env-default:"50"`
+	// Scraper configuration
+	BATCH_SIZE        int           `env:"BATCH_SIZE" env-default:"800"`
+	MAX_RETRIES       int           `env:"MAX_RETRIES" env-default:"3"`
+	HTTP_TIMEOUT      time.Duration `env:"HTTP_TIMEOUT" env-default:"30s"`
+	DB_TIMEOUT        time.Duration `env:"DB_TIMEOUT" env-default:"5s"`
 }
 
 func LoadEnvs() error {
