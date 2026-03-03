@@ -27,6 +27,6 @@ dist-ssr
 .tanstack
 plans/*
 
-.env.development
+
 .env.production
 
