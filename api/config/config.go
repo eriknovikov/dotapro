@@ -16,14 +16,13 @@ const (
 var CONFIG = &Config{}
 
 type Config struct {
-	LocalDBURL      string `env:"LOCAL_DB_URL" env-default:"postgres://postgres:admin@localhost:5432/dotapro"`
-	LocalAddr       string `env:"LOCAL_ADDR" env-default:"http://localhost:8080"`
-	DBURLParamName  string `env:"DB_URL_PARAM_NAME"`
-	Environ         string `env:"ENVIRON"`
-	CloudfrontURL   string `env:"CLOUDFRONT_URL"`
+	LocalDBURL     string `env:"LOCAL_DB_URL" env-default:"postgres://postgres:admin@localhost:5432/dotapro"`
+	LocalAddr      string `env:"LOCAL_ADDR" env-default:"http://localhost:8080"`
+	DBURLParamName string `env:"DB_URL_PARAM_NAME"`
+	Environ        string `env:"ENVIRON"`
 	// Database pool configuration
-	DBMaxConns      int           `env:"DB_MAX_CONNS" env-default:"2"`
-	DBMinConns      int           `env:"DB_MIN_CONNS" env-default:"1"`
+	DBMaxConns        int           `env:"DB_MAX_CONNS" env-default:"2"`
+	DBMinConns        int           `env:"DB_MIN_CONNS" env-default:"1"`
 	DBMaxConnIdleTime time.Duration `env:"DB_MAX_CONN_IDLE_TIME" env-default:"5m"`
 	DBMaxConnLifetime time.Duration `env:"DB_MAX_CONN_LIFETIME" env-default:"30m"`
 }

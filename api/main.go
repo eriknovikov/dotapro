@@ -73,7 +73,7 @@ func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
 	//cors
-	allowedOrigins := getAllowedOrigins(config.IsLocal(), config.CONFIG.CloudfrontURL)
+	allowedOrigins := getAllowedOrigins(config.IsLocal())
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
