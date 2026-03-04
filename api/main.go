@@ -7,6 +7,7 @@ import (
 	"dotapro-lambda-api/filtersmetadata"
 	"dotapro-lambda-api/matches"
 	"dotapro-lambda-api/series"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -85,7 +86,14 @@ func (a *App) setupRouter() *chi.Mux {
 
 	r.Use(middleware.Recoverer)
 	// routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprint(w, "hello from home") })
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"status":  "ok",
+			"message": "DotaPro API is running",
+		})
+	})
 	r.Get("/matches", a.matchController.GetMany)
 	r.Get("/matches/{id}", a.matchController.GetOne)
 	r.Get("/series", a.seriesController.GetMany)
