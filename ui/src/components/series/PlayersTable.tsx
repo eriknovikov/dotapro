@@ -9,6 +9,23 @@ import { Tooltip } from "@/components/ui/tooltip"
 const HeroTooltipContent = lazy(() => import("./HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })))
 const ItemTooltipContent = lazy(() => import("./ItemTooltipContent").then(m => ({ default: m.ItemTooltipContent })))
 
+// Wrapper components to handle Suspense inside tooltip content
+function HeroTooltipWrapper({ heroId }: { heroId: number }) {
+    return (
+        <Suspense fallback={<div className="w-80 h-32 animate-pulse bg-[#1c1d21] rounded-md" />}>
+            <HeroTooltipContent heroId={heroId} />
+        </Suspense>
+    )
+}
+
+function ItemTooltipWrapper({ itemId }: { itemId: number }) {
+    return (
+        <Suspense fallback={<div className="w-72 h-32 animate-pulse bg-[#1c1d21] rounded-md" />}>
+            <ItemTooltipContent itemId={itemId} />
+        </Suspense>
+    )
+}
+
 interface PlayersTableProps {
     match: SeriesMatchDetail
     radiantTeam: TeamInfo
@@ -122,25 +139,16 @@ function TeamPlayersTable({ players, captain, teamInfo, score, isWinner }: TeamP
                                 >
                                     {/* Hero */}
                                     <TableCell className="px-3">
-                                        <Suspense
-                                            fallback={
-                                                <img
-                                                    src={getHeroImageUrl(player.hero_id)}
-                                                    className="h-7 w-auto sm:h-8"
-                                                />
-                                            }
+                                        <Tooltip
+                                            content={<HeroTooltipWrapper heroId={player.hero_id} />}
+                                            side="right"
+                                            contentClassName="p-0 border-none bg-transparent"
                                         >
-                                            <Tooltip
-                                                content={<HeroTooltipContent heroId={player.hero_id} />}
-                                                side="right"
-                                                contentClassName="p-0 border-none bg-transparent"
-                                            >
-                                                <img
-                                                    src={getHeroImageUrl(player.hero_id)}
-                                                    className="h-7 w-auto cursor-pointer sm:h-8"
-                                                />
-                                            </Tooltip>
-                                        </Suspense>
+                                            <img
+                                                src={getHeroImageUrl(player.hero_id)}
+                                                className="h-7 w-auto cursor-pointer sm:h-8"
+                                            />
+                                        </Tooltip>
                                     </TableCell>
                                     {/* Player */}
                                     <TableCell className="px-3 py-0">
@@ -250,45 +258,29 @@ function ItemSlot({ itemId, itemUrl, widthClass, heightClass, emptyBgClass }: It
     const isEmpty = itemId === 0 || itemUrl === ""
 
     return (
-        <Suspense
-            fallback={
-                <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
-                    {!isEmpty && <img src={itemUrl} className="h-full w-full rounded object-cover" />}
-                </div>
-            }
+        <Tooltip
+            content={<ItemTooltipWrapper itemId={itemId} />}
+            side="left"
+            contentClassName="p-0 border-none bg-transparent"
         >
-            <Tooltip
-                content={<ItemTooltipContent itemId={itemId} />}
-                side="left"
-                contentClassName="p-0 border-none bg-transparent"
-            >
-                <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
-                    {!isEmpty && <img src={itemUrl} className="h-full w-full rounded object-cover" />}
-                </div>
-            </Tooltip>
-        </Suspense>
+            <div className={`${widthClass} ${heightClass} rounded ${isEmpty ? emptyBgClass : ""}`}>
+                {!isEmpty && <img src={itemUrl} className="h-full w-full rounded object-cover" />}
+            </div>
+        </Tooltip>
     )
 }
 
 function NeutralItemSlot({ itemId }: { itemId: number }) {
     return (
-        <Suspense
-            fallback={
-                <div className="border-border h-7 w-10 min-w-10 shrink-0 rounded border bg-black sm:h-8 sm:w-11 sm:min-w-11">
-                    {itemId > 0 && <img src={getItemImageUrl(itemId)} className="h-full w-full rounded object-cover" />}
-                </div>
-            }
+        <Tooltip
+            content={<ItemTooltipWrapper itemId={itemId} />}
+            side="right"
+            contentClassName="p-0 border-none bg-transparent"
         >
-            <Tooltip
-                content={<ItemTooltipContent itemId={itemId} />}
-                side="right"
-                contentClassName="p-0 border-none bg-transparent"
-            >
-                <div className="border-border h-7 w-10 min-w-10 shrink-0 rounded border bg-black sm:h-8 sm:w-11 sm:min-w-11">
-                    {itemId > 0 && <img src={getItemImageUrl(itemId)} className="h-full w-full rounded object-cover" />}
-                </div>
-            </Tooltip>
-        </Suspense>
+            <div className="border-border h-7 w-10 min-w-10 shrink-0 rounded border bg-black sm:h-8 sm:w-11 sm:min-w-11">
+                {itemId > 0 && <img src={getItemImageUrl(itemId)} className="h-full w-full rounded object-cover" />}
+            </div>
+        </Tooltip>
     )
 }
 
