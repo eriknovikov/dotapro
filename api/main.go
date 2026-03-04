@@ -76,7 +76,7 @@ func (a *App) setupRouter() *chi.Mux {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrs,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"*"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"}, // Added "Origin"
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
