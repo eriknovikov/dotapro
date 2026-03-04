@@ -80,5 +80,5 @@ func getAllowedOrigins(isLocal bool) []string {
 	if isLocal {
 		return []string{"http://localhost:5173", "http://localhost:3000"}
 	}
-	return []string{"https://dotapro.org", "https://www.dotapro.org"}
+	return []string{"https://dotapro.org", "https://www.dotapro.org", "http://dotapro.org", "http://www.dotapro.org"}
 }
