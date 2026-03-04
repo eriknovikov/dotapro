@@ -74,6 +74,8 @@ func (a *App) setupRouter() *chi.Mux {
 
 	//cors
 	allowedOrigins := getAllowedOrigins(config.IsLocal())
+	log.Info().Strs("allowed_origins", allowedOrigins).Msg("CORS setup")
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
