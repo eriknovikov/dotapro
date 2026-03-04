@@ -79,16 +79,16 @@ func (a *App) setupRouter() *chi.Mux {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"}, // Added "Origin"
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           constants.CORSMaxAge,
+		MaxAge:           300,
 	}))
 	if config.IsLocal() {
 		r.Use(middleware.Logger)
 	}
 	r.Use(middleware.Recoverer)
-
+	r.Use(middleware.Logger)
 	// routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprint(w, "hello from home") })
 	r.Get("/matches", a.matchController.GetMany)
