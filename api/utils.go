@@ -6,6 +6,7 @@ import (
 	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/db"
 	"fmt"
+	"net/http"
 
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
@@ -81,4 +82,19 @@ func getAllowedOrigins(isLocal bool) []string {
 		return []string{"http://localhost:5173", "http://localhost:3000"}
 	}
 	return []string{"https://dotapro.org", "https://www.dotapro.org", "http://dotapro.org", "http://www.dotapro.org"}
+}
+
+// Middleware to block access from the direct urls (from API GW or CF)
+func isRequestAllowedMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		secret := r.Header.Get(config.CONFIG.MagicHeaderName)
+		if secret != config.CONFIG.MagicHeaderValue {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusForbidden)
+			_, _ = w.Write([]byte(`{"error": "Direct access forbidden"}`))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }

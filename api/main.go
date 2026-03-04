@@ -7,6 +7,7 @@ import (
 	"dotapro-lambda-api/filtersmetadata"
 	"dotapro-lambda-api/matches"
 	"dotapro-lambda-api/series"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -72,8 +73,6 @@ func (a *App) Close() error {
 func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
-	//allowedOrs := getAllowedOrigins(config.IsLocal())
-
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -83,9 +82,13 @@ func (a *App) setupRouter() *chi.Mux {
 		MaxAge:           300,
 	}))
 
+	if config.IsProd() {
+		r.Use(isRequestAllowedMiddleware)
+
+	}
 	r.Use(middleware.Recoverer)
 	// routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprint(w, "hello from home") })
+	r.Get("/", handleHome)
 	r.Get("/matches", a.matchController.GetMany)
 	r.Get("/matches/{id}", a.matchController.GetOne)
 	r.Get("/series", a.seriesController.GetMany)
@@ -157,4 +160,14 @@ func main() {
 		app.adapter = httpadapter.NewV2(r)
 		lambda.Start(app.Handler)
 	}
+}
+
+func handleHome(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"status":  "ok",
+		"message": "DotaPro API is running",
+	})
+
 }
