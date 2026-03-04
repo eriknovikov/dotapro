@@ -5,8 +5,6 @@ import (
 	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/utils"
 	"net/http"
-
-	"github.com/rs/zerolog/log"
 )
 
 type Controller struct {
@@ -33,11 +31,9 @@ func (c *Controller) SearchTeams(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err == context.DeadlineExceeded {
-			log.Debug().Msg("Deadline exceeded")
 			utils.WriteError(w, context.DeadlineExceeded.Error(), http.StatusGatewayTimeout)
 			return
 		}
-		log.Err(err).Send()
 		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -61,11 +57,9 @@ func (c *Controller) SearchLeagues(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err == context.DeadlineExceeded {
-			log.Debug().Msg("Deadline exceeded")
 			utils.WriteError(w, context.DeadlineExceeded.Error(), http.StatusGatewayTimeout)
 			return
 		}
-		log.Err(err).Send()
 		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -28,14 +28,14 @@ type Response = events.APIGatewayV2HTTPResponse
 
 // App holds the application state and dependencies
 type App struct {
-	db                      *bun.DB
-	matchModel              *matches.Model
-	seriesModel             *series.Model
-	filtersMetadataModel    *filtersmetadata.Model
-	matchController         *matches.Controller
-	seriesController        *series.Controller
+	db                        *bun.DB
+	matchModel                *matches.Model
+	seriesModel               *series.Model
+	filtersMetadataModel      *filtersmetadata.Model
+	matchController           *matches.Controller
+	seriesController          *series.Controller
 	filtersMetadataController *filtersmetadata.Controller
-	adapter                 *httpadapter.HandlerAdapterV2
+	adapter                   *httpadapter.HandlerAdapterV2
 }
 
 // NewApp creates and initializes a new application instance
@@ -50,12 +50,12 @@ func NewApp() (*App, error) {
 	filtersMetadataModel := filtersmetadata.NewModel(db)
 
 	return &App{
-		db:                      db,
-		matchModel:              matchModel,
-		seriesModel:             seriesModel,
-		filtersMetadataModel:    filtersMetadataModel,
-		matchController:         matches.NewController(matchModel),
-		seriesController:        series.NewController(seriesModel),
+		db:                        db,
+		matchModel:                matchModel,
+		seriesModel:               seriesModel,
+		filtersMetadataModel:      filtersMetadataModel,
+		matchController:           matches.NewController(matchModel),
+		seriesController:          series.NewController(seriesModel),
 		filtersMetadataController: filtersmetadata.NewController(filtersMetadataModel),
 	}, nil
 }
@@ -71,26 +71,21 @@ func (a *App) Close() error {
 // setupRouter configures and returns the HTTP router with all routes and middleware
 func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
-	
-	// Middleware
-	// Only use Logger in local development to reduce CloudWatch costs
-	if config.IsLocal() {
-		r.Use(middleware.Logger)
-		// CORS only needed for local development
-		// In production, API Gateway handles CORS
-		r.Use(cors.Handler(cors.Options{
-			AllowedOrigins:   []string{"*"},
-			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-			ExposedHeaders:   []string{"Link"},
-			AllowCredentials: false,
-			MaxAge:           constants.CORSMaxAge,
-		}))
-	}
-	r.Use(middleware.Recoverer)
 
-	// Routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "hello from home") })
+	//allowedOrs := getAllowedOrigins(config.IsLocal())
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"}, // Added "Origin"
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
+	r.Use(middleware.Recoverer)
+	// routes
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprint(w, "hello from home") })
 	r.Get("/matches", a.matchController.GetMany)
 	r.Get("/matches/{id}", a.matchController.GetOne)
 	r.Get("/series", a.seriesController.GetMany)
@@ -104,12 +99,11 @@ func (a *App) setupRouter() *chi.Mux {
 // ensureDBConnection checks if the database connection is alive and reconnects if needed
 func (a *App) ensureDBConnection(ctx context.Context) error {
 	if a.matchModel.DB == nil || a.matchModel.DB.PingContext(ctx) != nil {
-		log.Warn().Msg("DB connection lost, re-initializing db pool...")
 		db, err := setupDB()
 		if err != nil {
 			return fmt.Errorf("failed to re-initialize db pool: %w", err)
 		}
-		a.matchModel.DB.Close()
+		_ = a.matchModel.DB.Close()
 		a.matchModel.DB = db
 		a.seriesModel.DB = db
 		a.filtersMetadataModel.DB = db
@@ -124,7 +118,6 @@ func (a *App) Handler(ctx context.Context, req Request) (Response, error) {
 	defer cancel()
 
 	if err := a.ensureDBConnection(ctx); err != nil {
-		log.Error().Err(err).Msg("failed to ensure DB connection")
 		return Response{StatusCode: 500}, nil
 	}
 
@@ -134,14 +127,15 @@ func (a *App) Handler(ctx context.Context, req Request) (Response, error) {
 // init initializes the application configuration and logging
 func init() {
 	if err := config.LoadEnvs(); err != nil {
-		log.Fatal().Err(err).Msg("failed to load environment variables")
+		panic(fmt.Errorf("failed to load environment variables: %w", err))
 	}
 	if err := config.Validate(); err != nil {
-		log.Fatal().Err(err).Msg("invalid configuration")
+		panic(fmt.Errorf("invalid configuration: %w", err))
 	}
 	if config.IsLocal() {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+
 	}
 }
 
@@ -149,16 +143,15 @@ func init() {
 func main() {
 	app, err := NewApp()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to initialize application")
+		panic(fmt.Errorf("failed to initialize application: %w", err))
 	}
-	defer app.Close()
+	defer func() { _ = app.Close() }()
 
 	r := app.setupRouter()
 
 	if config.IsLocal() {
-		log.Info().Str("LOCAL_ADDR", config.CONFIG.LOCAL_ADDR).Msg("running API locally")
-		if err := http.ListenAndServe(config.CONFIG.LOCAL_ADDR, r); err != nil {
-			log.Fatal().Err(err).Msg("failed to start server")
+		if err := http.ListenAndServe(config.CONFIG.LocalAddr, r); err != nil {
+			panic(fmt.Errorf("failed to start server: %w", err))
 		}
 	} else if config.IsProd() {
 		app.adapter = httpadapter.NewV2(r)

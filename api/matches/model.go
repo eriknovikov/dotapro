@@ -79,7 +79,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, types.PaginationData{}, errs.NOT_FOUND
+			return nil, types.PaginationData{}, errs.ErrNotFound
 		}
 		return nil, types.PaginationData{}, err
 	}
@@ -135,7 +135,7 @@ func (m *Model) GetOne(ctx context.Context, id int64) (*types.MatchDetail, error
 	log.Debug().Str("BUN_QUERY", q.String()).Send()
 	if err := q.Scan(ctx, res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NOT_FOUND
+			return nil, errs.ErrNotFound
 		}
 		return nil, err
 	}

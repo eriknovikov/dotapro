@@ -86,7 +86,7 @@ function About() {
                     <div className="p-10 shadow-md shadow-gray-900">
                         <h2 className="text-foreground mb-4 text-2xl font-bold">Contributing</h2>
                         <p className="text-foreground-muted mb-4 leading-relaxed">
-                            dotapro.com is open source, and I would appreciate your help greatly! You could:
+                            dotapro.org is open source, and I would appreciate your help greatly! You could:
                         </p>
 
                         <ul className="text-foreground-muted mb-4 ml-6 list-disc space-y-2">

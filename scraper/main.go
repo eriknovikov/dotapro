@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"scraper/config"
@@ -15,26 +14,29 @@ import (
 )
 
 const (
-	DB_CREATION_TIMEOUT = 5 * time.Second
-	SSM_TIMEOUT         = 5 * time.Second
-	LAMBDA_TIMEOUT      = 4 * time.Minute // Leave 1 minute buffer for cleanup
+	dbCreationTimeout = 5 * time.Second
+	ssmTimeout         = 5 * time.Second
+	lambdaTimeout      = 4 * time.Minute // Leave 1 minute buffer for cleanup
 )
 
 var DB *bun.DB
 
 func initialize() {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	if err := config.LoadEnvs(); err != nil {
-		log.Fatal().Err(err).Msg("failed to load environment variables")
+		panic(fmt.Errorf("failed to load environment variables: %w", err))
 	}
 	if err := config.Validate(); err != nil {
-		log.Fatal().Err(err).Msg("configuration validation failed")
+		panic(fmt.Errorf("configuration validation failed: %w", err))
 	}
 	if config.IsLocal() {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		log.Logger = log.Output(zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			TimeFormat: time.Kitchen,
 		})
+	} else {
+		// save those cloudwatch pennies !
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	}
 }
 
@@ -42,7 +44,7 @@ func main() {
 	initialize()
 
 	if err := ensureDB(); err != nil {
-		log.Fatal().Err(err).Msg("failed to create or restart database connection")
+		panic(fmt.Errorf("failed to create or restart database connection: %w", err))
 	}
 	defer func() {
 		if DB != nil {
@@ -59,12 +61,12 @@ func main() {
 		lambda.Start(handler)
 	} else if config.IsLocal() {
 		// Run handler once (aka: invoke the 'lambda' locally)
-		ctx, cancel := context.WithTimeout(context.Background(), LAMBDA_TIMEOUT)
+		ctx, cancel := context.WithTimeout(context.Background(), lambdaTimeout)
 		defer cancel()
 
 		err := handler(ctx)
 		if err != nil {
-			log.Fatal().Err(err).Msg("handler execution failed")
+			panic(fmt.Errorf("handler execution failed: %w", err))
 		}
 	}
 }
@@ -92,32 +94,25 @@ func handler(ctx context.Context) error {
 	}
 
 	// Create a context with timeout for DB operations
-	dbCtx, cancel := context.WithTimeout(ctx, DB_CREATION_TIMEOUT)
+	dbCtx, cancel := context.WithTimeout(ctx, dbCreationTimeout)
 	defer cancel()
 
 	// Check DB connection
 	if err := DB.PingContext(dbCtx); err != nil {
-		log.Warn().Err(err).Msg("database connection lost, attempting to reconnect...")
 		if err := ensureDB(); err != nil {
 			return fmt.Errorf("failed to reconnect to database: %w", err)
 		}
-		log.Info().Msg("successfully reconnected to database")
 	}
 
 	// Create a context with timeout for the entire scraping operation
-	scrapeCtx, cancel := context.WithTimeout(ctx, LAMBDA_TIMEOUT)
+	scrapeCtx, cancel := context.WithTimeout(ctx, lambdaTimeout)
 	defer cancel()
 
 	// Execute the scraping
-	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.MAX_BATCHES)
+	err := ScrapeMatches(scrapeCtx, DB, config.CONFIG.MaxBatches)
 	if err != nil {
-		if errors.Is(err, ErrNoNewMatches) {
-			log.Info().Msg("no new matches have been inserted since last scrape")
-			return nil
-		}
 		return fmt.Errorf("scraping failed: %w", err)
 	}
 
-	log.Info().Msg("scraping completed successfully")
 	return nil
 }

@@ -9,7 +9,7 @@ function Matches() {
     return (
         <>
             <SEO
-                title="dotapro.com | Matches"
+                title="dotapro.org | Matches"
                 description="Browse professional Dota 2 matches. Coming soon with advanced filtering and statistics."
             />
             <main className="min-h-[calc(100vh-4rem)] flex-1 py-6">

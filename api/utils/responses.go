@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 )
 
 // WriteResponse writes a JSON response with the given status code.
@@ -20,6 +22,13 @@ func WriteResponse(w http.ResponseWriter, resp any, statusCode int) {
 // WriteError writes an error response with the given status code.
 // The error is returned as a JSON object with an "error" key.
 func WriteError(w http.ResponseWriter, err string, statusCode int) {
+	// Only log error responses (non-2xx status codes)
+	if statusCode >= 400 {
+		log.Error().
+			Str("error", err).
+			Int("status_code", statusCode).
+			Msg("API error response")
+	}
 	resp := map[string]string{"error": err}
 	WriteResponse(w, resp, statusCode)
 }
@@ -43,7 +52,7 @@ func HandleError(w http.ResponseWriter, err error) {
 	}
 
 	// Handle context errors
-	if err == errs.NOT_FOUND {
+	if err == errs.ErrNotFound {
 		WriteError(w, err.Error(), http.StatusNotFound)
 		return
 	}

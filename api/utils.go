@@ -19,10 +19,10 @@ func setupDB() (*bun.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get database URL: %w", err)
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), constants.DBConnectionTimeout)
 	defer cancel()
-	
+
 	db, err := db.CreatePool(ctx, dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create database pool: %w", err)
@@ -41,15 +41,15 @@ func getDBURLFromSSM(ctx context.Context) (string, error) {
 
 	ssmClient := ssm.NewFromConfig(cfg)
 	decryption := true
-	
+
 	output, err := ssmClient.GetParameter(ctx, &ssm.GetParameterInput{
-		Name:           &config.CONFIG.DB_URL_PARAM_NAME,
+		Name:           &config.CONFIG.DBURLParamName,
 		WithDecryption: &decryption,
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to get SSM parameter: %w", err)
 	}
-	
+
 	if output.Parameter.Value == nil {
 		return "", fmt.Errorf("SSM parameter value is nil")
 	}
@@ -62,16 +62,23 @@ func getDBURLFromSSM(ctx context.Context) (string, error) {
 // For production, it retrieves the URL from AWS SSM Parameter Store.
 func getDBURL() (string, error) {
 	if config.IsLocal() {
-		return config.CONFIG.LOCAL_DB_URL, nil
+		return config.CONFIG.LocalDBURL, nil
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), constants.SSMTimeout)
 	defer cancel()
-	
+
 	url, err := getDBURLFromSSM(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve database URL from SSM: %w", err)
 	}
-	
+
 	return url, nil
+}
+
+func getAllowedOrigins(isLocal bool) []string {
+	if isLocal {
+		return []string{"http://localhost:5173", "http://localhost:3000"}
+	}
+	return []string{"https://dotapro.org", "https://www.dotapro.org", "http://dotapro.org", "http://www.dotapro.org"}
 }

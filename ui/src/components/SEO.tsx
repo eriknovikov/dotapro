@@ -10,11 +10,11 @@ interface SEOProps {
     canonicalUrl?: string
 }
 
-const DEFAULT_TITLE = "dotapro.com - Dota 2 professional analytics"
+const DEFAULT_TITLE = "dotapro.org - Dota 2 professional analytics"
 const DEFAULT_DESCRIPTION =
     "Comprehensive Dota 2 match data aggregation system. View series and matches statistics from the professional scene."
 const DEFAULT_IMAGE = "/og-image.webp"
-const SITE_URL = "https://dotapro.com"
+const SITE_URL = "https://dotapro.org"
 
 /**
  * SEO component for managing document title and meta tags dynamically
@@ -35,7 +35,7 @@ export function SEO({
         const fullUrl = canonicalUrl || `${SITE_URL}${location.pathname}`
 
         // Set document title
-        document.title = title ? `${title} | dotapro.com` : DEFAULT_TITLE
+        document.title = title ? `${title} | dotapro.org` : DEFAULT_TITLE
 
         // Update or create meta tags
         const updateMetaTag = (name: string, content: string, property = false) => {

@@ -7,7 +7,7 @@ export function Footer() {
                 <div className="text-foreground-muted text-center text-sm">
                     <p className="text-nowrap">
                         <a href="/" className="hover:text-foreground transition-colors">
-                            dotapro.com
+                            dotapro.org
                         </a>
                         {" © 2026"}
                         <a

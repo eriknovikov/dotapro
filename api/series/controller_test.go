@@ -127,7 +127,7 @@ func (c *mockController) GetOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		switch err {
-		case errs.NOT_FOUND:
+		case errs.ErrNotFound:
 			writeTestErrorResponse(w, err.Error(), http.StatusNotFound)
 		default:
 			writeTestErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -190,7 +190,7 @@ func writeTestErrorResponse(w http.ResponseWriter, err string, statusCode int) {
 func writeTestResponse(w http.ResponseWriter, resp any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // TestController_GetMany_Success tests successful retrieval of multiple series
@@ -198,31 +198,31 @@ func TestController_GetMany_Success(t *testing.T) {
 	mock := &mockModel{
 		getManyFunc: func(ctx context.Context, filter types.GetSeriesFilter) ([]types.SeriesSummary, types.PaginationData, error) {
 			return []types.SeriesSummary{
-				{
-					SeriesID:   1,
-					StartTime:  time.Now(),
-					TeamAScore: 2,
-					TeamBScore: 1,
-					TeamA: types.TeamInfo{
-						ID:   100,
-						Name: "Team A",
-						Tag:  "TA",
+					{
+						SeriesID:   1,
+						StartTime:  time.Now(),
+						TeamAScore: 2,
+						TeamBScore: 1,
+						TeamA: types.TeamInfo{
+							ID:   100,
+							Name: "Team A",
+							Tag:  "TA",
+						},
+						TeamB: types.TeamInfo{
+							ID:   200,
+							Name: "Team B",
+							Tag:  "TB",
+						},
+						League: types.LeagueInfo{
+							ID:   10,
+							Name: "Test League",
+							Tier: "1",
+						},
 					},
-					TeamB: types.TeamInfo{
-						ID:   200,
-						Name: "Team B",
-						Tag:  "TB",
-					},
-					League: types.LeagueInfo{
-						ID:   10,
-						Name: "Test League",
-						Tier: "1",
-					},
-				},
-			}, types.PaginationData{
-				NextCursor: nil,
-				HasMore:    false,
-			}, nil
+				}, types.PaginationData{
+					NextCursor: nil,
+					HasMore:    false,
+				}, nil
 		},
 	}
 
@@ -412,7 +412,7 @@ func TestController_GetMany_InvalidCursor(t *testing.T) {
 func TestController_GetMany_NotFound(t *testing.T) {
 	mock := &mockModel{
 		getManyFunc: func(ctx context.Context, filter types.GetSeriesFilter) ([]types.SeriesSummary, types.PaginationData, error) {
-			return nil, types.PaginationData{}, errs.NOT_FOUND
+			return nil, types.PaginationData{}, errs.ErrNotFound
 		},
 	}
 
@@ -560,7 +560,7 @@ func TestController_GetOne_Success(t *testing.T) {
 func TestController_GetOne_NotFound(t *testing.T) {
 	mock := &mockModel{
 		getOneFunc: func(ctx context.Context, id int64) (*types.SeriesDetail, error) {
-			return nil, errs.NOT_FOUND
+			return nil, errs.ErrNotFound
 		},
 	}
 

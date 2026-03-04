@@ -11,6 +11,11 @@ import (
 	"dotapro-lambda-api/types"
 )
 
+const (
+	testQueryTeam   = "Team"
+	testQueryLeague = "League"
+)
+
 // getTestDB returns a database connection for testing
 func getTestDB(t *testing.T) *Model {
 	// Load environment variables
@@ -27,7 +32,7 @@ func getTestDB(t *testing.T) *Model {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dbURL := config.CONFIG.LOCAL_DB_URL
+	dbURL := config.CONFIG.LocalDBURL
 	if dbURL == "" {
 		t.Skip("Skipping test: LOCAL_DB_URL not set")
 	}
@@ -38,7 +43,7 @@ func getTestDB(t *testing.T) *Model {
 	}
 
 	t.Cleanup(func() {
-		bunDB.Close()
+		_ = bunDB.Close()
 	})
 
 	return NewModel(bunDB)
@@ -52,7 +57,7 @@ func TestModel_SearchTeams_Success(t *testing.T) {
 
 	model := getTestDB(t)
 	ctx := context.Background()
-	query := "Team"
+	query := testQueryTeam
 
 	teams, err := model.SearchTeams(ctx, query)
 	if err != nil {
@@ -90,7 +95,7 @@ func TestModel_SearchTeams_DatabaseError(t *testing.T) {
 
 	model := getTestDB(t)
 	ctx := context.Background()
-	query := "Team"
+	query := testQueryTeam
 
 	// This test verifies error handling - we can't easily force a DB error
 	// without breaking the connection, so we just verify the function works
@@ -147,7 +152,7 @@ func TestModel_SearchLeagues_Success(t *testing.T) {
 
 	model := getTestDB(t)
 	ctx := context.Background()
-	query := "League"
+	query := testQueryLeague
 
 	leagues, err := model.SearchLeagues(ctx, query)
 	if err != nil {
@@ -185,7 +190,7 @@ func TestModel_SearchLeagues_DatabaseError(t *testing.T) {
 
 	model := getTestDB(t)
 	ctx := context.Background()
-	query := "League"
+	query := testQueryLeague
 
 	// This test verifies error handling - we can't easily force a DB error
 	// without breaking the connection, so we just verify the function works
@@ -378,8 +383,8 @@ func TestSearchQueryValidation(t *testing.T) {
 // TestMain sets up the test environment
 func TestMain(m *testing.M) {
 	// Set test environment
-	os.Setenv("ENVIRON", "local")
-	os.Setenv("LOCAL_DB_URL", "postgres://postgres:admin@localhost:5432/dotapro?sslmode=disable")
+	_ = os.Setenv("ENVIRON", "local")
+	_ = os.Setenv("LOCAL_DB_URL", "postgres://postgres:admin@localhost:5432/dotapro?sslmode=disable")
 
 	// Run tests
 	code := m.Run()
