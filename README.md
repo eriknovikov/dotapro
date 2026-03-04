@@ -1,83 +1,55 @@
-# Dotapro
+# dotapro.org
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?logo=go)
-![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript)
+> An open source, completely free-to-use platform for professional Dota 2 analytics.
 
-> Professional Dota 2 match data platform. Scrapes from OpenDota, stores in PostgreSQL, serves via API with a React frontend.
+## What's dotapro.org?
 
-## What it does
+It's a platform focused exclusively on professional Dota 2 matches – no random pub games here, just the good stuff from the pro scene.
 
-- Track series with match-by-match breakdowns
-- Browse matches with filters (league, team, player, hero)
-- Auto-updates every minute
-- Beautiful dark-themed UI
+It's by no means a replacement or better alternative to traditional heavy-weight analytics sites like Dotabuff, Stratz, or OpenDota. Those platforms dump a mountain of data on you and say "good luck figuring it out," while dotapro focuses on the analytics that actually matter to Dota players (according to real players), without the noise of public matches data.
 
-## Stack
+## Who is dotapro.org for?
 
-**Backend**: Go + PostgreSQL + AWS Lambda
-**Frontend**: React + TypeScript + Tailwind
+Pretty much anyone who likes watching pro Dota. But specifically:
 
-## Quick start
+- **Casual fans** – Just want to see what your favorite teams are up to without drowning in stats
+- **Casters & analysts** – Quick access to match history and team performance for prep work
+- **Pro players & coaches** – Scout opponents, analyze strategies, see what's meta in the pro scene
+- **Dota nerds** – People who just love looking at match data (I see you)
 
-```bash
-# Clone
-git clone https://github.com/E-nkv/dotapro.git
-cd dotapro
+## Quick Start
 
-# Set up env
-source .env.local
+Docs needed!
 
-# Set up database
-cd database && make migrate-up
+## Tech Stack
 
-# Run API
-cd ../api && go run main.go
+- **Backend**: Go + PostgreSQL
+- **Frontend**: React + TypeScript + Tailwind v4
+- **Infra**: AWS (Lambda, RDS, API GW, S3, Cloudfront)
 
-# Run scraper (optional, for data)
-cd ../scraper && MAX_BATCHES=10 go run main.go
+## Disclaimer
 
-# Run frontend
-cd ../ui && pnpm install && pnpm dev
-```
+Gotta give credit where it's due – dotapro is built on top of the amazing OpenDota API. Those folks have done incredible work making Dota 2 data accessible to everyone, and this project wouldn't exist without them. Big thanks to the OpenDota team! 🙌
 
-Then open `http://localhost:5173`
+## About the Developer
 
-## Or use Docker
+Hi there! I'm Erik, the creator of dotapro.
 
-```bash
-docker-compose up -d
-```
-
-## Project structure
-
-```
-api/       - Go backend (REST API)
-scraper/   - Go scraper (data ingestion)
-database/  - SQL schemas and migrations
-ui/        - React frontend
-```
-
-## API
-
-| Endpoint       | Method | Description               |
-| -------------- | ------ | ------------------------- |
-| `/matches`     | GET    | List matches with filters |
-| `/matches/:id` | GET    | Get match details         |
-| `/series`      | GET    | List series with filters  |
-| `/series/:id`  | GET    | Get matches in a series   |
-
-## Deployment
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for infrastructure details.
-
-- [MANUAL_DEPLOYMENT.md](MANUAL_DEPLOYMENT.md) - First-time AWS setup
-- [DEPLOYMENT.md](DEPLOYMENT.md) - Automated CI/CD setup
+As a Dota 2 fan and player myself, it was quite difficult to follow the pro-scene with traditional platforms, and this also seemed to be an issue for Pro Players I knew, so I decided to build 'dotapro'. The tech stack is pretty modern (Go, React, PostgreSQL, AWS), and it has been super exciting to work on something I love.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md)
+dotapro.org is open source, and I would appreciate your help greatly! You could:
+
+- Submit pull requests for bug fixes or new features
+- Open issues for bugs you find or features you'd like to see
+- Share feedback and suggestions (I'm always open to ideas!)
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+For infrastructure details and deployment instructions:
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Full architecture overview
 
 ## License
 
