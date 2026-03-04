@@ -72,17 +72,17 @@ func (a *App) Close() error {
 func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
-	if config.IsLocal() {
-		r.Use(cors.Handler(cors.Options{
-			AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"},
-			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"}, // Added "Origin"
-			ExposedHeaders:   []string{"Link"},
-			AllowCredentials: false,
-			MaxAge:           300,
-		}))
-		r.Use(middleware.Logger)
-	}
+	allowedOrs := getAllowedOrigins(config.IsLocal())
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   allowedOrs,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"}, // Added "Origin"
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
 	r.Use(middleware.Recoverer)
 	// routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) { _, _ = fmt.Fprint(w, "hello from home") })

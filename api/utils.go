@@ -76,10 +76,9 @@ func getDBURL() (string, error) {
 	return url, nil
 }
 
-/* func getAllowedOrigins(isLocal bool) []string {
+func getAllowedOrigins(isLocal bool) []string {
 	if isLocal {
 		return []string{"http://localhost:5173", "http://localhost:3000"}
 	}
 	return []string{"https://dotapro.org", "https://www.dotapro.org"}
 }
-*/
