@@ -72,11 +72,11 @@ func (a *App) Close() error {
 func (a *App) setupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
-	allowedOrs := getAllowedOrigins(config.IsLocal())
+	//allowedOrs := getAllowedOrigins(config.IsLocal())
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   allowedOrs,
-		AllowedMethods:   []string{"*"},
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"}, // Added "Origin"
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
