@@ -77,13 +77,6 @@ func getDBURL() (string, error) {
 	return url, nil
 }
 
-func getAllowedOrigins(isLocal bool) []string {
-	if isLocal {
-		return []string{"http://localhost:5173", "http://localhost:3000"}
-	}
-	return []string{"https://dotapro.org", "https://www.dotapro.org", "http://dotapro.org", "http://www.dotapro.org"}
-}
-
 // Middleware to block access from the direct urls (from API GW or CF)
 func isRequestAllowedMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

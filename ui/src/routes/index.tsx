@@ -59,6 +59,8 @@ function Index() {
                             <img
                                 src="/hero.webp"
                                 alt="Series Screenshot"
+                                width="2525"
+                                height="1222"
                                 className="block h-auto w-full sm:max-w-[80vw] md:max-w-[90vw] lg:max-w-[80vw]"
                             />
                         </div>

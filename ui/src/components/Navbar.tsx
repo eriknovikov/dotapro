@@ -28,6 +28,7 @@ function NavLink({
             activeProps={{ className: "text-foreground after:scale-x-100" }}
             onClick={onClick}
             aria-label={ariaLabel || label}
+            role="menuitem"
         >
             {label}
         </Link>
@@ -73,7 +74,13 @@ export function Navbar() {
                         <div className="flex shrink-0 items-center gap-2">
                             <picture>
                                 <source srcSet="/logo-48.webp" media="(min-width: 768px)" />
-                                <img src="/logo-32x32.webp" alt="" className="h-7 w-auto sm:h-8 md:h-10 lg:h-12" />
+                                <img
+                                    src="/logo-32x32.webp"
+                                    alt=""
+                                    width="32"
+                                    height="32"
+                                    className="h-7 w-auto sm:h-8 md:h-10 lg:h-12"
+                                />
                             </picture>
 
                             <Link
@@ -95,6 +102,7 @@ export function Navbar() {
                                     rel="noopener noreferrer"
                                     className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
                                     aria-label="GitHub"
+                                    role="menuitem"
                                 >
                                     <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
                                 </a>
@@ -104,6 +112,7 @@ export function Navbar() {
                                     rel="noopener noreferrer"
                                     className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
                                     aria-label="Discord"
+                                    role="menuitem"
                                 >
                                     <DiscordIcon />
                                 </a>
