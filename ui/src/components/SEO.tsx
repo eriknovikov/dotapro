@@ -13,8 +13,16 @@ interface SEOProps {
 const DEFAULT_TITLE = "dotapro.org - Dota 2 professional analytics"
 const DEFAULT_DESCRIPTION =
     "Comprehensive Dota 2 match data aggregation system. View series and matches statistics from the professional scene."
-const DEFAULT_IMAGE = "/og-image.webp"
+const DEFAULT_IMAGE = "https://dotapro.org/og-image.webp"
 const SITE_URL = "https://dotapro.org"
+
+// Helper to convert relative image paths to absolute URLs
+const getAbsoluteImageUrl = (image: string): string => {
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+        return image
+    }
+    return `${SITE_URL}${image.startsWith("/") ? "" : "/"}${image}`
+}
 
 /**
  * SEO component for managing document title and meta tags dynamically
@@ -33,6 +41,7 @@ export function SEO({
     useEffect(() => {
         // Build full URL
         const fullUrl = canonicalUrl || `${SITE_URL}${location.pathname}`
+        const absoluteImageUrl = getAbsoluteImageUrl(image)
 
         // Set document title
         document.title = title ? `${title} | dotapro.org` : DEFAULT_TITLE
@@ -64,17 +73,19 @@ export function SEO({
         updateMetaTag("og:url", fullUrl, true)
         updateMetaTag("og:title", title || "Dotapro - Dota 2 Match Data & Statistics", true)
         updateMetaTag("og:description", description || DEFAULT_DESCRIPTION, true)
-        updateMetaTag("og:image", image, true)
+        updateMetaTag("og:image", absoluteImageUrl, true)
         updateMetaTag("og:image:width", "1200", true)
         updateMetaTag("og:image:height", "630", true)
         updateMetaTag("og:image:alt", "Dotapro Logo", true)
+        updateMetaTag("og:image:secure_url", absoluteImageUrl, true)
+        updateMetaTag("og:image:type", "image/webp", true)
 
         // Twitter
         updateMetaTag("twitter:card", "summary_large_image")
         updateMetaTag("twitter:url", fullUrl, true)
         updateMetaTag("twitter:title", title || "Dotapro - Dota 2 Match Data & Statistics", true)
         updateMetaTag("twitter:description", description || DEFAULT_DESCRIPTION, true)
-        updateMetaTag("twitter:image", image, true)
+        updateMetaTag("twitter:image", absoluteImageUrl, true)
 
         // Canonical URL
         let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
