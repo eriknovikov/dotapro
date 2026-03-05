@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"slices"
 	"time"
 
 	"scraper/config"
+
 	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 )
@@ -48,6 +48,7 @@ type BatchProcessor struct {
 	teams        map[int64]Team
 	players      map[int64]Player
 	seriesMap    map[int64]Series
+	seriesInfo   map[int64]SeriesInfo // New map for neutral team IDs
 	seriesScores map[int64]SeriesScore
 
 	// Slices for valid matches
@@ -62,15 +63,6 @@ type BatchProcessor struct {
 	ids []int64
 }
 
-// closeBody safely closes an HTTP response body and logs any error
-func closeBody(body io.ReadCloser) {
-	if body != nil {
-		if err := body.Close(); err != nil {
-			log.Warn().Err(err).Msg("error closing response body")
-		}
-	}
-}
-
 // NewBatchProcessor creates a new BatchProcessor with pre-allocated capacity
 func NewBatchProcessor() *BatchProcessor {
 	return &BatchProcessor{
@@ -78,6 +70,7 @@ func NewBatchProcessor() *BatchProcessor {
 		teams:              make(map[int64]Team, config.CONFIG.BatchSize*2),
 		players:            make(map[int64]Player, config.CONFIG.BatchSize*10),
 		seriesMap:          make(map[int64]Series, config.CONFIG.BatchSize),
+		seriesInfo:         make(map[int64]SeriesInfo, config.CONFIG.BatchSize),
 		seriesScores:       make(map[int64]SeriesScore, config.CONFIG.BatchSize),
 		validMatches:       make([]Match, 0, config.CONFIG.BatchSize),
 		validMetadata:      make([]MatchMetadata, 0, config.CONFIG.BatchSize),
@@ -101,6 +94,9 @@ func (bp *BatchProcessor) clear() {
 	}
 	for k := range bp.seriesMap {
 		delete(bp.seriesMap, k)
+	}
+	for k := range bp.seriesInfo {
+		delete(bp.seriesInfo, k)
 	}
 	for k := range bp.seriesScores {
 		delete(bp.seriesScores, k)
@@ -130,7 +126,7 @@ func ScrapeMatches(ctx context.Context, DB *bun.DB, maxBatches int) error {
 		return fmt.Errorf("error getting last_fetched_match_id: %w", err)
 	}
 
-	matchesToFetchLimit := maxBatches * config.CONFIG.MaxBatches
+	matchesToFetchLimit := maxBatches * config.CONFIG.BatchSize
 	matchIDs, err := fetchMatchIDs(ctx, lastFetchedMatchID, matchesToFetchLimit)
 	if err != nil {
 		errorCount++
@@ -217,7 +213,7 @@ func makeOpendotaRequestExplorer(ctx context.Context, query string) (*http.Respo
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		closeBody(resp.Body)
+		resp.Body.Close() //nolint:errcheck
 		return nil, fmt.Errorf("OpenDota explorer request failed with status: %s", resp.Status)
 	}
 
@@ -241,7 +237,7 @@ func fetchMatchIDs(ctx context.Context, lastFetchedMatchID int64, limit int) ([]
 		if err != nil {
 			return err
 		}
-		defer closeBody(resp.Body)
+		defer resp.Body.Close() //nolint:errcheck
 
 		var opendotaResp OpendotaResponse
 		if err := json.NewDecoder(resp.Body).Decode(&opendotaResp); err != nil {
@@ -281,7 +277,7 @@ func fetchODMatches(ctx context.Context, matchIDs []int64) ([]json.RawMessage, e
 		if err != nil {
 			return err
 		}
-		defer closeBody(resp.Body)
+		defer resp.Body.Close() //nolint:errcheck
 
 		var opendotaMatchResp OpendotaMatchResponse
 		if err := json.NewDecoder(resp.Body).Decode(&opendotaMatchResp); err != nil {
@@ -314,7 +310,7 @@ func parseRawMatches(rawBatch []json.RawMessage, odMatches []ODMatch) ([]ODMatch
 }
 
 // extractRelatedEntities extracts leagues, teams, players, and series from matches
-func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series) {
+func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series, seriesInfo map[int64]SeriesInfo) {
 	for _, m := range odMatches {
 		if m.League.ID > 0 {
 			leagues[m.League.ID] = League{
@@ -343,6 +339,25 @@ func extractRelatedEntities(odMatches []ODMatch, leagues map[int64]League, teams
 		}
 
 		if m.SeriesID > 0 {
+			// Store neutral team IDs without A/B assignment
+			info := SeriesInfo{
+				SeriesID:  m.SeriesID,
+				StartTime: time.Unix(m.StartTime, 0),
+			}
+			if m.League.ID > 0 {
+				info.LeagueID = m.League.ID
+			}
+			if m.RadiantTeam.ID > 0 && m.DireTeam.ID > 0 {
+				info.TeamOneID = m.RadiantTeam.ID
+				info.TeamTwoID = m.DireTeam.ID
+			}
+			
+			// Only set start_time if this is the first match in the series
+			if existingInfo, exists := seriesInfo[m.SeriesID]; !exists || m.StartTime < existingInfo.StartTime.Unix() {
+				seriesInfo[m.SeriesID] = info
+			}
+			
+			// Create Series object for database insertion (will be handled by smart upsert)
 			s := Series{
 				SeriesID:  m.SeriesID,
 				StartTime: time.Unix(m.StartTime, 0),
@@ -445,7 +460,7 @@ func buildMatchEntities(om ODMatch, players map[int64]Player) (Match, MatchMetad
 }
 
 // insertRelatedEntities inserts leagues, teams, players, and series into the database
-func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series) error {
+func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]League, teams map[int64]Team, players map[int64]Player, seriesMap map[int64]Series, seriesInfo map[int64]SeriesInfo) error {
 	if len(leagues) > 0 {
 		lSlice := mapsToSlice(leagues)
 		// Validate leagues before insertion
@@ -486,14 +501,54 @@ func insertRelatedEntities(ctx context.Context, tx bun.Tx, leagues map[int64]Lea
 	}
 
 	if len(seriesMap) > 0 {
-		sSlice := mapsToSlice(seriesMap)
-		// Validate series before insertion
-		for i := range sSlice {
-			if err := validator.ValidateSeries(sSlice[i]); err != nil {
-				continue
+		// Get existing series to determine team_a_id and team_b_id
+		existingSeries := make(map[int64]Series)
+		seriesIDs := make([]int64, 0, len(seriesMap))
+		for id := range seriesMap {
+			seriesIDs = append(seriesIDs, id)
+		}
+		
+		if len(seriesIDs) > 0 {
+			var existing []Series
+			err := tx.NewSelect().
+				Model(&existing).
+				Where("series_id IN (?)", bun.In(seriesIDs)).
+				Scan(ctx)
+			if err != nil {
+				return fmt.Errorf("failed to fetch existing series: %w", err)
+			}
+			
+			for _, s := range existing {
+				existingSeries[s.SeriesID] = s
 			}
 		}
-		if _, err := tx.NewInsert().Model(&sSlice).On("CONFLICT (series_id) DO NOTHING").Exec(ctx); err != nil {
+		
+		// Prepare series for insertion with smart upsert logic
+		sSlice := make([]Series, 0, len(seriesMap))
+		for id, s := range seriesMap {
+			// Validate series before insertion
+			if err := validator.ValidateSeries(s); err != nil {
+				continue
+			}
+			
+			// Check if series already exists
+			if existing, exists := existingSeries[id]; exists {
+				// Use existing team assignments and start_time
+				s.TeamAID = existing.TeamAID
+				s.TeamBID = existing.TeamBID
+				s.StartTime = existing.StartTime
+			}
+			// For new series, use the first match's team assignments and start_time
+			// (already set in extractRelatedEntities)
+			
+			sSlice = append(sSlice, s)
+		}
+		
+		// Smart upsert: only insert new series, don't update existing ones
+		if _, err := tx.NewInsert().
+			Model(&sSlice).
+			On("CONFLICT (series_id) DO NOTHING").
+			Exec(ctx); err != nil {
 			return fmt.Errorf("failed to insert series: %w", err)
 		}
 	}
@@ -528,7 +583,35 @@ func insertBatch(ctx context.Context, tx bun.Tx, matches []Match, metadata []Mat
 }
 
 // calculateSeriesScores calculates series scores from match results
-func calculateSeriesScores(odMatches []ODMatch, scores map[int64]SeriesScore) {
+func calculateSeriesScores(ctx context.Context, tx bun.Tx, odMatches []ODMatch, scores map[int64]SeriesScore) error {
+	// Collect all unique series IDs from the current batch
+	seriesIDs := make([]int64, 0, len(odMatches))
+	seriesSet := make(map[int64]bool)
+	for _, m := range odMatches {
+		if m.SeriesID > 0 && !seriesSet[m.SeriesID] {
+			seriesIDs = append(seriesIDs, m.SeriesID)
+			seriesSet[m.SeriesID] = true
+		}
+	}
+
+	// Query existing series to get team_a_id and team_b_id mappings
+	existingSeries := make(map[int64]Series)
+	if len(seriesIDs) > 0 {
+		var series []Series
+		err := tx.NewSelect().
+			Model(&series).
+			Where("series_id IN (?)", bun.In(seriesIDs)).
+			Scan(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to fetch existing series for score calculation: %w", err)
+		}
+		
+		for _, s := range series {
+			existingSeries[s.SeriesID] = s
+		}
+	}
+
+	// Calculate scores using the correct team assignments
 	for _, m := range odMatches {
 		if m.SeriesID == 0 {
 			continue
@@ -546,16 +629,30 @@ func calculateSeriesScores(odMatches []ODMatch, scores map[int64]SeriesScore) {
 			winningTeamID = m.DireTeam.ID
 		}
 
-		switch winningTeamID {
-		case m.RadiantTeam.ID:
-			score.TeamAWins++
-		case m.DireTeam.ID:
-			score.TeamBWins++
-		default:
+		// Get the correct team assignments from the database
+		if series, exists := existingSeries[m.SeriesID]; exists {
+			// Use existing team assignments from database
+			switch winningTeamID {
+			case series.TeamAID:
+				score.TeamAWins++
+			case series.TeamBID:
+				score.TeamBWins++
+			}
+		} else {
+			// For new series, use first match's radiant/dire as TeamA/TeamB
+			// (since we process matches chronologically)
+			switch winningTeamID {
+			case m.RadiantTeam.ID:
+				score.TeamAWins++
+			case m.DireTeam.ID:
+				score.TeamBWins++
+			}
 		}
 
 		scores[m.SeriesID] = score
 	}
+	
+	return nil
 }
 
 // updateSeriesScores updates series scores in the database
@@ -593,7 +690,7 @@ func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, b
 		}
 	}
 
-	extractRelatedEntities(odMatches, bp.leagues, bp.teams, bp.players, bp.seriesMap)
+	extractRelatedEntities(odMatches, bp.leagues, bp.teams, bp.players, bp.seriesMap, bp.seriesInfo)
 
 	bp.validMatches = bp.validMatches[:0]
 	bp.validMetadata = bp.validMetadata[:0]
@@ -613,7 +710,7 @@ func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, b
 	}
 
 	err = db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
-		if err := insertRelatedEntities(ctx, tx, bp.leagues, bp.teams, bp.players, bp.seriesMap); err != nil {
+		if err := insertRelatedEntities(ctx, tx, bp.leagues, bp.teams, bp.players, bp.seriesMap, bp.seriesInfo); err != nil {
 			return err
 		}
 
@@ -621,7 +718,9 @@ func processBatch(ctx context.Context, rawBatch []json.RawMessage, db *bun.DB, b
 			return err
 		}
 
-		calculateSeriesScores(odMatches, bp.seriesScores)
+		if err := calculateSeriesScores(ctx, tx, odMatches, bp.seriesScores); err != nil {
+			return err
+		}
 		if err := updateSeriesScores(ctx, tx, bp.seriesScores); err != nil {
 			return err
 		}

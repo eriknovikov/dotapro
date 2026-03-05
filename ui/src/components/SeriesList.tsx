@@ -1,11 +1,10 @@
-import type { Series, Pagination } from "../api/api"
-import { SeriesCard } from "./SeriesCard"
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router"
+import type { Pagination, Series } from "../api/api"
 import { EmptyState } from "./EmptyState"
 import { ErrorState } from "./ErrorState"
+import { SeriesCard } from "./SeriesCard"
 import { SeriesCardSkeleton } from "./Skeleton"
 import { Button } from "./ui"
-import { useNavigate, useRouter } from "@tanstack/react-router"
-import { useSearch } from "@tanstack/react-router"
 
 interface SeriesListProps {
     series: Series[]
@@ -64,7 +63,7 @@ export function SeriesList({ series, isLoading, error, pagination, limit }: Seri
     }
 
     return (
-        <div className="w-full px-2">
+        <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] sm:gap-6">
                 {series.map(s => (
                     <SeriesCard key={s.series_id} series={s} />
