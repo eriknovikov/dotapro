@@ -45,6 +45,15 @@ type Series struct {
 	TeamBScore    int16     `bun:"team_b_score,default:0"`
 }
 
+// SeriesInfo represents series information with neutral team IDs
+type SeriesInfo struct {
+	SeriesID  int64
+	LeagueID  int64
+	TeamOneID int64
+	TeamTwoID int64
+	StartTime time.Time
+}
+
 // Match represents a Dota 2 match
 type Match struct {
 	bun.BaseModel  `bun:"table:matches"`

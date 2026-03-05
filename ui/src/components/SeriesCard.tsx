@@ -9,19 +9,11 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
         ref={ref}
         className={cn(
-            "group bg-background-card/80 text-card-foreground relative overflow-hidden rounded-xl shadow-xl backdrop-blur-sm transition-all duration-200 ease-in-out hover:shadow-2xl",
+            "bg-background-card/80 text-card-foreground relative overflow-hidden rounded-xl shadow-xl backdrop-blur-sm",
             className,
         )}
         {...props}
     >
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="from-primary-500/20 via-primary-500/10 absolute inset-0 bg-linear-to-br to-transparent opacity-0 transition-opacity duration-200 ease-in-out group-hover:opacity-100" />
-        </div>
-
-        <div className="pointer-events-none absolute inset-0">
-            <div className="from-primary-500/5 absolute inset-0 bg-linear-to-t to-transparent opacity-0 transition-opacity duration-200 ease-in-out group-hover:opacity-100" />
-        </div>
-
         <div className="relative z-10 flex h-full flex-col">{props.children}</div>
     </div>
 ))

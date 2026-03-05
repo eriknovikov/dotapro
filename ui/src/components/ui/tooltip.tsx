@@ -23,6 +23,7 @@ export function Tooltip({
     const triggerRef = React.useRef<HTMLDivElement>(null)
     const contentRef = React.useRef<HTMLDivElement>(null)
     const hasHover = React.useRef(false)
+    const openedByTouch = React.useRef(false)
 
     // Detect if device has hover capability
     React.useEffect(() => {
@@ -73,11 +74,13 @@ export function Tooltip({
 
     const handleMouseEnter = () => {
         if (!hasHover.current) return
+        openedByTouch.current = false
         setOpen(true)
     }
 
     const handleMouseLeave = (e: React.MouseEvent) => {
         if (!hasHover.current) return
+        if (openedByTouch.current) return // Don't close if opened by touch
         const relatedTarget = e.relatedTarget as HTMLElement
         if (contentRef.current?.contains(relatedTarget)) return
         setOpen(false)
@@ -91,16 +94,24 @@ export function Tooltip({
 
     const handleContentMouseLeave = (e: React.MouseEvent) => {
         if (!hasHover.current) return
+        if (openedByTouch.current) return // Don't close if opened by touch
         const relatedTarget = e.relatedTarget as HTMLElement
         if (triggerRef.current?.contains(relatedTarget)) return
         setOpen(false)
         setPosition(null)
     }
 
+    const handleClick = () => {
+        if (hasHover.current) return // Don't handle click on hover devices
+        openedByTouch.current = true
+        setOpen(!open) // Toggle on touch devices
+    }
+
     const handleClickOutside = (e: MouseEvent) => {
         if (!triggerRef.current?.contains(e.target as Node) && !contentRef.current?.contains(e.target as Node)) {
             setOpen(false)
             setPosition(null)
+            openedByTouch.current = false
         }
     }
 
@@ -142,6 +153,7 @@ export function Tooltip({
             className={cn("inline-block", className)}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onClick={handleClick}
         >
             {children}
             {open && (
