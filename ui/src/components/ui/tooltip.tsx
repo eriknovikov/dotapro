@@ -1,6 +1,6 @@
+import { cn } from "@/lib/utils"
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { cn } from "@/lib/utils"
 
 interface TooltipProps {
     children: React.ReactNode
@@ -85,12 +85,12 @@ export function Tooltip({
     // Detect if we're on a mobile device
     React.useEffect(() => {
         const checkMobile = () => {
-            setIsMobile(window.innerWidth < 1024 || 'ontouchstart' in window)
+            setIsMobile(window.innerWidth < 1024 || "ontouchstart" in window)
         }
-        
+
         checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
+        window.addEventListener("resize", checkMobile)
+        return () => window.removeEventListener("resize", checkMobile)
     }, [])
 
     // Calculate tooltip position based on trigger element and preferred side
@@ -100,26 +100,26 @@ export function Tooltip({
         const triggerRect = triggerRef.current.getBoundingClientRect()
         const initialPosition = getInitialPosition(triggerRect, side, sideOffset)
         const adjustedPosition = adjustForViewportBounds(initialPosition, triggerRect, sideOffset)
-        
+
         setPosition(adjustedPosition)
     }, [side, sideOffset])
 
     // Event handlers
     const handleMouseEnter = () => {
         if (isMobile) return // Disable hover tooltips on mobile
-        
+
         // Clear any existing timeout
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
         }
-        
+
         calculatePosition()
         setOpen(true)
     }
-    
+
     const handleMouseLeave = () => {
         if (isMobile) return // Disable hover tooltips on mobile
-        
+
         // Add a small delay before hiding to prevent flickering
         timeoutRef.current = setTimeout(() => {
             setOpen(false)
@@ -136,13 +136,13 @@ export function Tooltip({
     // Recalculate position on scroll/resize
     React.useEffect(() => {
         if (!open || !position) return
-        
+
         const handleScroll = () => calculatePosition()
         const handleResize = () => calculatePosition()
-        
+
         window.addEventListener("scroll", handleScroll, true)
         window.addEventListener("resize", handleResize)
-        
+
         return () => {
             window.removeEventListener("scroll", handleScroll, true)
             window.removeEventListener("resize", handleResize)
@@ -155,10 +155,7 @@ export function Tooltip({
 
         return createPortal(
             <div
-                className={cn(
-                    "fixed z-[9999] animate-in fade-in-0 zoom-in-95",
-                    contentClassName
-                )}
+                className={cn("animate-in fade-in-0 zoom-in-95 fixed z-9999", contentClassName)}
                 style={{
                     top: `${position.top}px`,
                     left: `${position.left}px`,
@@ -166,7 +163,7 @@ export function Tooltip({
             >
                 {content}
             </div>,
-            document.body
+            document.body,
         )
     }
 

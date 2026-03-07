@@ -1,9 +1,9 @@
-import { useMatches } from "@/hooks/useMatches"
-import { MatchCard } from "./MatchCard"
-import { Skeleton } from "@/components/ui"
 import { EmptyState } from "@/components/EmptyState"
 import { ErrorState } from "@/components/ErrorState"
+import { Skeleton } from "@/components/ui"
+import { useMatches } from "@/hooks/useMatches"
 import type { MatchFilters } from "@/types"
+import { MatchCard } from "./MatchCard"
 
 interface MatchListProps {
     filters: MatchFilters
@@ -40,10 +40,10 @@ function MatchListSkeleton() {
         <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(270px,1fr))] sm:gap-6">
                 {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className="bg-background-card/80 rounded-xl shadow-xl p-4 min-w-[270px]">
-                        <Skeleton className="h-6 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-1/2 mb-4" />
-                        <Skeleton className="h-4 w-full mb-1" />
+                    <div key={i} className="bg-background-card/80 min-w-67.5 rounded-xl p-4 shadow-xl">
+                        <Skeleton className="mb-2 h-6 w-3/4" />
+                        <Skeleton className="mb-4 h-4 w-1/2" />
+                        <Skeleton className="mb-1 h-4 w-full" />
                         <Skeleton className="h-4 w-2/3" />
                     </div>
                 ))}

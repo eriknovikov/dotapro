@@ -3,11 +3,11 @@ import { FiltersSidebar } from "@/components/FiltersSidebar"
 import { SEO } from "@/components/SEO"
 import { SeriesList } from "@/components/series/SeriesList"
 import { Button } from "@/components/ui"
+import { PAGINATION_LIMITS } from "@/constants"
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
+import { createFileRoute, useSearch } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { PAGINATION_LIMITS } from "@/constants"
 
 export const Route = createFileRoute("/series/")({
     component: Series,
@@ -17,7 +17,10 @@ export const Route = createFileRoute("/series/")({
             league: search.league !== undefined ? Number(search.league) : undefined,
             team: search.team !== undefined ? Number(search.team) : undefined,
             sort: typeof search.sort === "string" ? search.sort : undefined,
-            limit: limit !== undefined && PAGINATION_LIMITS.includes(limit as typeof PAGINATION_LIMITS[number]) ? limit : undefined,
+            limit:
+                limit !== undefined && PAGINATION_LIMITS.includes(limit as (typeof PAGINATION_LIMITS)[number])
+                    ? limit
+                    : undefined,
             c: search.c !== undefined ? Number(search.c) : undefined,
         }
     },
@@ -25,7 +28,6 @@ export const Route = createFileRoute("/series/")({
 
 function Series() {
     const search = useSearch({ strict: false })
-    const navigate = useNavigate()
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
     const scrollPositionRef = useRef(0)
 

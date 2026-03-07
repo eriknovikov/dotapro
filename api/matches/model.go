@@ -10,7 +10,6 @@ import (
 	"dotapro-lambda-api/utils"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 )
 
@@ -136,7 +135,6 @@ func (m *Model) GetOne(ctx context.Context, id int64) (*types.MatchDetail, error
 		Join("LEFT JOIN teams AS dire ON dire.team_id = m.dire_team_id").
 		Where("m.match_id = ?", id)
 
-	log.Debug().Str("BUN_QUERY", q.String()).Send()
 	if err := q.Scan(ctx, res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.ErrNotFound

@@ -10,7 +10,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
         ref={ref}
         className={cn(
-            "bg-background-card/80 text-card-foreground relative min-w-[270px] rounded-xl shadow-xl backdrop-blur-sm",
+            "bg-background-card/80 text-card-foreground relative min-w-67.5 rounded-xl shadow-xl backdrop-blur-sm",
             className,
         )}
         {...props}
@@ -118,7 +118,7 @@ export function MatchCard({ match }: { match: MatchSummary }) {
                         ))}
                     </div>
                 </div>
-                
+
                 {/* Full-width separator line */}
                 <hr className="border-border mx-4 my-2 w-full border-t" />
 
