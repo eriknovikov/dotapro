@@ -66,3 +66,55 @@ func (c *Controller) SearchLeagues(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponse(w, leagues, http.StatusOK)
 }
+
+func (c *Controller) GetTeamName(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), constants.ShortRequestTimeout)
+	defer cancel()
+
+	id, err := utils.ParseRequiredInt64Param(r.URL.Query(), "id")
+	if err != nil {
+		utils.WriteError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	name, err := c.model.GetTeamName(ctx, id)
+	if err != nil {
+		if err == context.Canceled {
+			return
+		}
+		if err == context.DeadlineExceeded {
+			utils.WriteError(w, context.DeadlineExceeded.Error(), http.StatusGatewayTimeout)
+			return
+		}
+		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponse(w, name, http.StatusOK)
+}
+
+func (c *Controller) GetLeagueName(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), constants.ShortRequestTimeout)
+	defer cancel()
+
+	id, err := utils.ParseRequiredInt64Param(r.URL.Query(), "id")
+	if err != nil {
+		utils.WriteError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	name, err := c.model.GetLeagueName(ctx, id)
+	if err != nil {
+		if err == context.Canceled {
+			return
+		}
+		if err == context.DeadlineExceeded {
+			utils.WriteError(w, context.DeadlineExceeded.Error(), http.StatusGatewayTimeout)
+			return
+		}
+		utils.WriteError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponse(w, name, http.StatusOK)
+}

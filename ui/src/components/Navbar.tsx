@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react"
 import { Link } from "@tanstack/react-router"
-import { Button } from "./ui/index"
+import { useEffect, useState } from "react"
 import { DiscordIcon } from "./Icons"
+import { Button } from "./ui/index"
 
 const navLinks = [
     { to: "/", label: "home", ariaLabel: "Home" },
     { to: "/series", label: "series", ariaLabel: "Series" },
+    { to: "/matches", label: "matches", ariaLabel: "Matches" },
     { to: "/about", label: "about", ariaLabel: "About" },
     { to: "/guide", label: "guide", ariaLabel: "Guide" },
 ] as const
@@ -71,6 +72,7 @@ export function Navbar() {
             >
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-14 items-center justify-between sm:h-16">
+                        {/* Logo section - left */}
                         <div className="flex shrink-0 items-center gap-2">
                             <picture>
                                 <source srcSet="/logo-48.webp" media="(min-width: 768px)" />
@@ -79,7 +81,7 @@ export function Navbar() {
                                     alt=""
                                     width="32"
                                     height="32"
-                                    className="h-7 w-auto sm:h-8 md:h-10 lg:h-12"
+                                    className="h-10 w-auto lg:h-12"
                                 />
                             </picture>
 
@@ -91,34 +93,40 @@ export function Navbar() {
                             </Link>
                         </div>
 
-                        <div className="hidden md:block">
+                        {/* Nav links section - center (desktop only) */}
+                        <div className="hidden md:flex md:flex-1 md:justify-center">
                             <div className="flex items-center space-x-2 sm:space-x-4" role="menubar">
                                 {navLinks.map(link => (
                                     <NavLink key={link.to} to={link.to} label={link.label} ariaLabel={link.ariaLabel} />
                                 ))}
-                                <a
-                                    href="https://github.com/E-nkv/dotapro"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
-                                    aria-label="GitHub"
-                                    role="menuitem"
-                                >
-                                    <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
-                                </a>
-                                <a
-                                    href="https://discord.gg/h6sVtge8"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
-                                    aria-label="Discord"
-                                    role="menuitem"
-                                >
-                                    <DiscordIcon />
-                                </a>
                             </div>
                         </div>
 
+                        {/* Contact links section - right (desktop only) */}
+                        <div className="hidden items-center space-x-2 sm:space-x-4 md:flex">
+                            <a
+                                href="https://github.com/E-nkv/dotapro"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
+                                aria-label="GitHub"
+                                role="menuitem"
+                            >
+                                <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
+                            </a>
+                            <a
+                                href="https://discord.gg/h6sVtge8"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
+                                aria-label="Discord"
+                                role="menuitem"
+                            >
+                                <DiscordIcon />
+                            </a>
+                        </div>
+
+                        {/* Mobile menu button - right (mobile only) */}
                         <div className="flex md:hidden">
                             <Button
                                 variant="ghost"
@@ -216,7 +224,7 @@ export function Navbar() {
                                 ))}
                             </div>
 
-                            {/* GitHub link */}
+                            {/* Contact links */}
                             <div className="border-border border-t pt-6">
                                 <a
                                     href="https://github.com/E-nkv/dotapro"

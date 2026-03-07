@@ -1,12 +1,8 @@
 import { DiscordIcon } from "./Icons"
-import { useLocation } from "@tanstack/react-router"
 
 export function Footer() {
-    const location = useLocation()
-    const isMatchesPage = location.pathname.startsWith("/matches")
-    
     return (
-        <footer className={`border-border/50 mt-auto w-full border-t ${isMatchesPage ? "lg:ml-72" : ""}`}>
+        <footer className="border-border/50 mt-auto w-full border-t">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <div className="text-foreground-muted text-center text-sm">
                     <p className="text-nowrap">

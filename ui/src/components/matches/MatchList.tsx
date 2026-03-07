@@ -17,11 +17,19 @@ export function MatchList({ filters }: MatchListProps) {
     }
 
     if (error) {
-        return <ErrorState error="Failed to load matches" />
+        return <ErrorState error={error} title="Error loading matches" />
     }
 
-    if (!data?.matches.length) {
-        return <EmptyState title="No matches found" />
+    if (!data || !data.matches || data.matches.length === 0) {
+        return (
+            <div className="flex min-h-[50vh] items-center justify-center">
+                <EmptyState
+                    icon="🤕"
+                    title="No matches found"
+                    description="Try adjusting your filters to find what you're looking for."
+                />
+            </div>
+        )
     }
 
     return (

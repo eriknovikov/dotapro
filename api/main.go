@@ -84,8 +84,13 @@ func (a *App) setupRouter() *chi.Mux {
 
 	if config.IsProd() {
 		r.Use(isRequestAllowedMiddleware)
-
 	}
+	
+	// Add logger middleware for local environment
+	if config.IsLocal() {
+		r.Use(middleware.Logger)
+	}
+	
 	r.Use(middleware.Recoverer)
 	// routes
 	r.Get("/", handleHome)
@@ -95,6 +100,8 @@ func (a *App) setupRouter() *chi.Mux {
 	r.Get("/series/{id}", a.seriesController.GetOne)
 	r.Get("/filtersmetadata/teams", a.filtersMetadataController.SearchTeams)
 	r.Get("/filtersmetadata/leagues", a.filtersMetadataController.SearchLeagues)
+	r.Get("/filtersmetadata/team", a.filtersMetadataController.GetTeamName)
+	r.Get("/filtersmetadata/league", a.filtersMetadataController.GetLeagueName)
 
 	return r
 }

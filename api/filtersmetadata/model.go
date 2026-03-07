@@ -46,3 +46,41 @@ func (m *Model) SearchLeagues(ctx context.Context, query string) ([]types.League
 
 	return results, err
 }
+
+// GetTeamName retrieves the name of a team by its ID
+func (m *Model) GetTeamName(ctx context.Context, id int64) (map[string]string, error) {
+	var result struct {
+		Name string `bun:"name"`
+	}
+	
+	err := m.DB.NewSelect().
+		Column("name").
+		TableExpr("teams").
+		Where("team_id = ?", id).
+		Scan(ctx, &result)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	return map[string]string{"name": result.Name}, nil
+}
+
+// GetLeagueName retrieves the name of a league by its ID
+func (m *Model) GetLeagueName(ctx context.Context, id int64) (map[string]string, error) {
+	var result struct {
+		Name string `bun:"name"`
+	}
+	
+	err := m.DB.NewSelect().
+		Column("name").
+		TableExpr("leagues").
+		Where("league_id = ?", id).
+		Scan(ctx, &result)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	return map[string]string{"name": result.Name}, nil
+}

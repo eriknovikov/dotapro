@@ -7,6 +7,7 @@ export function useMatches(filters: MatchFilters) {
         queryKey: ["matches", filters],
         queryFn: ({ signal }) => getMatches(filters, signal),
         staleTime: 5 * 60 * 1000, // 5 minutes
+        retry: 2,
     })
 }
 

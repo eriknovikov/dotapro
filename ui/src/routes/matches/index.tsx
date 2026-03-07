@@ -88,6 +88,7 @@ function Matches() {
                 filters={search}
                 isMobileOpen={isMobileFiltersOpen}
                 onMobileClose={() => setIsMobileFiltersOpen(false)}
+                itemType="matches"
             />
 
             {/* Main Content - Results */}

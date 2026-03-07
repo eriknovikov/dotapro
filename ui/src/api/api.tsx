@@ -86,3 +86,13 @@ export async function getMatchById(id: number, signal: AbortSignal): Promise<Mat
     const url = new URL(`${API_BASE_URL}/matches/${id}`)
     return fetchApi(url, signal, "Failed to fetch match details")
 }
+
+export async function getTeamName(id: number, signal: AbortSignal): Promise<{ name: string }> {
+    const url = buildUrl("/filtersmetadata/team", { id })
+    return fetchApi(url, signal, "Failed to fetch team name")
+}
+
+export async function getLeagueName(id: number, signal: AbortSignal): Promise<{ name: string }> {
+    const url = buildUrl("/filtersmetadata/league", { id })
+    return fetchApi(url, signal, "Failed to fetch league name")
+}
