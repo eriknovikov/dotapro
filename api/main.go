@@ -153,6 +153,7 @@ func main() {
 	r := app.setupRouter()
 
 	if config.IsLocal() {
+		log.Info().Str("local addr", config.CONFIG.LocalAddr).Msg("STARTED SERVER")
 		if err := http.ListenAndServe(config.CONFIG.LocalAddr, r); err != nil {
 			panic(fmt.Errorf("failed to start server: %w", err))
 		}

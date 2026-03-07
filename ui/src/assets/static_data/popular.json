@@ -37,21 +37,22 @@
         }
     ],
     "popular_leagues": [
-        {
-            "id": 18324,
-            "name": "The International 2025"
-        },
-        {
-            "id": 18959,
-            "name": "Destiny League"
-        },
+        { "id": 19435, "name": "PGL Wallachia 2026 Season 7" },
         {
             "id": 19269,
             "name": "DreamLeague Season 28"
         },
         {
+            "id": 18324,
+            "name": "The International 2025"
+        },
+        {
             "id": 19201,
             "name": "Dota 2 Space League"
+        },
+        {
+            "id": 18959,
+            "name": "Destiny League"
         },
         {
             "id": 19176,

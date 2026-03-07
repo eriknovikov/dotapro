@@ -1,10 +1,10 @@
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router"
-import type { Pagination, Series } from "../api/api"
-import { EmptyState } from "./EmptyState"
-import { ErrorState } from "./ErrorState"
+import type { Pagination, Series } from "../../api/api"
+import { EmptyState } from "../EmptyState"
+import { ErrorState } from "../ErrorState"
+import { SeriesCardSkeleton } from "../Skeleton"
+import { Button } from "../ui"
 import { SeriesCard } from "./SeriesCard"
-import { SeriesCardSkeleton } from "./Skeleton"
-import { Button } from "./ui"
 
 interface SeriesListProps {
     series: Series[]

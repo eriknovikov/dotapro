@@ -1,4 +1,5 @@
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"
 
 interface TooltipProps {
@@ -10,6 +11,63 @@ interface TooltipProps {
     contentClassName?: string
 }
 
+// Constants for tooltip dimensions and viewport padding
+const TOOLTIP_WIDTH = 320 // w-80 class
+const TOOLTIP_HEIGHT = 120 // estimated height
+const VIEWPORT_PADDING = 8
+
+type Position = { top: number; left: number }
+
+// Helper functions outside component to avoid hoisting issues
+const getInitialPosition = (triggerRect: DOMRect, tooltipSide: string, offset: number): Position => {
+    switch (tooltipSide) {
+        case "top":
+            return {
+                top: triggerRect.top - TOOLTIP_HEIGHT - offset,
+                left: triggerRect.left + (triggerRect.width - TOOLTIP_WIDTH) / 2,
+            }
+        case "bottom":
+            return {
+                top: triggerRect.bottom + offset,
+                left: triggerRect.left + (triggerRect.width - TOOLTIP_WIDTH) / 2,
+            }
+        case "left":
+            return {
+                top: triggerRect.top + (triggerRect.height - TOOLTIP_HEIGHT) / 2,
+                left: triggerRect.left - TOOLTIP_WIDTH - offset,
+            }
+        case "right":
+        default:
+            return {
+                top: triggerRect.top + (triggerRect.height - TOOLTIP_HEIGHT) / 2,
+                left: triggerRect.right + offset,
+            }
+    }
+}
+
+const adjustForViewportBounds = (position: Position, triggerRect: DOMRect, sideOffset: number): Position => {
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+
+    let { top, left } = position
+
+    // Adjust horizontal position
+    if (left < VIEWPORT_PADDING) {
+        left = VIEWPORT_PADDING
+    } else if (left + TOOLTIP_WIDTH > viewportWidth - VIEWPORT_PADDING) {
+        left = Math.max(VIEWPORT_PADDING, triggerRect.left - TOOLTIP_WIDTH - sideOffset)
+    }
+
+    // Adjust vertical position
+    if (top < VIEWPORT_PADDING) {
+        top = VIEWPORT_PADDING
+    } else if (top + TOOLTIP_HEIGHT > viewportHeight - VIEWPORT_PADDING) {
+        top = Math.max(VIEWPORT_PADDING, viewportHeight - TOOLTIP_HEIGHT - VIEWPORT_PADDING)
+    }
+
+    return { top, left }
+}
+
 export function Tooltip({
     children,
     content,
@@ -19,169 +77,112 @@ export function Tooltip({
     contentClassName,
 }: TooltipProps) {
     const [open, setOpen] = React.useState(false)
-    const [position, setPosition] = React.useState<{ top: number; left: number } | null>(null)
+    const [position, setPosition] = React.useState<Position | null>(null)
+    const [isMobile, setIsMobile] = React.useState(false)
     const triggerRef = React.useRef<HTMLDivElement>(null)
-    const contentRef = React.useRef<HTMLDivElement>(null)
-    const hasHover = React.useRef(false)
-    const openedByTouch = React.useRef(false)
+    const timeoutRef = React.useRef<number | null>(null)
 
-    // Detect if device has hover capability
+    // Detect if we're on a mobile device
     React.useEffect(() => {
-        hasHover.current = window.matchMedia("(hover: hover)").matches
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024 || 'ontouchstart' in window)
+        }
+        
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
+    // Calculate tooltip position based on trigger element and preferred side
     const calculatePosition = React.useCallback(() => {
-        if (!triggerRef.current || !contentRef.current) return
+        if (!triggerRef.current) return
 
         const triggerRect = triggerRef.current.getBoundingClientRect()
-        const contentRect = contentRef.current.getBoundingClientRect()
-
-        let top = 0
-        let left = 0
-
-        switch (side) {
-            case "top":
-                top = triggerRect.top - contentRect.height - sideOffset
-                left = triggerRect.left + (triggerRect.width - contentRect.width) / 2
-                break
-            case "bottom":
-                top = triggerRect.bottom + sideOffset
-                left = triggerRect.left + (triggerRect.width - contentRect.width) / 2
-                break
-            case "left":
-                top = triggerRect.top + (triggerRect.height - contentRect.height) / 2
-                left = triggerRect.left - contentRect.width - sideOffset
-                break
-            case "right":
-            default:
-                top = triggerRect.top + (triggerRect.height - contentRect.height) / 2
-                left = triggerRect.right + sideOffset
-                break
-        }
-
-        // Keep within viewport bounds
-        const padding = 8
-        const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
-
-        if (left < padding) left = padding
-        if (left + contentRect.width > viewportWidth - padding) left = viewportWidth - contentRect.width - padding
-        if (top < padding) top = padding
-        if (top + contentRect.height > viewportHeight - padding) top = viewportHeight - contentRect.height - padding
-
-        setPosition({ top, left })
+        const initialPosition = getInitialPosition(triggerRect, side, sideOffset)
+        const adjustedPosition = adjustForViewportBounds(initialPosition, triggerRect, sideOffset)
+        
+        setPosition(adjustedPosition)
     }, [side, sideOffset])
 
+    // Event handlers
     const handleMouseEnter = () => {
-        if (!hasHover.current) return
-        openedByTouch.current = false
+        if (isMobile) return // Disable hover tooltips on mobile
+        
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+        }
+        
+        calculatePosition()
         setOpen(true)
     }
-
-    const handleMouseLeave = (e: React.MouseEvent) => {
-        if (!hasHover.current) return
-        if (openedByTouch.current) return // Don't close if opened by touch
-        const relatedTarget = e.relatedTarget as HTMLElement
-        if (contentRef.current?.contains(relatedTarget)) return
-        setOpen(false)
-        setPosition(null)
-    }
-
-    const handleContentMouseEnter = () => {
-        if (!hasHover.current) return
-        setOpen(true)
-    }
-
-    const handleContentMouseLeave = (e: React.MouseEvent) => {
-        if (!hasHover.current) return
-        if (openedByTouch.current) return // Don't close if opened by touch
-        const relatedTarget = e.relatedTarget as HTMLElement
-        if (triggerRef.current?.contains(relatedTarget)) return
-        setOpen(false)
-        setPosition(null)
-    }
-
-    const handleClick = () => {
-        if (hasHover.current) return // Don't handle click on hover devices
-        openedByTouch.current = true
-        setOpen(!open) // Toggle on touch devices
-    }
-
-    const handleClickOutside = (e: MouseEvent) => {
-        if (!triggerRef.current?.contains(e.target as Node) && !contentRef.current?.contains(e.target as Node)) {
+    
+    const handleMouseLeave = () => {
+        if (isMobile) return // Disable hover tooltips on mobile
+        
+        // Add a small delay before hiding to prevent flickering
+        timeoutRef.current = setTimeout(() => {
             setOpen(false)
             setPosition(null)
-            openedByTouch.current = false
-        }
+        }, 100)
     }
 
-    // Calculate position when content is rendered
-    React.useEffect(() => {
-        if (open && contentRef.current) {
-            calculatePosition()
-        }
-    }, [open, calculatePosition])
-
-    // Click outside handler
-    React.useEffect(() => {
-        if (open) {
-            document.addEventListener("mousedown", handleClickOutside)
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside)
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
-        }
-    }, [open])
+    // Touch event handlers for mobile
+    const handleTouchStart = (e: React.TouchEvent) => {
+        e.preventDefault() // Prevent the default touch behavior
+        // Don't show tooltip on touch/tap on mobile
+    }
 
     // Recalculate position on scroll/resize
     React.useEffect(() => {
         if (!open || !position) return
+        
         const handleScroll = () => calculatePosition()
         const handleResize = () => calculatePosition()
+        
         window.addEventListener("scroll", handleScroll, true)
         window.addEventListener("resize", handleResize)
+        
         return () => {
             window.removeEventListener("scroll", handleScroll, true)
             window.removeEventListener("resize", handleResize)
         }
     }, [open, position, calculatePosition])
 
+    // Render tooltip content using portal
+    const renderTooltipContent = () => {
+        if (!open || !position) return null
+
+        return createPortal(
+            <div
+                className={cn(
+                    "fixed z-[9999] animate-in fade-in-0 zoom-in-95",
+                    contentClassName
+                )}
+                style={{
+                    top: `${position.top}px`,
+                    left: `${position.left}px`,
+                }}
+            >
+                {content}
+            </div>,
+            document.body
+        )
+    }
+
     return (
-        <div
-            ref={triggerRef}
-            className={cn("inline-block", className)}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onClick={handleClick}
-        >
-            {children}
-            {open && (
-                <div
-                    ref={contentRef}
-                    className={cn(
-                        "animate-in fade-in-0 zoom-in-95 fixed z-50",
-                        !position && "pointer-events-none opacity-0",
-                        contentClassName,
-                    )}
-                    style={
-                        position
-                            ? {
-                                  top: `${position.top}px`,
-                                  left: `${position.left}px`,
-                              }
-                            : {
-                                  top: "0",
-                                  left: "0",
-                              }
-                    }
-                    onMouseEnter={handleContentMouseEnter}
-                    onMouseLeave={handleContentMouseLeave}
-                >
-                    {content}
-                </div>
-            )}
-        </div>
+        <>
+            <div
+                ref={triggerRef}
+                className={cn("relative inline-block", className)}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
+            >
+                {children}
+            </div>
+            {renderTooltipContent()}
+        </>
     )
 }
 

@@ -107,6 +107,51 @@ export type GetSeriesResponse = {
     pagination: Pagination
 }
 
+export type MatchSummary = {
+    match_id: number
+    start_time: string
+    duration: number
+    radiant_win: boolean
+    radiant_team: TeamInfo
+    dire_team: TeamInfo
+    league: LeagueInfo
+    series_id: number
+    radiant_heroes: number[]
+    dire_heroes: number[]
+}
+
+export type MatchDetail = {
+    match_id: number
+    start_time: string
+    duration: number
+    radiant_win: boolean
+    patch: string
+    version: number
+    radiant_team: TeamInfo & { score: number; captain: number | null }
+    dire_team: TeamInfo & { score: number; captain: number | null }
+    league: LeagueInfo
+    series_id: number
+    picks_bans: unknown[]
+    players_data: PlayerData[]
+    radiant_gold_adv: number[]
+    radiant_xp_adv: number[]
+}
+
+export type GetMatchesResponse = {
+    matches: MatchSummary[]
+    pagination: Pagination
+}
+
+export type MatchFilters = {
+    league?: number
+    team?: number
+    player?: number
+    hero?: number
+    sort?: string
+    limit?: number
+    c?: number
+}
+
 export type TeamSearchResult = {
     team_id: number
     name: string

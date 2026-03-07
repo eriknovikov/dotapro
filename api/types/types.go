@@ -111,8 +111,8 @@ type MatchSummary struct {
 	DireTeam      TeamInfo   `json:"dire_team" bun:"dire_team"`
 	League        LeagueInfo `json:"league" bun:"league"`
 	SeriesID      int64      `json:"series_id" bun:"series_id"`
-	RadiantHeroes []int64    `json:"radiant_heroes" bun:"radiant_heroes,array"`
-	DireHeroes    []int64    `json:"dire_heroes" bun:"dire_heroes,array"`
+	RadiantHeroes  []int64    `json:"radiant_heroes" bun:"radiant_heroes,array"`
+	DireHeroes     []int64    `json:"dire_heroes" bun:"dire_heroes,array"`
 }
 
 type MatchDetail struct {
