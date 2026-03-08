@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
-import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react"
-import { searchLeagues } from "../api/api"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { getLeagueName, searchLeagues } from "../api/api"
 import { useDebounce } from "../hooks"
 import { cn, getPopularData } from "../lib"
 import { Spinner } from "./Spinner"
@@ -72,6 +72,7 @@ export function LeagueSelector({
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState("")
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
+    const [hasFetchedInitialValue, setHasFetchedInitialValue] = useState(false)
 
     // ---------------------------------------------------------------------------
     // Refs
@@ -85,6 +86,7 @@ export function LeagueSelector({
     const isExternalUpdateRef = useRef(false)
     const selectedLeagueIdRef = useRef<number | undefined>(undefined)
     const selectedLeagueNameRef = useRef<string | undefined>(undefined)
+    const hasSetInitialValueRef = useRef(false)
 
     // ---------------------------------------------------------------------------
     // Data fetching
@@ -105,6 +107,29 @@ export function LeagueSelector({
         enabled: debouncedQuery.trim().length > 0,
         staleTime: STALE_TIME_MS,
     })
+
+    // ---------------------------------------------------------------------------
+    // Fetch league name by ID when initialValue is provided
+    // ---------------------------------------------------------------------------
+
+    const { data: leagueNameData, isLoading: isLeagueNameLoading } = useQuery({
+        queryKey: ["league", "name", initialValue],
+        queryFn: async ({ signal }) => {
+            if (initialValue === undefined) return null
+            return getLeagueName(initialValue, signal)
+        },
+        enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValue,
+        staleTime: 10 * 60 * 1000, // 10 minutes
+    })
+
+    // Mark initial value as fetched when data is received
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useEffect(() => {
+        if (leagueNameData && !hasFetchedInitialValue) {
+            setHasFetchedInitialValue(true)
+        }
+    }, [leagueNameData, hasFetchedInitialValue])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // ---------------------------------------------------------------------------
     // Computed values
@@ -160,22 +185,34 @@ export function LeagueSelector({
     // Using useLayoutEffect to avoid visual flicker when updating the input
     /* eslint-disable react-hooks/set-state-in-effect */
     useLayoutEffect(() => {
-        if (initialValue !== undefined) {
+        if (initialValue !== undefined && !hasSetInitialValueRef.current) {
+            // First try to find in items (popular leagues or search results)
             const initialItem = items.find(l => l.id === initialValue)
-            if (initialItem && inputValue !== initialItem.name) {
+
+            if (initialItem) {
+                // Always update if we have the item, regardless of current inputValue
                 isExternalUpdateRef.current = true
                 setInputValue(initialItem.name)
                 selectedLeagueIdRef.current = initialValue
                 selectedLeagueNameRef.current = initialItem.name
+                hasSetInitialValueRef.current = true
+            } else if (leagueNameData && !isLeagueNameLoading) {
+                // If not found in items but we have the name from API, use that
+                isExternalUpdateRef.current = true
+                setInputValue(leagueNameData.name)
+                selectedLeagueIdRef.current = initialValue
+                selectedLeagueNameRef.current = leagueNameData.name
+                hasSetInitialValueRef.current = true
             }
         } else if (initialValue === undefined && selectedLeagueIdRef.current !== undefined) {
             // Clear the input when initialValue becomes undefined
-            isExternalUpdateRef.current = true
             setInputValue("")
             selectedLeagueIdRef.current = undefined
             selectedLeagueNameRef.current = undefined
+            setHasFetchedInitialValue(false)
+            hasSetInitialValueRef.current = false
         }
-    }, [initialValue, items, inputValue])
+    }, [initialValue, items, leagueNameData, isLeagueNameLoading])
     /* eslint-enable react-hooks/set-state-in-effect */
 
     // Close dropdown when clicking outside
@@ -212,7 +249,7 @@ export function LeagueSelector({
     }, [highlightedIndex])
 
     // Sync div content with inputValue when it changes externally (e.g., from selection)
-    // Using useLayoutEffect to avoid visual flicker when updating the DOM
+    // Using useLayoutEffect to ensure DOM sync happens synchronously before paint
     useLayoutEffect(() => {
         if (inputRef.current) {
             // Always clear the div content when inputValue is empty to ensure placeholder shows
@@ -225,7 +262,7 @@ export function LeagueSelector({
             if (isExternalUpdateRef.current) {
                 // Save the current selection/cursor position
                 const selection = window.getSelection()
-                const range = selection?.getRangeAt(0)
+                const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null
                 const cursorOffset = range?.startOffset ?? 0
 
                 inputRef.current.textContent = inputValue
@@ -247,6 +284,13 @@ export function LeagueSelector({
             }
         }
     }, [inputValue])
+
+    // Ensure text content is set when ref becomes available (for initial value on page refresh)
+    useLayoutEffect(() => {
+        if (inputRef.current && inputValue && inputRef.current.textContent !== inputValue) {
+            inputRef.current.textContent = inputValue
+        }
+    }, [inputValue, leagueNameData])
 
     // ---------------------------------------------------------------------------
     // Event handlers
@@ -302,12 +346,18 @@ export function LeagueSelector({
         // Ensure inputValue is in sync with div content on blur
         if (inputRef.current) {
             const text = inputRef.current.textContent || ""
+            // If input is cleared, remove the filter entirely
+            if (text === "" && selectedLeagueIdRef.current !== undefined) {
+                onSelect(undefined)
+                selectedLeagueIdRef.current = undefined
+                selectedLeagueNameRef.current = undefined
+            }
             // Only update state if value actually changed to avoid unnecessary re-renders
             if (text !== inputValue) {
                 setInputValue(text)
             }
         }
-    }, [inputValue])
+    }, [inputValue, onSelect])
 
     const handleItemMouseEnter = useCallback((index: number) => {
         setHighlightedIndex(index)
@@ -334,6 +384,7 @@ export function LeagueSelector({
                     // Prevent newline insertion when pressing Enter to open dropdown
                     if (e.key === "Enter") {
                         e.preventDefault()
+                        e.stopPropagation()
                     }
                     setIsOpen(true)
                 }
@@ -343,23 +394,28 @@ export function LeagueSelector({
             switch (e.key) {
                 case "ArrowDown":
                     e.preventDefault()
+                    e.stopPropagation()
                     setHighlightedIndex(prev => (prev < items.length - 1 ? prev + 1 : prev))
                     break
                 case "ArrowUp":
                     e.preventDefault()
+                    e.stopPropagation()
                     setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0))
                     break
                 case "Enter":
                     e.preventDefault()
+                    e.stopPropagation()
                     if (highlightedIndex >= 0 && items[highlightedIndex]) {
                         handleSelect(items[highlightedIndex])
                     }
                     break
                 case "Escape":
+                    e.stopPropagation()
                     closeDropdown()
                     inputRef.current?.focus()
                     break
                 case "Tab":
+                    e.stopPropagation()
                     closeDropdown()
                     break
             }
@@ -466,7 +522,7 @@ export function LeagueSelector({
             id={listboxId}
             role="listbox"
             aria-label={ariaLabel || "Leagues"}
-            className="border-border-accent bg-background-card absolute top-full z-50 mt-1 max-h-72 w-full overflow-auto rounded-lg border shadow-xl"
+            className="border-border-accent bg-background-card absolute top-full z-50 mt-1 max-h-72 w-full min-w-65 overflow-auto rounded-lg border shadow-xl"
         >
             {showEmptyState ? renderEmptyState() : items.map(renderLeagueItem)}
         </ul>

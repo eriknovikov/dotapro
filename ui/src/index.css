@@ -168,6 +168,7 @@ html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -184,7 +185,9 @@ body {
     color: hsl(0, 0%, 98%);
     background-color: hsl(0, 0%, 4%);
     overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
+
 
 *:focus-visible {
     outline: 2px solid hsl(0, 84%, 50%);

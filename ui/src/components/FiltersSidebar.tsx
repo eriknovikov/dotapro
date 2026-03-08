@@ -1,19 +1,38 @@
 import type { Filters } from "../api/api"
 import { useNavigate } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Button } from "./ui"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/index"
+import { CustomSelect, CustomSelectItem } from "./ui/CustomSelect"
 import { LeagueSelector } from "./LeagueSelector"
 import { TeamSelector } from "./TeamSelector"
+import { PAGINATION_LIMITS } from "@/constants"
 
 interface FiltersSidebarProps {
     filters: Filters
     isMobileOpen?: boolean
     onMobileClose?: () => void
+    itemType?: "series" | "matches"
 }
 
-export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: FiltersSidebarProps) {
+export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType = "series" }: FiltersSidebarProps) {
     const navigate = useNavigate()
+    const [hasSetMobileDefault, setHasSetMobileDefault] = useState(false)
+
+    // Set default limit to 10 on mobile (for better performance)
+    // Using useEffect since we're not measuring layout
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useEffect(() => {
+        if (!hasSetMobileDefault && filters.limit === undefined && window.innerWidth < 1024) {
+            navigate({
+                to: ".",
+                search: { ...filters, limit: 10 },
+                replace: true,
+            })
+            setHasSetMobileDefault(true)
+        }
+    }, [filters, navigate, hasSetMobileDefault])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const handleLeagueChange = (leagueId: number | undefined) => {
         navigate({
@@ -132,45 +151,45 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose }: Filters
                             <label htmlFor="sort-by" className="text-foreground mb-2 block text-sm font-medium">
                                 Sort by
                             </label>
-                            <Select value={filters.sort || "newest"} onValueChange={handleSortChange}>
-                                <SelectTrigger id="sort-by" aria-label="Sort by filter" className="text-sm">
-                                    <SelectValue placeholder="Default" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="newest" disabled={!filters.sort || filters.sort === "newest"}>
-                                        Newest
-                                    </SelectItem>
-                                    <SelectItem value="oldest" disabled={filters.sort === "oldest"}>
-                                        Oldest
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <CustomSelect
+                                id="sort-by"
+                                value={filters.sort || "newest"}
+                                onValueChange={handleSortChange}
+                                aria-label="Sort by filter"
+                                className="text-sm"
+                                placeholder="Newest"
+                            >
+                                <CustomSelectItem value="newest">
+                                    Newest
+                                </CustomSelectItem>
+                                <CustomSelectItem value="oldest">
+                                    Oldest
+                                </CustomSelectItem>
+                            </CustomSelect>
                         </div>
 
                         {/* Limit Filter */}
                         <div>
                             <label htmlFor="limit" className="text-foreground mb-2 block text-sm font-medium">
-                                Series per page
+                                {itemType === "matches" ? "Matches per page" : "Series per page"}
                             </label>
-                            <Select value={String(filters.limit || 20)} onValueChange={handleLimitChange}>
-                                <SelectTrigger id="limit" aria-label="Results per page filter" className="text-sm">
-                                    <SelectValue placeholder="20" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10" disabled={filters.limit === 10}>
-                                        10
-                                    </SelectItem>
-                                    <SelectItem value="20" disabled={!filters.limit || filters.limit === 20}>
-                                        20
-                                    </SelectItem>
-                                    <SelectItem value="40" disabled={filters.limit === 40}>
-                                        40
-                                    </SelectItem>
-                                    <SelectItem value="60" disabled={filters.limit === 60}>
-                                        60
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <CustomSelect
+                                id="limit"
+                                value={String(filters.limit || (window.innerWidth < 1024 ? 10 : 20))}
+                                onValueChange={handleLimitChange}
+                                aria-label="Results per page filter"
+                                className="text-sm"
+                                placeholder={window.innerWidth < 1024 ? "10" : "20"}
+                            >
+                                {PAGINATION_LIMITS.map(limit => (
+                                    <CustomSelectItem
+                                        key={limit}
+                                        value={limit.toString()}
+                                    >
+                                        {limit}
+                                    </CustomSelectItem>
+                                ))}
+                            </CustomSelect>
                         </div>
 
                         {/* Action Buttons */}

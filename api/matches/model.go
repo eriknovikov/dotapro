@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"dotapro-lambda-api/constants"
 	"dotapro-lambda-api/errs"
 	"dotapro-lambda-api/types"
 	"dotapro-lambda-api/utils"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/rs/zerolog/log"
 	"github.com/uptrace/bun"
 )
 
@@ -21,6 +21,12 @@ func NewModel(db *bun.DB) *Model { return &Model{DB: db} }
 
 func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]types.MatchSummary, types.PaginationData, error) {
 	var res []types.MatchSummary
+
+	// Apply default limit if not specified
+	limit := filter.Limit
+	if limit <= 0 {
+		limit = constants.DefaultLimit
+	}
 
 	q := m.DB.NewSelect().
 		ColumnExpr("m.match_id").
@@ -34,17 +40,14 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 		ColumnExpr("radiant.name AS radiant_team__name").
 		ColumnExpr("radiant.tag AS radiant_team__tag").
 		ColumnExpr("radiant.logo_url AS radiant_team__logo_url").
-		ColumnExpr("md.radiant_captain AS radiant_team__captain").
 		ColumnExpr("dire.name AS dire_team__name").
 		ColumnExpr("dire.tag AS dire_team__tag").
 		ColumnExpr("dire.logo_url AS dire_team__logo_url").
-		ColumnExpr("md.dire_captain AS dire_team__captain").
 		ColumnExpr("l.name AS league__name").
 		ColumnExpr("l.tier AS league__tier").
 		ColumnExpr("m.radiant_heroes").
 		ColumnExpr("m.dire_heroes").
 		TableExpr("matches AS m").
-		Join("LEFT JOIN matches_metadata AS md USING (match_id)").
 		Join("LEFT JOIN series_match AS sm USING (match_id)").
 		Join("LEFT JOIN leagues AS l USING (league_id)").
 		Join("LEFT JOIN teams AS radiant ON radiant.team_id = m.radiant_team_id").
@@ -75,7 +78,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 			q = q.Where("m.match_id < ?", *filter.Cursor)
 		}
 	}
-	q = q.Limit(filter.Limit + 1)
+	q = q.Limit(limit + 1)
 
 	if err := q.Scan(ctx, &res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -85,7 +88,7 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 	}
 
 	// Process pagination using the helper
-	results, paginationData := utils.ProcessPagination(res, filter.Limit, func(m types.MatchSummary) int64 {
+	results, paginationData := utils.ProcessPagination(res, limit, func(m types.MatchSummary) int64 {
 		return m.MatchID
 	})
 
@@ -132,7 +135,6 @@ func (m *Model) GetOne(ctx context.Context, id int64) (*types.MatchDetail, error
 		Join("LEFT JOIN teams AS dire ON dire.team_id = m.dire_team_id").
 		Where("m.match_id = ?", id)
 
-	log.Debug().Str("BUN_QUERY", q.String()).Send()
 	if err := q.Scan(ctx, res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.ErrNotFound

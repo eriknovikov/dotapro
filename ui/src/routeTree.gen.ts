@@ -9,18 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as GuideRouteImport } from './routes/guide'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SeriesIndexRouteImport } from './routes/series/index'
+import { Route as MatchesIndexRouteImport } from './routes/matches/index'
 import { Route as SeriesIdRouteImport } from './routes/series/$id'
+import { Route as MatchesIdRouteImport } from './routes/matches/$id'
 
-const MatchesRoute = MatchesRouteImport.update({
-  id: '/matches',
-  path: '/matches',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GuideRoute = GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
@@ -41,9 +37,19 @@ const SeriesIndexRoute = SeriesIndexRouteImport.update({
   path: '/series/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MatchesIndexRoute = MatchesIndexRouteImport.update({
+  id: '/matches/',
+  path: '/matches/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SeriesIdRoute = SeriesIdRouteImport.update({
   id: '/series/$id',
   path: '/series/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchesIdRoute = MatchesIdRouteImport.update({
+  id: '/matches/$id',
+  path: '/matches/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -51,16 +57,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/guide': typeof GuideRoute
-  '/matches': typeof MatchesRoute
+  '/matches/$id': typeof MatchesIdRoute
   '/series/$id': typeof SeriesIdRoute
+  '/matches/': typeof MatchesIndexRoute
   '/series/': typeof SeriesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/guide': typeof GuideRoute
-  '/matches': typeof MatchesRoute
+  '/matches/$id': typeof MatchesIdRoute
   '/series/$id': typeof SeriesIdRoute
+  '/matches': typeof MatchesIndexRoute
   '/series': typeof SeriesIndexRoute
 }
 export interface FileRoutesById {
@@ -68,22 +76,38 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/guide': typeof GuideRoute
-  '/matches': typeof MatchesRoute
+  '/matches/$id': typeof MatchesIdRoute
   '/series/$id': typeof SeriesIdRoute
+  '/matches/': typeof MatchesIndexRoute
   '/series/': typeof SeriesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/guide' | '/matches' | '/series/$id' | '/series/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/guide'
+    | '/matches/$id'
+    | '/series/$id'
+    | '/matches/'
+    | '/series/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/guide' | '/matches' | '/series/$id' | '/series'
+  to:
+    | '/'
+    | '/about'
+    | '/guide'
+    | '/matches/$id'
+    | '/series/$id'
+    | '/matches'
+    | '/series'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/guide'
-    | '/matches'
+    | '/matches/$id'
     | '/series/$id'
+    | '/matches/'
     | '/series/'
   fileRoutesById: FileRoutesById
 }
@@ -91,20 +115,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   GuideRoute: typeof GuideRoute
-  MatchesRoute: typeof MatchesRoute
+  MatchesIdRoute: typeof MatchesIdRoute
   SeriesIdRoute: typeof SeriesIdRoute
+  MatchesIndexRoute: typeof MatchesIndexRoute
   SeriesIndexRoute: typeof SeriesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/matches': {
-      id: '/matches'
-      path: '/matches'
-      fullPath: '/matches'
-      preLoaderRoute: typeof MatchesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/guide': {
       id: '/guide'
       path: '/guide'
@@ -133,11 +151,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeriesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/matches/': {
+      id: '/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof MatchesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/series/$id': {
       id: '/series/$id'
       path: '/series/$id'
       fullPath: '/series/$id'
       preLoaderRoute: typeof SeriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches/$id': {
+      id: '/matches/$id'
+      path: '/matches/$id'
+      fullPath: '/matches/$id'
+      preLoaderRoute: typeof MatchesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -147,8 +179,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   GuideRoute: GuideRoute,
-  MatchesRoute: MatchesRoute,
+  MatchesIdRoute: MatchesIdRoute,
   SeriesIdRoute: SeriesIdRoute,
+  MatchesIndexRoute: MatchesIndexRoute,
   SeriesIndexRoute: SeriesIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,21 +1,22 @@
-import { getSeries, type Filters, type GetSeriesResponse } from "@/api/api"
+import type { MatchFilters } from "@/api/api"
 import { FiltersSidebar } from "@/components/FiltersSidebar"
+import { MatchList } from "@/components/matches/MatchList"
 import { SEO } from "@/components/SEO"
-import { SeriesList } from "@/components/series/SeriesList"
 import { Button } from "@/components/ui"
 import { PAGINATION_LIMITS } from "@/constants"
-import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useSearch } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-export const Route = createFileRoute("/series/")({
-    component: Series,
-    validateSearch: (search: Record<string, unknown>): Filters => {
+export const Route = createFileRoute("/matches/")({
+    component: Matches,
+    validateSearch: (search: Record<string, unknown>): MatchFilters => {
         const limit = search.limit !== undefined ? Number(search.limit) : undefined
         return {
             league: search.league !== undefined ? Number(search.league) : undefined,
             team: search.team !== undefined ? Number(search.team) : undefined,
+            player: search.player !== undefined ? Number(search.player) : undefined,
+            hero: search.hero !== undefined ? Number(search.hero) : undefined,
             sort: typeof search.sort === "string" ? search.sort : undefined,
             limit:
                 limit !== undefined && PAGINATION_LIMITS.includes(limit as (typeof PAGINATION_LIMITS)[number])
@@ -26,8 +27,8 @@ export const Route = createFileRoute("/series/")({
     },
 })
 
-function Series() {
-    const search = useSearch({ strict: false })
+function Matches() {
+    const search = useSearch({ strict: false }) as MatchFilters
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
     const scrollPositionRef = useRef(0)
 
@@ -63,19 +64,11 @@ function Series() {
         }
     }, [isMobileFiltersOpen])
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ["series", search],
-        queryFn: async ({ signal }): Promise<GetSeriesResponse> => {
-            return getSeries(search, signal)
-        },
-        retry: 2,
-    })
-
     return (
         <>
             <SEO
-                title="Series"
-                description="Browse professional Dota 2 series and matches. Filter by league, team, and more."
+                title="Matches"
+                description="Browse professional Dota 2 matches with advanced filtering and statistics."
             />
             {/* Mobile/Tablet Filters Toggle Button */}
             <div className="fixed right-4 bottom-4 z-50 lg:hidden">
@@ -95,19 +88,16 @@ function Series() {
                 filters={search}
                 isMobileOpen={isMobileFiltersOpen}
                 onMobileClose={() => setIsMobileFiltersOpen(false)}
+                itemType="matches"
             />
 
             {/* Main Content - Results */}
             <main
                 className={`px-2 py-6 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? "overflow-hidden" : "overflow-y-auto"}`}
             >
-                <SeriesList
-                    series={data?.series || []}
-                    isLoading={isLoading}
-                    error={error as Error | null}
-                    pagination={data?.pagination}
-                    limit={search.limit}
-                />
+                <div className="mx-auto max-w-7xl">
+                    <MatchList filters={search} />
+                </div>
             </main>
         </>
     )

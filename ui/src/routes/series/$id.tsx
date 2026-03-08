@@ -1,11 +1,11 @@
-import { createFileRoute, useParams } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
 import { getSeriesById, type SeriesDetail } from "@/api/api"
-import { Spinner } from "@/components/Spinner"
 import { ErrorState } from "@/components/ErrorState"
-import { SeriesHeader, GameTabContent } from "@/components/series"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui"
 import { SEO } from "@/components/SEO"
+import { GameTabContent, SeriesHeader } from "@/components/series"
+import { Spinner } from "@/components/Spinner"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui"
+import { useQuery } from "@tanstack/react-query"
+import { createFileRoute, useParams } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/series/$id")({
     component: SeriesDetailPage,
@@ -55,8 +55,8 @@ function SeriesDetailPage() {
     return (
         <>
             <SEO
-                title={`dotapro.org |  ${data.team_a.name} vs ${data.team_b.name}`}
-                description={`View match details for ${data.team_a.name} vs ${data.team_b.name} in ${data.league.name}. Score: ${data.team_a_score} - ${data.team_b_score}`}
+                title={`${data.team_a.name} vs ${data.team_b.name}`}
+                description={`View match details for ${data.team_a.name} vs ${data.team_b.name}. `}
             />
             <div className="mx-auto max-w-7xl px-2 py-6">
                 <SeriesHeader series={data} />
