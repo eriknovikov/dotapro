@@ -72,6 +72,7 @@ export function LeagueSelector({
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState("")
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
+    const [hasFetchedInitialValue, setHasFetchedInitialValue] = useState(false)
 
     // ---------------------------------------------------------------------------
     // Refs
@@ -85,7 +86,6 @@ export function LeagueSelector({
     const isExternalUpdateRef = useRef(false)
     const selectedLeagueIdRef = useRef<number | undefined>(undefined)
     const selectedLeagueNameRef = useRef<string | undefined>(undefined)
-    const hasFetchedInitialValueRef = useRef(false)
     const hasSetInitialValueRef = useRef(false)
 
     // ---------------------------------------------------------------------------
@@ -118,16 +118,18 @@ export function LeagueSelector({
             if (initialValue === undefined) return null
             return getLeagueName(initialValue, signal)
         },
-        enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValueRef.current,
+        enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValue,
         staleTime: 10 * 60 * 1000, // 10 minutes
     })
 
     // Mark initial value as fetched when data is received
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        if (leagueNameData && !hasFetchedInitialValueRef.current) {
-            hasFetchedInitialValueRef.current = true
+        if (leagueNameData && !hasFetchedInitialValue) {
+            setHasFetchedInitialValue(true)
         }
-    }, [leagueNameData])
+    }, [leagueNameData, hasFetchedInitialValue])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // ---------------------------------------------------------------------------
     // Computed values
@@ -207,7 +209,7 @@ export function LeagueSelector({
             setInputValue("")
             selectedLeagueIdRef.current = undefined
             selectedLeagueNameRef.current = undefined
-            hasFetchedInitialValueRef.current = false
+            setHasFetchedInitialValue(false)
             hasSetInitialValueRef.current = false
         }
     }, [initialValue, items, leagueNameData, isLeagueNameLoading])

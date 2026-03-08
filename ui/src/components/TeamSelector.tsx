@@ -73,6 +73,7 @@ export function TeamSelector({
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState("")
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
+    const [hasFetchedInitialValue, setHasFetchedInitialValue] = useState(false)
 
     // ---------------------------------------------------------------------------
     // Refs
@@ -86,7 +87,6 @@ export function TeamSelector({
     const isExternalUpdateRef = useRef(false)
     const selectedTeamIdRef = useRef<number | undefined>(undefined)
     const selectedTeamNameRef = useRef<string | undefined>(undefined)
-    const hasFetchedInitialValueRef = useRef(false)
     const hasSetInitialValueRef = useRef(false)
 
     // ---------------------------------------------------------------------------
@@ -122,16 +122,18 @@ export function TeamSelector({
             if (initialValue === undefined) return null
             return getTeamName(initialValue, signal)
         },
-        enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValueRef.current,
+        enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValue,
         staleTime: 10 * 60 * 1000, // 10 minutes
     })
 
     // Mark initial value as fetched when data is received
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        if (teamNameData && !hasFetchedInitialValueRef.current) {
-            hasFetchedInitialValueRef.current = true
+        if (teamNameData && !hasFetchedInitialValue) {
+            setHasFetchedInitialValue(true)
         }
-    }, [teamNameData])
+    }, [teamNameData, hasFetchedInitialValue])
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // ---------------------------------------------------------------------------
     // Computed values
@@ -210,7 +212,7 @@ export function TeamSelector({
             setInputValue("")
             selectedTeamIdRef.current = undefined
             selectedTeamNameRef.current = undefined
-            hasFetchedInitialValueRef.current = false
+            setHasFetchedInitialValue(false)
             hasSetInitialValueRef.current = false
         }
     }, [initialValue, items, teamNameData, isTeamNameLoading])

@@ -149,9 +149,11 @@ export function CustomSelect({
     }
 
     // Clone children to pass down props
-    const enhancedChildren = React.Children.map(children, (child, index) => {
+    /* eslint-disable react-hooks/refs */
+    const enhancedChildren = React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === CustomSelectItem) {
             const childValue = (child.props as { value: string }).value
+            const index = itemValues.indexOf(childValue)
             return React.cloneElement(child, {
                 index,
                 isFocused: focusedIndex === index,
@@ -163,6 +165,7 @@ export function CustomSelect({
         }
         return child
     })
+    /* eslint-enable react-hooks/refs */
 
     return (
         <div ref={containerRef} className={cn("relative w-full", className)}>
