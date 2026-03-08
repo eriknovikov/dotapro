@@ -95,6 +95,26 @@ function About() {
                             <li>Share feedback and suggestions (I'm always open to ideas!)</li>
                         </ul>
                     </div>
+
+                    {/* Currently working on */}
+                    <div id="features-to-add" className="p-10 shadow-md shadow-gray-900">
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">Features on the way</h2>
+
+                        <ul className="text-foreground-muted mb-4 ml-6 list-disc space-y-2">
+                            <li>Allowing to search matches by hero and player</li>
+                            <li>
+                                A "no spoiler mode", so that match and series results are turned off with a toggle in
+                                the filters
+                            </li>
+                            <li>Allowing for multiple languages instead of english only</li>
+                            <li>Adding an interactive draft mode for both the series and matches</li>
+                        </ul>
+                        <p className="text-foreground-muted text-sm">
+                            The features are listed in the order of intended implementation. If you think you would want
+                            a feature more than the other, or want something totally different to be added to dotapro,
+                            then let us know in our discord!
+                        </p>
+                    </div>
                 </div>
             </div>
         </>
