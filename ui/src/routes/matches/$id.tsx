@@ -1,12 +1,13 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router"
-import { ChevronLeft, Swords } from "lucide-react"
-import { useMatch } from "@/hooks/useMatches"
-import { PlayersTable } from "@/components/series/PlayersTable"
-import { Skeleton } from "@/components/ui"
+import * as React from "react"
 import { ErrorState } from "@/components/ErrorState"
 import { SEO } from "@/components/SEO"
-import { formatRelativeTime, formatDuration } from "@/lib"
+import { PlayersTable } from "@/components/series/PlayersTable"
+import { Skeleton, Button } from "@/components/ui"
+import { useMatch } from "@/hooks/useMatches"
+import { formatDuration, formatRelativeTime, copyToClipboard } from "@/lib"
 import type { MatchDetail, SeriesMatchDetail } from "@/types"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { ChevronLeft, Swords, Check, Clock, Copy, ExternalLink } from "lucide-react"
 
 export const Route = createFileRoute("/matches/$id")({
     component: MatchDetails,
@@ -33,7 +34,7 @@ function MatchDetails() {
     return (
         <>
             <SEO
-                title={`dotapro.org | ${match.radiant_team.name} vs ${match.dire_team.name}`}
+                title={`${match.radiant_team.name} vs ${match.dire_team.name}`}
                 description={`Match details for ${match.radiant_team.name} vs ${match.dire_team.name} in ${match.league.name}`}
             />
             <div className="mx-auto max-w-7xl px-2 py-6">
@@ -63,7 +64,16 @@ function MatchDetails() {
 }
 
 function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType<typeof useRouter> }) {
-    const { radiant_team, dire_team, league, start_time, duration } = match
+    const { radiant_team, dire_team, league, start_time, duration, match_id } = match
+    const [copied, setCopied] = React.useState(false)
+
+    const handleCopyId = async () => {
+        const success = await copyToClipboard(match_id.toString())
+        if (success) {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        }
+    }
 
     return (
         <div className="rounded-xl pb-2" role="region" aria-label="Match header">
@@ -89,7 +99,9 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                                 className="h-8 w-auto shrink-0 rounded-lg object-contain"
                             />
                         )}
-                        <span className="font-shantell truncate text-center text-base font-bold">{radiant_team.name}</span>
+                        <span className="font-shantell truncate text-center text-base font-bold">
+                            {radiant_team.name}
+                        </span>
                     </div>
                 </div>
 
@@ -116,7 +128,6 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                 <div className="text-foreground-muted flex flex-col text-sm">
                     <span className="font-medium">{league.name}</span>
                     <span>~{formatRelativeTime(start_time)} ago</span>
-                    <span>{formatDuration(duration)}</span>
                 </div>
             </div>
 
@@ -161,8 +172,91 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                     <span className="bg-secondary/20 inline-block rounded px-2 py-0.5 text-xs">{league.tier}</span>
                     <span className="mx-2">•</span>
                     <span>~{formatRelativeTime(start_time)} ago</span>
-                    <span className="mx-2">•</span>
-                    <span>{formatDuration(duration)}</span>
+                </div>
+            </div>
+
+            {/* Match ID and Duration Header */}
+            <div
+                className="bg-background-card mt-4 overflow-hidden rounded-xl border border-white/10 focus:outline-none"
+                role="region"
+                aria-label="Match information"
+            >
+                <div className="p-6">
+                    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                        <div>
+                            <h3 className="text-md" id={`match-${match_id}`}>
+                                Match ID: {match_id}
+                            </h3>
+                            <p className="text-foreground-muted flex items-center gap-1 text-sm select-none">
+                                <Clock size={15} aria-hidden="true" />{" "}
+                                <span aria-label={`Duration: ${formatDuration(duration)}`}>
+                                    {formatDuration(duration)}
+                                </span>
+                            </p>
+                        </div>
+                        {/* Mobile: Icon-only buttons */}
+                        <div className="flex justify-center gap-2 sm:hidden">
+                            <Button variant="outline" size="sm" onClick={handleCopyId} className="p-2" aria-label="Copy ID">
+                                {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+
+                            <Button variant="outline" size="sm" asChild className="p-2" aria-label="View on OpenDota">
+                                <a
+                                    href={`https://opendota.com/matches/${match_id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1"
+                                >
+                                    OD
+                                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                                </a>
+                            </Button>
+
+                            <Button variant="outline" size="sm" asChild className="p-2" aria-label="View on Stratz">
+                                <a
+                                    href={`https://stratz.com/matches/${match_id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1"
+                                >
+                                    Stratz
+                                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                                </a>
+                            </Button>
+                        </div>
+                        {/* Desktop: Full text buttons */}
+                        <div className="hidden gap-2 sm:flex">
+                            <Button variant="outline" size="sm" onClick={handleCopyId} className="gap-2 leading-relaxed">
+                                {copied ? "Copied!" : "Copy ID"}
+                                {!copied ? <Copy className="h-4 w-4" /> : <Check className="h-4 w-4 text-green-600" />}
+                            </Button>
+
+                            <Button variant="outline" size="sm" asChild>
+                                <a
+                                    href={`https://opendota.com/matches/${match_id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 leading-relaxed"
+                                    aria-label="View match on OpenDota"
+                                >
+                                    <p>OpenDota</p>
+                                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                                </a>
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                                <a
+                                    href={`https://stratz.com/matches/${match_id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 leading-relaxed"
+                                    aria-label="View match on Stratz"
+                                >
+                                    <p>Stratz</p>
+                                    <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                                </a>
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

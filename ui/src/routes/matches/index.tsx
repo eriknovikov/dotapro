@@ -1,9 +1,10 @@
-import type { MatchFilters } from "@/api/api"
+import { getMatches, type MatchFilters, type GetMatchesResponse } from "@/api/api"
 import { FiltersSidebar } from "@/components/FiltersSidebar"
 import { MatchList } from "@/components/matches/MatchList"
 import { SEO } from "@/components/SEO"
 import { Button } from "@/components/ui"
 import { PAGINATION_LIMITS } from "@/constants"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useSearch } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
@@ -64,6 +65,14 @@ function Matches() {
         }
     }, [isMobileFiltersOpen])
 
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["matches", search],
+        queryFn: async ({ signal }): Promise<GetMatchesResponse> => {
+            return getMatches(search, signal)
+        },
+        retry: 2,
+    })
+
     return (
         <>
             <SEO
@@ -95,9 +104,13 @@ function Matches() {
             <main
                 className={`px-2 py-6 sm:px-0 lg:ml-72 ${isMobileFiltersOpen ? "overflow-hidden" : "overflow-y-auto"}`}
             >
-                <div className="mx-auto max-w-7xl">
-                    <MatchList filters={search} />
-                </div>
+                <MatchList
+                    matches={data?.matches || []}
+                    isLoading={isLoading}
+                    error={error as Error | null}
+                    pagination={data?.pagination}
+                    limit={search.limit}
+                />
             </main>
         </>
     )

@@ -1,26 +1,47 @@
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router"
+import type { Pagination, MatchSummary, MatchFilters } from "@/types"
 import { EmptyState } from "@/components/EmptyState"
 import { ErrorState } from "@/components/ErrorState"
 import { Skeleton } from "@/components/ui"
-import { useMatches } from "@/hooks/useMatches"
-import type { MatchFilters } from "@/types"
+import { Button } from "@/components/ui"
 import { MatchCard } from "./MatchCard"
 
 interface MatchListProps {
-    filters: MatchFilters
+    matches?: MatchSummary[]
+    isLoading?: boolean
+    error?: Error | null
+    pagination?: Pagination
+    limit?: number
 }
 
-export function MatchList({ filters }: MatchListProps) {
-    const { data, isLoading, error } = useMatches(filters)
+export function MatchList({ matches, isLoading, error, pagination, limit }: MatchListProps) {
+    const navigate = useNavigate()
+    const router = useRouter()
+    const search = useSearch({ strict: false }) as MatchFilters
+    const skeletonCount = limit || 9
+
+    const handleLoadMore = () => {
+        if (pagination?.nc) {
+            navigate({
+                to: ".",
+                search: { ...search, c: pagination.nc },
+            })
+        }
+    }
+
+    const handlePrevious = () => {
+        router.history.back()
+    }
 
     if (isLoading) {
-        return <MatchListSkeleton />
+        return <MatchListSkeleton count={skeletonCount} />
     }
 
     if (error) {
         return <ErrorState error={error} title="Error loading matches" />
     }
 
-    if (!data || !data.matches || data.matches.length === 0) {
+    if (!matches || matches.length === 0) {
         return (
             <div className="flex min-h-[50vh] items-center justify-center">
                 <EmptyState
@@ -35,19 +56,33 @@ export function MatchList({ filters }: MatchListProps) {
     return (
         <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(270px,1fr))] sm:gap-6">
-                {data.matches.map(match => (
+                {matches.map(match => (
                     <MatchCard key={match.match_id} match={match} />
                 ))}
+            </div>
+
+            <div className="mt-4 flex items-center justify-center gap-3 sm:mt-6 sm:gap-4">
+                <Button onClick={handlePrevious} variant="cool-outline" size="sm" disabled={isLoading || !search.c}>
+                    Previous
+                </Button>
+                <Button
+                    onClick={handleLoadMore}
+                    variant="cool-outline"
+                    size="sm"
+                    disabled={isLoading || !pagination?.nc || !pagination?.has_more}
+                >
+                    Next
+                </Button>
             </div>
         </div>
     )
 }
 
-function MatchListSkeleton() {
+function MatchListSkeleton({ count = 9 }: { count?: number }) {
     return (
         <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(270px,1fr))] sm:gap-6">
-                {Array.from({ length: 9 }).map((_, i) => (
+                {Array.from({ length: count }).map((_, i) => (
                     <div key={i} className="bg-background-card/80 min-w-67.5 rounded-xl p-4 shadow-xl">
                         <Skeleton className="mb-2 h-6 w-3/4" />
                         <Skeleton className="mb-4 h-4 w-1/2" />
