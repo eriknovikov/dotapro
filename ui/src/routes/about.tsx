@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router"
 import { SEO } from "@/components/SEO"
+import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/about")({
     component: About,
@@ -56,9 +56,9 @@ function About() {
                         </ul>
                     </div>
 
-                    {/* Disclaimer */}
+                    {/* Credits */}
                     <div className="p-10 shadow-md shadow-gray-900">
-                        <h2 className="text-foreground mb-4 text-2xl font-bold">Disclaimer</h2>
+                        <h2 className="text-foreground mb-4 text-2xl font-bold">Credits</h2>
                         <p className="text-foreground-muted leading-relaxed">
                             Gotta give credit where it's due – dotapro is built on top of the amazing OpenDota API.
                             Those folks have done incredible work making <span className="text-nowrap">Dota 2</span>{" "}

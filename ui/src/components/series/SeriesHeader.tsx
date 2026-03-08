@@ -1,5 +1,5 @@
 import { ChevronLeft, Swords } from "lucide-react"
-import { Link } from "@tanstack/react-router"
+import { useRouter } from "@tanstack/react-router"
 import type { SeriesDetail } from "@/api/api"
 import { formatRelativeTime } from "@/lib"
 
@@ -8,19 +8,20 @@ interface SeriesHeaderProps {
 }
 
 export function SeriesHeader({ series }: SeriesHeaderProps) {
+    const router = useRouter()
     const { team_a, team_b, league, team_a_score, team_b_score, start_time } = series
 
     return (
         <div className="rounded-xl pb-2" role="region" aria-label="Series header">
             {/* Back Button */}
-            <Link
+            <button
                 className="text-foreground-muted hover:text-foreground mb-4 flex w-fit items-center gap-2"
-                to="/series"
+                onClick={() => router.history.back()}
                 aria-label="Back to series list"
             >
                 <ChevronLeft className="h-4 w-4" />
                 Back to Series
-            </Link>
+            </button>
 
             {/* Mobile Layout */}
             <div className="flex flex-col gap-4 px-2 md:hidden">
