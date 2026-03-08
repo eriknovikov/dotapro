@@ -1,7 +1,5 @@
 import { useSearch, useNavigate } from "@tanstack/react-router"
-import { LeagueSelector } from "@/components/LeagueSelector"
-import { TeamSelector } from "@/components/TeamSelector"
-import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui"
+import { LeagueSelector, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, TeamSelector } from ".."
 import type { MatchFilters } from "@/types"
 import { LIMIT_OPTIONS } from "@/constants"
 import { useEffect, useState } from "react"

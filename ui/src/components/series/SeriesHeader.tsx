@@ -1,7 +1,7 @@
-import { ChevronLeft, Swords } from "lucide-react"
-import { useRouter } from "@tanstack/react-router"
-import type { SeriesDetail } from "@/api/api"
+import type { SeriesDetail } from "@/api"
 import { formatRelativeTime } from "@/lib"
+import { useRouter } from "@tanstack/react-router"
+import { ChevronLeft, Swords } from "lucide-react"
 
 interface SeriesHeaderProps {
     series: SeriesDetail

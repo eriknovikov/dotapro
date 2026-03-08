@@ -1,6 +1,6 @@
-import * as React from "react"
-import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ChevronDown } from "lucide-react"
+import * as React from "react"
 
 interface CustomSelectProps {
     value?: string
@@ -13,7 +13,7 @@ interface CustomSelectProps {
 }
 
 // ============================================================================
-// Main Select Component
+// Main Select Component. It is required because radix component breaks the UI in the filters (making the body grow horizontally >100%vw).
 // ============================================================================
 
 export function CustomSelect({
@@ -23,7 +23,7 @@ export function CustomSelect({
     className,
     id,
     "aria-label": ariaLabel,
-    placeholder
+    placeholder,
 }: CustomSelectProps) {
     const [isOpen, setIsOpen] = React.useState(false)
     const [focusedIndex, setFocusedIndex] = React.useState(-1)
@@ -65,7 +65,7 @@ export function CustomSelect({
             // Only handle keyboard events if the target is the button or within the dropdown
             const isButtonTarget = buttonRef.current?.contains(e.target as Node)
             const isDropdownTarget = isOpen && containerRef.current?.contains(e.target as Node)
-            
+
             if (!isButtonTarget && !isDropdownTarget) {
                 return
             }
@@ -150,7 +150,7 @@ export function CustomSelect({
 
     // Clone children to pass down props
     /* eslint-disable react-hooks/refs */
-    const enhancedChildren = React.Children.map(children, (child) => {
+    const enhancedChildren = React.Children.map(children, child => {
         if (React.isValidElement(child) && child.type === CustomSelectItem) {
             const childValue = (child.props as { value: string }).value
             const index = itemValues.indexOf(childValue)
@@ -187,16 +187,16 @@ export function CustomSelect({
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
             >
-                <span className={cn(!value && "text-foreground-muted")}>
-                    {getDisplayText(value)}
-                </span>
-                <ChevronDown className="text-foreground-muted h-4 w-4 transition-transform duration-200" 
-                             style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
+                <span className={cn(!value && "text-foreground-muted")}>{getDisplayText(value)}</span>
+                <ChevronDown
+                    className="text-foreground-muted h-4 w-4 transition-transform duration-200"
+                    style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
             </button>
             {isOpen && (
                 <div
                     role="listbox"
-                    className="border-border-accent bg-background-card text-foreground absolute top-full z-50 mt-1 max-h-72 w-full min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-lg border shadow-xl"
+                    className="border-border-accent bg-background-card text-foreground absolute top-full z-50 mt-1 max-h-72 w-full min-w-32 overflow-x-hidden overflow-y-auto rounded-lg border shadow-xl"
                     style={{
                         animation: "fadeIn 0.15s ease-out",
                     }}
@@ -213,14 +213,14 @@ export function CustomSelect({
 // ============================================================================
 
 export function CustomSelectItem({
-    value, 
-    children, 
+    value,
+    children,
     index = 0,
     isFocused = false,
     isSelected = false,
     onHover,
     onClick,
-    registerItem 
+    registerItem,
 }: {
     value: string
     children: React.ReactNode
@@ -271,7 +271,7 @@ export function CustomSelectItem({
 // Add animation styles
 // ============================================================================
 
-const style = document.createElement('style')
+const style = document.createElement("style")
 style.textContent = `
     @keyframes fadeIn {
         from {
@@ -284,7 +284,7 @@ style.textContent = `
         }
     }
 `
-if (!document.head.querySelector('style[data-custom-select]')) {
-    style.setAttribute('data-custom-select', 'true')
+if (!document.head.querySelector("style[data-custom-select]")) {
+    style.setAttribute("data-custom-select", "true")
     document.head.appendChild(style)
 }

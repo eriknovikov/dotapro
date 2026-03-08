@@ -1,21 +1,18 @@
-import type { Filters } from "../api/api"
+import type { Filters } from "@/api"
+import { Button, CustomSelect, CustomSelectItem, LeagueSelector, TeamSelector } from ".."
+import { PAGINATION_LIMITS } from "@/constants"
 import { useNavigate } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Button } from "./ui"
-import { CustomSelect, CustomSelectItem } from "./ui/CustomSelect"
-import { LeagueSelector } from "./LeagueSelector"
-import { TeamSelector } from "./TeamSelector"
-import { PAGINATION_LIMITS } from "@/constants"
 
-interface FiltersSidebarProps {
+interface SeriesFiltersProps {
     filters: Filters
     isMobileOpen?: boolean
     onMobileClose?: () => void
     itemType?: "series" | "matches"
 }
 
-export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType = "series" }: FiltersSidebarProps) {
+export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType = "series" }: SeriesFiltersProps) {
     const navigate = useNavigate()
     const [hasSetMobileDefault, setHasSetMobileDefault] = useState(false)
 
@@ -159,12 +156,8 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
                                 className="text-sm"
                                 placeholder="Newest"
                             >
-                                <CustomSelectItem value="newest">
-                                    Newest
-                                </CustomSelectItem>
-                                <CustomSelectItem value="oldest">
-                                    Oldest
-                                </CustomSelectItem>
+                                <CustomSelectItem value="newest">Newest</CustomSelectItem>
+                                <CustomSelectItem value="oldest">Oldest</CustomSelectItem>
                             </CustomSelect>
                         </div>
 
@@ -182,10 +175,7 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
                                 placeholder={window.innerWidth < 1024 ? "10" : "20"}
                             >
                                 {PAGINATION_LIMITS.map(limit => (
-                                    <CustomSelectItem
-                                        key={limit}
-                                        value={limit.toString()}
-                                    >
+                                    <CustomSelectItem key={limit} value={limit.toString()}>
                                         {limit}
                                     </CustomSelectItem>
                                 ))}

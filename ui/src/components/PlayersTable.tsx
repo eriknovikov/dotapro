@@ -1,18 +1,17 @@
-import { lazy, Suspense } from "react"
+import type { PlayerData, SeriesMatchDetail, TeamInfo } from "@/api"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tooltip } from "./ui"
+import { cn, getHeroImageUrl, getItemImageUrl } from "@/lib"
 import { Crown, Trophy } from "lucide-react"
-import type { SeriesMatchDetail, PlayerData, TeamInfo } from "@/api/api"
-import { getHeroImageUrl, getItemImageUrl, cn } from "@/lib"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui"
-import { Tooltip } from "@/components/ui/tooltip"
+import { lazy, Suspense } from "react"
 
 // Lazy load tooltip components to reduce initial bundle size
-const HeroTooltipContent = lazy(() => import("./HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })))
-const ItemTooltipContent = lazy(() => import("./ItemTooltipContent").then(m => ({ default: m.ItemTooltipContent })))
+const HeroTooltipContent = lazy(() => import("./series/HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })))
+const ItemTooltipContent = lazy(() => import("./series/ItemTooltipContent").then(m => ({ default: m.ItemTooltipContent })))
 
 // Wrapper components to handle Suspense inside tooltip content
 function HeroTooltipWrapper({ heroId }: { heroId: number }) {
     return (
-        <Suspense fallback={<div className="w-80 h-32 animate-pulse bg-[#1c1d21] rounded-md" />}>
+        <Suspense fallback={<div className="h-32 w-80 animate-pulse rounded-md bg-[#1c1d21]" />}>
             <HeroTooltipContent heroId={heroId} />
         </Suspense>
     )
@@ -20,7 +19,7 @@ function HeroTooltipWrapper({ heroId }: { heroId: number }) {
 
 function ItemTooltipWrapper({ itemId }: { itemId: number }) {
     return (
-        <Suspense fallback={<div className="w-72 h-32 animate-pulse bg-[#1c1d21] rounded-md" />}>
+        <Suspense fallback={<div className="h-32 w-72 animate-pulse rounded-md bg-[#1c1d21]" />}>
             <ItemTooltipContent itemId={itemId} />
         </Suspense>
     )

@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query"
-import { getMatches, getMatchById } from "@/api/api"
+import { getMatchById, getMatches } from "@/api"
 import type { MatchFilters } from "@/types"
+import { useQuery } from "@tanstack/react-query"
 
 export function useMatches(filters: MatchFilters) {
     return useQuery({

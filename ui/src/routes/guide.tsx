@@ -1,4 +1,4 @@
-import { SEO } from "@/components/SEO"
+import { SEO } from "@/components"
 import { createFileRoute, Link } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/guide")({

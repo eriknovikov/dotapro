@@ -1,9 +1,8 @@
-import * as React from "react"
+import type { SeriesMatchDetail, TeamInfo } from "@/api"
+import { Button, PlayersTable } from ".."
+import { copyToClipboard, formatDuration } from "@/lib"
 import { Check, Clock, Copy, ExternalLink } from "lucide-react"
-import type { SeriesMatchDetail, TeamInfo } from "@/api/api"
-import { Button } from "@/components/ui"
-import { PlayersTable } from "./index"
-import { formatDuration, copyToClipboard } from "@/lib"
+import * as React from "react"
 
 interface GameTabContentProps {
     match: SeriesMatchDetail

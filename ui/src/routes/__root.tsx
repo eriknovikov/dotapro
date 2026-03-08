@@ -1,6 +1,4 @@
-import { Navbar } from "@/components/Navbar"
-import { Footer } from "@/components/Footer"
-import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { ErrorBoundary, Footer, Navbar } from "@/components"
 import type { QueryClient } from "@tanstack/react-query"
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"

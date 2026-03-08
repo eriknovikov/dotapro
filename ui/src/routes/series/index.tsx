@@ -1,8 +1,5 @@
-import { getSeries, type Filters, type GetSeriesResponse } from "@/api/api"
-import { FiltersSidebar } from "@/components/FiltersSidebar"
-import { SEO } from "@/components/SEO"
-import { SeriesList } from "@/components/series/SeriesList"
-import { Button } from "@/components/ui"
+import { getSeries, type Filters, type GetSeriesResponse } from "@/api"
+import { Button, SEO, SeriesFilters, SeriesList } from "@/components"
 import { PAGINATION_LIMITS } from "@/constants"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useSearch } from "@tanstack/react-router"
@@ -91,7 +88,7 @@ function Series() {
             </div>
 
             {/* Sidebar - Filters (absolute positioned to not affect footer width) */}
-            <FiltersSidebar
+            <SeriesFilters
                 filters={search}
                 isMobileOpen={isMobileFiltersOpen}
                 onMobileClose={() => setIsMobileFiltersOpen(false)}

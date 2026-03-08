@@ -1,13 +1,10 @@
-import * as React from "react"
-import { ErrorState } from "@/components/ErrorState"
-import { SEO } from "@/components/SEO"
-import { PlayersTable } from "@/components/series/PlayersTable"
-import { Skeleton, Button } from "@/components/ui"
+import { Button, ErrorState, PlayersTable, SEO, Skeleton } from "@/components"
 import { useMatch } from "@/hooks/useMatches"
-import { formatDuration, formatRelativeTime, copyToClipboard } from "@/lib"
+import { copyToClipboard, formatDuration, formatRelativeTime } from "@/lib"
 import type { MatchDetail, SeriesMatchDetail } from "@/types"
 import { createFileRoute, useRouter } from "@tanstack/react-router"
-import { ChevronLeft, Swords, Check, Clock, Copy, ExternalLink } from "lucide-react"
+import { Check, ChevronLeft, Clock, Copy, ExternalLink, Swords } from "lucide-react"
+import * as React from "react"
 
 export const Route = createFileRoute("/matches/$id")({
     component: MatchDetails,
@@ -196,7 +193,13 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                         </div>
                         {/* Mobile: Icon-only buttons */}
                         <div className="flex justify-center gap-2 sm:hidden">
-                            <Button variant="outline" size="sm" onClick={handleCopyId} className="p-2" aria-label="Copy ID">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleCopyId}
+                                className="p-2"
+                                aria-label="Copy ID"
+                            >
                                 {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                             </Button>
 
@@ -226,7 +229,12 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                         </div>
                         {/* Desktop: Full text buttons */}
                         <div className="hidden gap-2 sm:flex">
-                            <Button variant="outline" size="sm" onClick={handleCopyId} className="gap-2 leading-relaxed">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleCopyId}
+                                className="gap-2 leading-relaxed"
+                            >
                                 {copied ? "Copied!" : "Copy ID"}
                                 {!copied ? <Copy className="h-4 w-4" /> : <Check className="h-4 w-4 text-green-600" />}
                             </Button>

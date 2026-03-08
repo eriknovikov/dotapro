@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui"
-import { Tooltip } from "@/components/ui/tooltip"
+import { Button, Tooltip } from "../ui"
 import { cn, formatRelativeTime, getHeroImageUrl } from "@/lib"
 import type { MatchSummary } from "@/types"
 import { useNavigate } from "@tanstack/react-router"
@@ -27,7 +26,7 @@ CardContent.displayName = "CardContent"
 
 // Lazy load tooltip components to reduce initial bundle size
 const HeroTooltipContent = lazy(() =>
-    import("@/components/series/HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })),
+    import("../series/HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })),
 )
 
 // Wrapper components to handle Suspense inside tooltip content

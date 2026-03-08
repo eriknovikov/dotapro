@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { getLeagueName, searchLeagues } from "../api/api"
+import { getLeagueName, searchLeagues } from "../api"
 import { useDebounce } from "../hooks"
 import { cn, getPopularData } from "../lib"
 import { Spinner } from "./Spinner"
