@@ -101,7 +101,6 @@ function About() {
                         <h2 className="text-foreground mb-4 text-2xl font-bold">Features on the way</h2>
 
                         <ul className="text-foreground-muted mb-4 ml-6 list-disc space-y-2">
-                            <li>Allowing to search matches by hero and player</li>
                             <li>
                                 A "no spoiler mode", so that match and series results are turned off with a toggle in
                                 the filters

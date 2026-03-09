@@ -1,8 +1,18 @@
-import { useSearch, useNavigate } from "@tanstack/react-router"
-import { LeagueSelector, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, TeamSelector } from ".."
-import type { MatchFilters } from "@/types"
 import { LIMIT_OPTIONS } from "@/constants"
+import type { MatchFilters } from "@/types"
+import { useNavigate, useSearch } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
+import {
+    HeroSelector,
+    LeagueSelector,
+    PlayerSelector,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    TeamSelector,
+} from ".."
 
 const SORT_OPTIONS = [
     { value: "newest", label: "Newest first" },
@@ -38,22 +48,20 @@ export function MatchFilters() {
     }
 
     return (
-        <div className="bg-background-accent rounded-lg p-4 mb-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <LeagueSelector
-                    initialValue={search.league}
-                    onSelect={(league) => updateFilters({ league })}
+        <div className="bg-background-accent mb-6 rounded-lg p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <LeagueSelector initialValue={search.league} onSelect={league => updateFilters({ league })} />
+
+                <TeamSelector initialValue={search.team} onSelect={team => updateFilters({ team })} />
+
+                <HeroSelector initialValue={search.hero} onSelect={hero => updateFilters({ hero, c: undefined })} />
+
+                <PlayerSelector
+                    initialValue={search.player}
+                    onSelect={player => updateFilters({ player, c: undefined })}
                 />
-                
-                <TeamSelector
-                    initialValue={search.team}
-                    onSelect={(team) => updateFilters({ team })}
-                />
-                
-                <Select
-                    value={search.sort || "newest"}
-                    onValueChange={(sort) => updateFilters({ sort })}
-                >
+
+                <Select value={search.sort || "newest"} onValueChange={sort => updateFilters({ sort })}>
                     <SelectTrigger>
                         <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
@@ -65,10 +73,10 @@ export function MatchFilters() {
                         ))}
                     </SelectContent>
                 </Select>
-                
+
                 <Select
                     value={search.limit?.toString() || (window.innerWidth < 1024 ? "10" : "20")}
-                    onValueChange={(limit) => updateFilters({ limit: parseInt(limit) })}
+                    onValueChange={limit => updateFilters({ limit: parseInt(limit) })}
                 >
                     <SelectTrigger>
                         <SelectValue placeholder={window.innerWidth < 1024 ? "10" : "20"} />

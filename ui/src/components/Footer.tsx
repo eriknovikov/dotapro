@@ -28,7 +28,7 @@ export function Footer() {
                         <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
                     </a>
                     <a
-                        href="https://discord.gg/h6sVtge8"
+                        href="https://discord.gg/SVGVYcef"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-foreground-muted hover:text-foreground inline-block align-middle transition-all duration-200 hover:scale-110"

@@ -28,6 +28,10 @@ func (b *QueryBuilder) GetIds(lastFetchedMatchID int64, limit int) string {
 			AND m.series_id != 0
 			AND m.radiant_team_id IS NOT NULL
 			AND m.dire_team_id IS NOT NULL
+			AND m.radiant_team_name IS NOT NULL
+			AND m.radiant_team_name != ''
+			AND m.dire_team_name IS NOT NULL
+			AND m.dire_team_name != ''
 		ORDER BY m.match_id ASC
 		LIMIT %d;
 	`, TierPremium, TierProfessional, lastFetchedMatchID, limit)

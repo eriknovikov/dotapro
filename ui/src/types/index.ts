@@ -9,6 +9,8 @@
 export type Filters = {
     league?: number
     team?: number
+    hero?: number
+    player?: number
     sort?: string
     limit?: number
     c?: number

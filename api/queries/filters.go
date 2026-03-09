@@ -14,6 +14,12 @@ const (
 		league_id,
 		name
 	`
+
+	// PlayerSearchColumns are the column expressions for player search queries
+	PlayerSearchColumns = `
+		player_id,
+		name
+	`
 )
 
 // Filters query table expressions
@@ -23,6 +29,9 @@ const (
 
 	// LeaguesTable is the table expression for leagues
 	LeaguesTable = "leagues"
+
+	// PlayersTable is the table expression for players
+	PlayersTable = "players"
 )
 
 // Filters query filters

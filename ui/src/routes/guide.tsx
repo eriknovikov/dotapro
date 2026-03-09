@@ -36,7 +36,8 @@ function Guide() {
                             <Link to="/matches" className="text-blue-200">
                                 matches
                             </Link>{" "}
-                            instead. Here, you can search for the matches directly, using the same filters.
+                            instead. Here, you can search for the matches directly, using the same filters plus
+                            searching by hero or player.
                         </p>
                         <p>
                             It is advised using the platform on desktop, though it has been designed to be responsive in
