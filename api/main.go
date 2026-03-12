@@ -102,6 +102,8 @@ func (a *App) setupRouter() *chi.Mux {
 	r.Get("/filtersmetadata/leagues", a.filtersMetadataController.SearchLeagues)
 	r.Get("/filtersmetadata/team", a.filtersMetadataController.GetTeamName)
 	r.Get("/filtersmetadata/league", a.filtersMetadataController.GetLeagueName)
+	r.Get("/filtersmetadata/players", a.filtersMetadataController.SearchPlayers)
+	r.Get("/filtersmetadata/player", a.filtersMetadataController.GetPlayerName)
 
 	return r
 }

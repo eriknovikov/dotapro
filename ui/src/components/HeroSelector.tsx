@@ -1,16 +1,14 @@
-import { useQuery } from "@tanstack/react-query"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { getLeagueName, searchLeagues } from "../api"
 import { useDebounce } from "../hooks"
 import { cn, getPopularData } from "../lib"
-import { Spinner } from "./Spinner"
+import heroesData from "@/assets/static_data/heroes.json"
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface LeagueSelectorProps {
-    onSelect: (leagueId: number | undefined) => void
+interface HeroSelectorProps {
+    onSelect: (heroId: number | undefined) => void
     initialValue?: number
     className?: string
     id?: string
@@ -18,9 +16,10 @@ interface LeagueSelectorProps {
     inputClassName?: string
 }
 
-interface League {
+interface Hero {
     id: number
     name: string
+    displayName: string
 }
 
 // ============================================================================
@@ -28,7 +27,6 @@ interface League {
 // ============================================================================
 
 const DEBOUNCE_MS = 250
-const STALE_TIME_MS = 5000
 const NAVIGATION_KEYS = ["ArrowDown", "ArrowUp", "Enter"]
 
 // ============================================================================
@@ -54,17 +52,70 @@ const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
 )
 
 // ============================================================================
+// Search Algorithm
+// ============================================================================
+
+function searchHeroes(query: string, heroes: Hero[]): Hero[] {
+    if (!query.trim()) return []
+
+    const normalizedQuery = query.toLowerCase().trim()
+    const queryTrigrams = generateTrigrams(normalizedQuery)
+
+    return heroes
+        .map(hero => {
+            const displayNameLower = hero.displayName.toLowerCase()
+            const nameLower = hero.name.toLowerCase()
+
+            // Calculate match score
+            let score = 0
+
+            // Exact match on displayName (highest priority)
+            if (displayNameLower === normalizedQuery) score += 100
+            // Exact match on name
+            else if (nameLower === normalizedQuery) score += 80
+
+            // Starts with displayName
+            if (displayNameLower.startsWith(normalizedQuery)) score += 50
+            // Starts with name
+            else if (nameLower.startsWith(normalizedQuery)) score += 30
+
+            // Contains displayName
+            if (displayNameLower.includes(normalizedQuery)) score += 20
+            // Contains name
+            if (nameLower.includes(normalizedQuery)) score += 10
+
+            // Trigram matching (partial matches)
+            const displayNameTrigrams = generateTrigrams(displayNameLower)
+            const trigramMatches = queryTrigrams.filter(t => displayNameTrigrams.includes(t)).length
+            score += trigramMatches * 2
+
+            return { hero, score }
+        })
+        .filter(result => result.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(result => result.hero)
+}
+
+function generateTrigrams(text: string): string[] {
+    const trigrams: string[] = []
+    for (let i = 0; i < text.length - 2; i++) {
+        trigrams.push(text.slice(i, i + 3))
+    }
+    return trigrams
+}
+
+// ============================================================================
 // Component
 // ============================================================================
 
-export function LeagueSelector({
+export function HeroSelector({
     onSelect,
     initialValue,
     className,
-    id,
-    "aria-label": ariaLabel,
+    id = "hero-selector",
+    "aria-label": ariaLabel = "Select hero",
     inputClassName,
-}: LeagueSelectorProps) {
+}: HeroSelectorProps) {
     // ---------------------------------------------------------------------------
     // State
     // ---------------------------------------------------------------------------
@@ -72,7 +123,6 @@ export function LeagueSelector({
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState("")
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
-    const [hasFetchedInitialValue, setHasFetchedInitialValue] = useState(false)
 
     // ---------------------------------------------------------------------------
     // Refs
@@ -84,52 +134,30 @@ export function LeagueSelector({
     const itemRefs = useRef<(HTMLLIElement | null)[]>([])
     const isSelectingRef = useRef(false)
     const isExternalUpdateRef = useRef(false)
-    const selectedLeagueIdRef = useRef<number | undefined>(undefined)
-    const selectedLeagueNameRef = useRef<string | undefined>(undefined)
+    const selectedHeroIdRef = useRef<number | undefined>(undefined)
+    const selectedHeroNameRef = useRef<string | undefined>(undefined)
     const hasSetInitialValueRef = useRef(false)
 
     // ---------------------------------------------------------------------------
-    // Data fetching
+    // Data (no API calls - all from heroes.json)
     // ---------------------------------------------------------------------------
 
     const debouncedQuery = useDebounce(inputValue, DEBOUNCE_MS)
 
-    const {
-        data: searchResults = [],
-        isLoading,
-        isFetching,
-    } = useQuery({
-        queryKey: ["leagues", "search", debouncedQuery],
-        queryFn: async ({ signal }) => {
-            if (!debouncedQuery.trim()) return []
-            return searchLeagues(debouncedQuery, signal)
-        },
-        enabled: debouncedQuery.trim().length > 0,
-        staleTime: STALE_TIME_MS,
-    })
+    // Convert heroes.json to array
+    const allHeroes: Hero[] = useMemo(() => {
+        return Object.values(heroesData).map(hero => ({
+            id: hero.id,
+            name: hero.name,
+            displayName: hero.displayName,
+        }))
+    }, [])
 
-    // ---------------------------------------------------------------------------
-    // Fetch league name by ID when initialValue is provided
-    // ---------------------------------------------------------------------------
-
-    const { data: leagueNameData, isLoading: isLeagueNameLoading } = useQuery({
-        queryKey: ["league", "name", initialValue],
-        queryFn: async ({ signal }) => {
-            if (initialValue === undefined) return null
-            return getLeagueName(initialValue, signal)
-        },
-        enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValue,
-        staleTime: 10 * 60 * 1000, // 10 minutes
-    })
-
-    // Mark initial value as fetched when data is received
-    /* eslint-disable react-hooks/set-state-in-effect */
-    useEffect(() => {
-        if (leagueNameData && !hasFetchedInitialValue) {
-            setHasFetchedInitialValue(true)
-        }
-    }, [leagueNameData, hasFetchedInitialValue])
-    /* eslint-enable react-hooks/set-state-in-effect */
+    // Search results (frontend search)
+    const searchResults = useMemo(() => {
+        if (!debouncedQuery.trim()) return []
+        return searchHeroes(debouncedQuery, allHeroes)
+    }, [debouncedQuery, allHeroes])
 
     // ---------------------------------------------------------------------------
     // Computed values
@@ -137,45 +165,47 @@ export function LeagueSelector({
 
     const items = useMemo(() => {
         if (debouncedQuery.trim().length === 0) {
-            return getPopularData().popular_leagues
+            return getPopularData().popular_heroes.map(h => ({
+                id: h.id,
+                name: h.name,
+                displayName: allHeroes.find(hero => hero.id === h.id)?.displayName || h.name,
+            }))
         }
-        return (searchResults || []).map(l => ({ id: l.league_id, name: l.name }))
-    }, [debouncedQuery, searchResults])
+        return searchResults
+    }, [debouncedQuery, searchResults, allHeroes])
 
     const listboxId = `${id}-listbox`
-    const hasQuery = debouncedQuery.trim().length > 0
-    const showSpinner = isFetching && hasQuery
-    const showClearButton = inputValue && !showSpinner
-    const showEmptyState = items.length === 0 && !isLoading && !isFetching
+    const showClearButton = inputValue
+    const showEmptyState = items.length === 0
 
     // ---------------------------------------------------------------------------
     // Helper functions
     // ---------------------------------------------------------------------------
 
-    const clearSelectedLeague = useCallback(() => {
-        if (selectedLeagueIdRef.current !== undefined) {
+    const clearSelectedHero = useCallback(() => {
+        if (selectedHeroIdRef.current !== undefined) {
             isExternalUpdateRef.current = true
             setInputValue("")
             onSelect(undefined)
-            selectedLeagueIdRef.current = undefined
-            selectedLeagueNameRef.current = undefined
+            selectedHeroIdRef.current = undefined
+            selectedHeroNameRef.current = undefined
         }
     }, [onSelect])
 
-    const shouldClearLeagueOnClose = useCallback(() => {
-        if (selectedLeagueIdRef.current === undefined) {
+    const shouldClearHeroOnClose = useCallback(() => {
+        if (selectedHeroIdRef.current === undefined) {
             return false
         }
-        // Clear if input is empty OR if input differs from the originally selected league name
-        return inputValue.trim() === "" || inputValue !== selectedLeagueNameRef.current
+        // Clear if input is empty OR if input differs from the originally selected hero name
+        return inputValue.trim() === "" || inputValue !== selectedHeroNameRef.current
     }, [inputValue])
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false)
-        if (shouldClearLeagueOnClose()) {
-            clearSelectedLeague()
+        if (shouldClearHeroOnClose()) {
+            clearSelectedHero()
         }
-    }, [shouldClearLeagueOnClose, clearSelectedLeague])
+    }, [shouldClearHeroOnClose, clearSelectedHero])
 
     // ---------------------------------------------------------------------------
     // Effects
@@ -186,33 +216,24 @@ export function LeagueSelector({
     /* eslint-disable react-hooks/set-state-in-effect */
     useLayoutEffect(() => {
         if (initialValue !== undefined && !hasSetInitialValueRef.current) {
-            // First try to find in items (popular leagues or search results)
-            const initialItem = items.find(l => l.id === initialValue)
+            // Find hero in allHeroes (since we have all data locally)
+            const initialHero = allHeroes.find(h => h.id === initialValue)
 
-            if (initialItem) {
-                // Always update if we have the item, regardless of current inputValue
+            if (initialHero) {
                 isExternalUpdateRef.current = true
-                setInputValue(initialItem.name)
-                selectedLeagueIdRef.current = initialValue
-                selectedLeagueNameRef.current = initialItem.name
-                hasSetInitialValueRef.current = true
-            } else if (leagueNameData && !isLeagueNameLoading) {
-                // If not found in items but we have the name from API, use that
-                isExternalUpdateRef.current = true
-                setInputValue(leagueNameData.name)
-                selectedLeagueIdRef.current = initialValue
-                selectedLeagueNameRef.current = leagueNameData.name
+                setInputValue(initialHero.displayName)
+                selectedHeroIdRef.current = initialValue
+                selectedHeroNameRef.current = initialHero.displayName
                 hasSetInitialValueRef.current = true
             }
-        } else if (initialValue === undefined && selectedLeagueIdRef.current !== undefined) {
+        } else if (initialValue === undefined && selectedHeroIdRef.current !== undefined) {
             // Clear the input when initialValue becomes undefined
             setInputValue("")
-            selectedLeagueIdRef.current = undefined
-            selectedLeagueNameRef.current = undefined
-            setHasFetchedInitialValue(false)
+            selectedHeroIdRef.current = undefined
+            selectedHeroNameRef.current = undefined
             hasSetInitialValueRef.current = false
         }
-    }, [initialValue, items, leagueNameData, isLeagueNameLoading])
+    }, [initialValue, allHeroes])
     /* eslint-enable react-hooks/set-state-in-effect */
 
     // Close dropdown when clicking outside
@@ -290,20 +311,20 @@ export function LeagueSelector({
         if (inputRef.current && inputValue && inputRef.current.textContent !== inputValue) {
             inputRef.current.textContent = inputValue
         }
-    }, [inputValue, leagueNameData])
+    }, [inputValue])
 
     // ---------------------------------------------------------------------------
     // Event handlers
     // ---------------------------------------------------------------------------
 
     const handleSelect = useCallback(
-        (league: League) => {
+        (hero: Hero) => {
             isExternalUpdateRef.current = true
-            setInputValue(league.name)
+            setInputValue(hero.displayName)
             setIsOpen(false)
-            onSelect(league.id)
-            selectedLeagueIdRef.current = league.id
-            selectedLeagueNameRef.current = league.name
+            onSelect(hero.id)
+            selectedHeroIdRef.current = hero.id
+            selectedHeroNameRef.current = hero.displayName
             isSelectingRef.current = true
             inputRef.current?.focus()
             setTimeout(() => {
@@ -317,8 +338,8 @@ export function LeagueSelector({
         isExternalUpdateRef.current = true
         setInputValue("")
         onSelect(undefined)
-        selectedLeagueIdRef.current = undefined
-        selectedLeagueNameRef.current = undefined
+        selectedHeroIdRef.current = undefined
+        selectedHeroNameRef.current = undefined
         inputRef.current?.focus()
     }, [onSelect])
 
@@ -347,10 +368,10 @@ export function LeagueSelector({
         if (inputRef.current) {
             const text = inputRef.current.textContent || ""
             // If input is cleared, remove the filter entirely
-            if (text === "" && selectedLeagueIdRef.current !== undefined) {
+            if (text === "" && selectedHeroIdRef.current !== undefined) {
                 onSelect(undefined)
-                selectedLeagueIdRef.current = undefined
-                selectedLeagueNameRef.current = undefined
+                selectedHeroIdRef.current = undefined
+                selectedHeroNameRef.current = undefined
             }
             // Only update state if value actually changed to avoid unnecessary re-renders
             if (text !== inputValue) {
@@ -364,10 +385,10 @@ export function LeagueSelector({
     }, [])
 
     const handleItemClick = useCallback(
-        (e: React.MouseEvent, league: League) => {
+        (e: React.MouseEvent, hero: Hero) => {
             e.preventDefault()
             e.stopPropagation()
-            handleSelect(league)
+            handleSelect(hero)
         },
         [handleSelect],
     )
@@ -431,7 +452,7 @@ export function LeagueSelector({
         <div className="relative">
             {inputValue === "" && (
                 <span className="text-foreground-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm select-none">
-                    Type to search leagues...
+                    Type to search heroes...
                 </span>
             )}
             <div
@@ -445,7 +466,7 @@ export function LeagueSelector({
                 onFocus={handleInputFocus}
                 onKeyDown={handleKeyDown}
                 tabIndex={0}
-                aria-label={ariaLabel || "Search leagues"}
+                aria-label={ariaLabel || "Search heroes"}
                 aria-autocomplete="list"
                 aria-controls={listboxId}
                 aria-expanded={isOpen}
@@ -465,7 +486,6 @@ export function LeagueSelector({
 
     const renderInputSuffix = () => (
         <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1">
-            {showSpinner && <Spinner size="sm" aria-label="Loading leagues" />}
             {showClearButton && (
                 <button
                     type="button"
@@ -476,7 +496,7 @@ export function LeagueSelector({
                     <ClearIcon />
                 </button>
             )}
-            {!showSpinner && !showClearButton && (
+            {!showClearButton && (
                 <button
                     type="button"
                     onClick={() => {
@@ -495,24 +515,24 @@ export function LeagueSelector({
 
     const renderEmptyState = () => (
         <li role="option" aria-selected="false" className="text-foreground-muted px-4 py-3 text-sm">
-            No leagues found
+            No heroes found
         </li>
     )
 
-    const renderLeagueItem = (league: League, index: number) => (
+    const renderHeroItem = (hero: Hero, index: number) => (
         <li
-            key={league.id}
+            key={hero.id}
             ref={el => {
                 itemRefs.current[index] = el
             }}
             id={`${listboxId}-option-${index}`}
             role="option"
             aria-selected={highlightedIndex === index}
-            onClick={e => handleItemClick(e, league)}
+            onClick={e => handleItemClick(e, hero)}
             onMouseEnter={() => handleItemMouseEnter(index)}
             className={cn("cursor-pointer px-4 py-3 text-sm", highlightedIndex === index && "bg-red-800/20")}
         >
-            {league.name}
+            {hero.displayName}
         </li>
     )
 
@@ -521,10 +541,10 @@ export function LeagueSelector({
             ref={listRef}
             id={listboxId}
             role="listbox"
-            aria-label={ariaLabel || "Leagues"}
+            aria-label={ariaLabel || "Heroes"}
             className="border-border-accent bg-background-card absolute top-full z-50 mt-1 max-h-72 w-full min-w-65 overflow-auto rounded-lg border shadow-xl"
         >
-            {showEmptyState ? renderEmptyState() : items.map(renderLeagueItem)}
+            {showEmptyState ? renderEmptyState() : items.map(renderHeroItem)}
         </ul>
     )
 

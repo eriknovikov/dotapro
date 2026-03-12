@@ -60,10 +60,10 @@ func (m *Model) GetMany(ctx context.Context, filter types.GetMatchesFilter) ([]t
 		q = q.Where("m.radiant_team_id = ? OR m.dire_team_id = ?", *filter.TeamID, *filter.TeamID)
 	}
 	if filter.PlayerID != nil {
-		q = q.Where("m.radiant_players @> ? OR m.dire_players @> ?", []int64{*filter.PlayerID}, []int64{*filter.PlayerID})
+		q = q.Where("m.radiant_players @> ARRAY[?]::bigint[] OR m.dire_players @> ARRAY[?]::bigint[]", *filter.PlayerID, *filter.PlayerID)
 	}
 	if filter.HeroID != nil {
-		q = q.Where("m.radiant_heroes @> ? OR m.dire_heroes @> ?", []int64{*filter.HeroID}, []int64{*filter.HeroID})
+		q = q.Where("m.radiant_heroes @> ARRAY[?]::bigint[] OR m.dire_heroes @> ARRAY[?]::bigint[]", *filter.HeroID, *filter.HeroID)
 	}
 
 	switch filter.Sort {

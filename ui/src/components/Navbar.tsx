@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
-import { DiscordIcon } from "./Icons"
 import { Button } from "./ui/index"
 
 const navLinks = [
@@ -114,16 +113,6 @@ export function Navbar() {
                             >
                                 <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
                             </a>
-                            <a
-                                href="https://discord.gg/h6sVtge8"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-foreground-muted hover:text-foreground flex items-center px-2 py-2 transition-all duration-200 hover:scale-110 sm:px-3"
-                                aria-label="Discord"
-                                role="menuitem"
-                            >
-                                <DiscordIcon />
-                            </a>
                         </div>
 
                         {/* Mobile menu button - right (mobile only) */}
@@ -235,16 +224,6 @@ export function Navbar() {
                                 >
                                     <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
                                     <span className="font-medium">GitHub</span>
-                                </a>
-                                <a
-                                    href="https://discord.gg/h6sVtge8"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-foreground-muted hover:text-foreground hover:bg-background-accent flex items-center gap-3 rounded-lg px-4 py-3 transition-colors"
-                                    aria-label="Join Discord server"
-                                >
-                                    <DiscordIcon />
-                                    <span className="font-medium">Discord</span>
                                 </a>
                             </div>
                         </div>

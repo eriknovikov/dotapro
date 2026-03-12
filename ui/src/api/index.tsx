@@ -17,6 +17,12 @@ import type {
     MatchFilters,
 } from "@/types"
 
+// Player search result type
+export type PlayerSearchResult = {
+	player_id: number
+	name: string
+}
+
 // Re-export types for backward compatibility
 export type {
     Filters,
@@ -95,4 +101,14 @@ export async function getTeamName(id: number, signal: AbortSignal): Promise<{ na
 export async function getLeagueName(id: number, signal: AbortSignal): Promise<{ name: string }> {
     const url = buildUrl("/filtersmetadata/league", { id })
     return fetchApi(url, signal, "Failed to fetch league name")
+}
+
+export async function searchPlayers(query: string, signal: AbortSignal): Promise<PlayerSearchResult[]> {
+    const url = buildUrl("/filtersmetadata/players", { q: query })
+    return fetchApi(url, signal, "Failed to search players")
+}
+
+export async function getPlayerName(id: number, signal: AbortSignal): Promise<{ name: string }> {
+    const url = buildUrl("/filtersmetadata/player", { id })
+    return fetchApi(url, signal, "Failed to fetch player name")
 }

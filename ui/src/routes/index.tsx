@@ -1,6 +1,5 @@
+import { Button, SEO } from "@/components"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { Button } from "@/components/ui"
-import { SEO } from "@/components/SEO"
 
 export const Route = createFileRoute("/")({
     component: Index,

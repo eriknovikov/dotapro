@@ -1,5 +1,4 @@
 import { useLocation } from "@tanstack/react-router"
-import { DiscordIcon } from "./Icons"
 
 export function Footer() {
     const location = useLocation()
@@ -26,15 +25,6 @@ export function Footer() {
                         aria-label="GitHub"
                     >
                         <img src="/github.svg" alt="GitHub" className="h-5 w-5 brightness-0 invert" />
-                    </a>
-                    <a
-                        href="https://discord.gg/h6sVtge8"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground-muted hover:text-foreground inline-block align-middle transition-all duration-200 hover:scale-110"
-                        aria-label="Discord"
-                    >
-                        <DiscordIcon />
                     </a>
                 </div>
             </div>

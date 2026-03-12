@@ -66,5 +66,22 @@
             "id": 18941,
             "name": "EPL Championship 2025-2026"
         }
+    ],
+    "popular_players": [
+        { "id": 321580662, "name": "Yatoro" },
+        { "id": 201358612, "name": "Nisha" },
+        { "id": 93618577, "name": "bzm" },
+        { "id": 77490514, "name": "Boxi" },
+        { "id": 317880638, "name": "Save-" },
+        { "id": 898754153, "name": "Ame" }
+    ],
+    "popular_heroes": [
+        { "id": 74, "name": "Invoker" },
+        { "id": 34, "name": "Tinker" },
+        { "id": 14, "name": "Pudge" },
+        { "id": 105, "name": "Meepo" },
+        { "id": 22, "name": "Zeus" },
+        { "id": 1, "name": "Anti-Mage" },
+        { "id": 8, "name": "Juggernaut" }
     ]
 }

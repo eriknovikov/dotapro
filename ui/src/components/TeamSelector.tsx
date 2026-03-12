@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
-import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from "react"
-import { searchTeams, getTeamName } from "../api/api"
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { getTeamName, searchTeams } from "../api"
 import { useDebounce } from "../hooks"
 import { cn, getPopularData } from "../lib"
 import { Spinner } from "./Spinner"
@@ -113,10 +113,7 @@ export function TeamSelector({
     // Fetch team name by ID when initialValue is provided
     // ---------------------------------------------------------------------------
 
-    const {
-        data: teamNameData,
-        isLoading: isTeamNameLoading,
-    } = useQuery({
+    const { data: teamNameData, isLoading: isTeamNameLoading } = useQuery({
         queryKey: ["team", "name", initialValue],
         queryFn: async ({ signal }) => {
             if (initialValue === undefined) return null

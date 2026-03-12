@@ -1,9 +1,6 @@
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router"
 import type { Pagination, MatchSummary, MatchFilters } from "@/types"
-import { EmptyState } from "@/components/EmptyState"
-import { ErrorState } from "@/components/ErrorState"
-import { Skeleton } from "@/components/ui"
-import { Button } from "@/components/ui"
+import { Button, EmptyState, ErrorState, Skeleton } from ".."
 import { MatchCard } from "./MatchCard"
 
 interface MatchListProps {

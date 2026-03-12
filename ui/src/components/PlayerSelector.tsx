@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { getLeagueName, searchLeagues } from "../api"
+import { getPlayerName, searchPlayers } from "../api"
 import { useDebounce } from "../hooks"
 import { cn, getPopularData } from "../lib"
 import { Spinner } from "./Spinner"
@@ -9,8 +9,8 @@ import { Spinner } from "./Spinner"
 // Types
 // ============================================================================
 
-interface LeagueSelectorProps {
-    onSelect: (leagueId: number | undefined) => void
+interface PlayerSelectorProps {
+    onSelect: (playerId: number | undefined) => void
     initialValue?: number
     className?: string
     id?: string
@@ -18,7 +18,7 @@ interface LeagueSelectorProps {
     inputClassName?: string
 }
 
-interface League {
+interface Player {
     id: number
     name: string
 }
@@ -57,14 +57,14 @@ const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
 // Component
 // ============================================================================
 
-export function LeagueSelector({
+export function PlayerSelector({
     onSelect,
     initialValue,
     className,
-    id,
-    "aria-label": ariaLabel,
+    id = "player-selector",
+    "aria-label": ariaLabel = "Select player",
     inputClassName,
-}: LeagueSelectorProps) {
+}: PlayerSelectorProps) {
     // ---------------------------------------------------------------------------
     // State
     // ---------------------------------------------------------------------------
@@ -84,8 +84,8 @@ export function LeagueSelector({
     const itemRefs = useRef<(HTMLLIElement | null)[]>([])
     const isSelectingRef = useRef(false)
     const isExternalUpdateRef = useRef(false)
-    const selectedLeagueIdRef = useRef<number | undefined>(undefined)
-    const selectedLeagueNameRef = useRef<string | undefined>(undefined)
+    const selectedPlayerIdRef = useRef<number | undefined>(undefined)
+    const selectedPlayerNameRef = useRef<string | undefined>(undefined)
     const hasSetInitialValueRef = useRef(false)
 
     // ---------------------------------------------------------------------------
@@ -99,24 +99,24 @@ export function LeagueSelector({
         isLoading,
         isFetching,
     } = useQuery({
-        queryKey: ["leagues", "search", debouncedQuery],
+        queryKey: ["players", "search", debouncedQuery],
         queryFn: async ({ signal }) => {
             if (!debouncedQuery.trim()) return []
-            return searchLeagues(debouncedQuery, signal)
+            return searchPlayers(debouncedQuery, signal)
         },
         enabled: debouncedQuery.trim().length > 0,
         staleTime: STALE_TIME_MS,
     })
 
     // ---------------------------------------------------------------------------
-    // Fetch league name by ID when initialValue is provided
+    // Fetch player name by ID when initialValue is provided
     // ---------------------------------------------------------------------------
 
-    const { data: leagueNameData, isLoading: isLeagueNameLoading } = useQuery({
-        queryKey: ["league", "name", initialValue],
+    const { data: playerNameData, isLoading: isPlayerNameLoading } = useQuery({
+        queryKey: ["player", "name", initialValue],
         queryFn: async ({ signal }) => {
             if (initialValue === undefined) return null
-            return getLeagueName(initialValue, signal)
+            return getPlayerName(initialValue, signal)
         },
         enabled: initialValue !== undefined && inputValue === "" && !hasFetchedInitialValue,
         staleTime: 10 * 60 * 1000, // 10 minutes
@@ -125,10 +125,10 @@ export function LeagueSelector({
     // Mark initial value as fetched when data is received
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        if (leagueNameData && !hasFetchedInitialValue) {
+        if (playerNameData && !hasFetchedInitialValue) {
             setHasFetchedInitialValue(true)
         }
-    }, [leagueNameData, hasFetchedInitialValue])
+    }, [playerNameData, hasFetchedInitialValue])
     /* eslint-enable react-hooks/set-state-in-effect */
 
     // ---------------------------------------------------------------------------
@@ -137,9 +137,12 @@ export function LeagueSelector({
 
     const items = useMemo(() => {
         if (debouncedQuery.trim().length === 0) {
-            return getPopularData().popular_leagues
+            return getPopularData().popular_players.map(p => ({
+                id: p.id,
+                name: p.name,
+            }))
         }
-        return (searchResults || []).map(l => ({ id: l.league_id, name: l.name }))
+        return (searchResults || []).map(p => ({ id: p.player_id, name: p.name }))
     }, [debouncedQuery, searchResults])
 
     const listboxId = `${id}-listbox`
@@ -152,30 +155,30 @@ export function LeagueSelector({
     // Helper functions
     // ---------------------------------------------------------------------------
 
-    const clearSelectedLeague = useCallback(() => {
-        if (selectedLeagueIdRef.current !== undefined) {
+    const clearSelectedPlayer = useCallback(() => {
+        if (selectedPlayerIdRef.current !== undefined) {
             isExternalUpdateRef.current = true
             setInputValue("")
             onSelect(undefined)
-            selectedLeagueIdRef.current = undefined
-            selectedLeagueNameRef.current = undefined
+            selectedPlayerIdRef.current = undefined
+            selectedPlayerNameRef.current = undefined
         }
     }, [onSelect])
 
-    const shouldClearLeagueOnClose = useCallback(() => {
-        if (selectedLeagueIdRef.current === undefined) {
+    const shouldClearPlayerOnClose = useCallback(() => {
+        if (selectedPlayerIdRef.current === undefined) {
             return false
         }
-        // Clear if input is empty OR if input differs from the originally selected league name
-        return inputValue.trim() === "" || inputValue !== selectedLeagueNameRef.current
+        // Clear if input is empty OR if input differs from the originally selected player name
+        return inputValue.trim() === "" || inputValue !== selectedPlayerNameRef.current
     }, [inputValue])
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false)
-        if (shouldClearLeagueOnClose()) {
-            clearSelectedLeague()
+        if (shouldClearPlayerOnClose()) {
+            clearSelectedPlayer()
         }
-    }, [shouldClearLeagueOnClose, clearSelectedLeague])
+    }, [shouldClearPlayerOnClose, clearSelectedPlayer])
 
     // ---------------------------------------------------------------------------
     // Effects
@@ -186,33 +189,33 @@ export function LeagueSelector({
     /* eslint-disable react-hooks/set-state-in-effect */
     useLayoutEffect(() => {
         if (initialValue !== undefined && !hasSetInitialValueRef.current) {
-            // First try to find in items (popular leagues or search results)
-            const initialItem = items.find(l => l.id === initialValue)
+            // First try to find in items (popular players or search results)
+            const initialItem = items.find(p => p.id === initialValue)
 
             if (initialItem) {
                 // Always update if we have the item, regardless of current inputValue
                 isExternalUpdateRef.current = true
                 setInputValue(initialItem.name)
-                selectedLeagueIdRef.current = initialValue
-                selectedLeagueNameRef.current = initialItem.name
+                selectedPlayerIdRef.current = initialValue
+                selectedPlayerNameRef.current = initialItem.name
                 hasSetInitialValueRef.current = true
-            } else if (leagueNameData && !isLeagueNameLoading) {
+            } else if (playerNameData && !isPlayerNameLoading) {
                 // If not found in items but we have the name from API, use that
                 isExternalUpdateRef.current = true
-                setInputValue(leagueNameData.name)
-                selectedLeagueIdRef.current = initialValue
-                selectedLeagueNameRef.current = leagueNameData.name
+                setInputValue(playerNameData.name)
+                selectedPlayerIdRef.current = initialValue
+                selectedPlayerNameRef.current = playerNameData.name
                 hasSetInitialValueRef.current = true
             }
-        } else if (initialValue === undefined && selectedLeagueIdRef.current !== undefined) {
+        } else if (initialValue === undefined && selectedPlayerIdRef.current !== undefined) {
             // Clear the input when initialValue becomes undefined
             setInputValue("")
-            selectedLeagueIdRef.current = undefined
-            selectedLeagueNameRef.current = undefined
+            selectedPlayerIdRef.current = undefined
+            selectedPlayerNameRef.current = undefined
             setHasFetchedInitialValue(false)
             hasSetInitialValueRef.current = false
         }
-    }, [initialValue, items, leagueNameData, isLeagueNameLoading])
+    }, [initialValue, items, playerNameData, isPlayerNameLoading])
     /* eslint-enable react-hooks/set-state-in-effect */
 
     // Close dropdown when clicking outside
@@ -290,20 +293,20 @@ export function LeagueSelector({
         if (inputRef.current && inputValue && inputRef.current.textContent !== inputValue) {
             inputRef.current.textContent = inputValue
         }
-    }, [inputValue, leagueNameData])
+    }, [inputValue, playerNameData])
 
     // ---------------------------------------------------------------------------
     // Event handlers
     // ---------------------------------------------------------------------------
 
     const handleSelect = useCallback(
-        (league: League) => {
+        (player: Player) => {
             isExternalUpdateRef.current = true
-            setInputValue(league.name)
+            setInputValue(player.name)
             setIsOpen(false)
-            onSelect(league.id)
-            selectedLeagueIdRef.current = league.id
-            selectedLeagueNameRef.current = league.name
+            onSelect(player.id)
+            selectedPlayerIdRef.current = player.id
+            selectedPlayerNameRef.current = player.name
             isSelectingRef.current = true
             inputRef.current?.focus()
             setTimeout(() => {
@@ -317,8 +320,8 @@ export function LeagueSelector({
         isExternalUpdateRef.current = true
         setInputValue("")
         onSelect(undefined)
-        selectedLeagueIdRef.current = undefined
-        selectedLeagueNameRef.current = undefined
+        selectedPlayerIdRef.current = undefined
+        selectedPlayerNameRef.current = undefined
         inputRef.current?.focus()
     }, [onSelect])
 
@@ -347,10 +350,10 @@ export function LeagueSelector({
         if (inputRef.current) {
             const text = inputRef.current.textContent || ""
             // If input is cleared, remove the filter entirely
-            if (text === "" && selectedLeagueIdRef.current !== undefined) {
+            if (text === "" && selectedPlayerIdRef.current !== undefined) {
                 onSelect(undefined)
-                selectedLeagueIdRef.current = undefined
-                selectedLeagueNameRef.current = undefined
+                selectedPlayerIdRef.current = undefined
+                selectedPlayerNameRef.current = undefined
             }
             // Only update state if value actually changed to avoid unnecessary re-renders
             if (text !== inputValue) {
@@ -364,10 +367,10 @@ export function LeagueSelector({
     }, [])
 
     const handleItemClick = useCallback(
-        (e: React.MouseEvent, league: League) => {
+        (e: React.MouseEvent, player: Player) => {
             e.preventDefault()
             e.stopPropagation()
-            handleSelect(league)
+            handleSelect(player)
         },
         [handleSelect],
     )
@@ -431,7 +434,7 @@ export function LeagueSelector({
         <div className="relative">
             {inputValue === "" && (
                 <span className="text-foreground-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm select-none">
-                    Type to search leagues...
+                    Type to search players...
                 </span>
             )}
             <div
@@ -445,7 +448,7 @@ export function LeagueSelector({
                 onFocus={handleInputFocus}
                 onKeyDown={handleKeyDown}
                 tabIndex={0}
-                aria-label={ariaLabel || "Search leagues"}
+                aria-label={ariaLabel || "Search players"}
                 aria-autocomplete="list"
                 aria-controls={listboxId}
                 aria-expanded={isOpen}
@@ -465,7 +468,7 @@ export function LeagueSelector({
 
     const renderInputSuffix = () => (
         <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1">
-            {showSpinner && <Spinner size="sm" aria-label="Loading leagues" />}
+            {showSpinner && <Spinner size="sm" aria-label="Loading players" />}
             {showClearButton && (
                 <button
                     type="button"
@@ -495,24 +498,27 @@ export function LeagueSelector({
 
     const renderEmptyState = () => (
         <li role="option" aria-selected="false" className="text-foreground-muted px-4 py-3 text-sm">
-            No leagues found
+            No players found
         </li>
     )
 
-    const renderLeagueItem = (league: League, index: number) => (
+    const renderPlayerItem = (player: Player, index: number) => (
         <li
-            key={league.id}
+            key={player.id}
             ref={el => {
                 itemRefs.current[index] = el
             }}
             id={`${listboxId}-option-${index}`}
             role="option"
             aria-selected={highlightedIndex === index}
-            onClick={e => handleItemClick(e, league)}
+            onClick={e => handleItemClick(e, player)}
             onMouseEnter={() => handleItemMouseEnter(index)}
-            className={cn("cursor-pointer px-4 py-3 text-sm", highlightedIndex === index && "bg-red-800/20")}
+            className={cn(
+                "flex cursor-pointer items-center gap-3 px-4 py-3 text-sm",
+                highlightedIndex === index && "bg-red-800/20",
+            )}
         >
-            {league.name}
+            <span className="truncate">{player.name}</span>
         </li>
     )
 
@@ -521,10 +527,10 @@ export function LeagueSelector({
             ref={listRef}
             id={listboxId}
             role="listbox"
-            aria-label={ariaLabel || "Leagues"}
-            className="border-border-accent bg-background-card absolute top-full z-50 mt-1 max-h-72 w-full min-w-65 overflow-auto rounded-lg border shadow-xl"
+            aria-label={ariaLabel || "Players"}
+            className="border-border-accent bg-background-card absolute top-full z-50 mt-1 max-h-72 w-full overflow-auto rounded-lg border shadow-xl"
         >
-            {showEmptyState ? renderEmptyState() : items.map(renderLeagueItem)}
+            {showEmptyState ? renderEmptyState() : items.map(renderPlayerItem)}
         </ul>
     )
 

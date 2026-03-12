@@ -1,8 +1,5 @@
-import { getMatches, type MatchFilters, type GetMatchesResponse } from "@/api/api"
-import { FiltersSidebar } from "@/components/FiltersSidebar"
-import { MatchList } from "@/components/matches/MatchList"
-import { SEO } from "@/components/SEO"
-import { Button } from "@/components/ui"
+import { getMatches, type GetMatchesResponse, type MatchFilters } from "@/api"
+import { Button, MatchList, SEO, SeriesFilters } from "@/components"
 import { PAGINATION_LIMITS } from "@/constants"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useSearch } from "@tanstack/react-router"
@@ -93,7 +90,7 @@ function Matches() {
             </div>
 
             {/* Sidebar - Filters (absolute positioned to not affect footer width) */}
-            <FiltersSidebar
+            <SeriesFilters
                 filters={search}
                 isMobileOpen={isMobileFiltersOpen}
                 onMobileClose={() => setIsMobileFiltersOpen(false)}

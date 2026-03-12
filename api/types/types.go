@@ -95,6 +95,11 @@ type LeagueSearchResult struct {
 	Name     string `json:"name" bun:"name"`
 }
 
+type PlayerSearchResult struct {
+	PlayerID int64  `json:"player_id" bun:"player_id"`
+	Name     string `json:"name" bun:"name"`
+}
+
 type LeagueInfo struct {
 	ID      int64  `json:"id" bun:"id"`
 	Name    string `json:"name" bun:"name"`

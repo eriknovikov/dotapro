@@ -1,4 +1,4 @@
-import { SEO } from "@/components/SEO"
+import { SEO } from "@/components"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/about")({
@@ -101,7 +101,6 @@ function About() {
                         <h2 className="text-foreground mb-4 text-2xl font-bold">Features on the way</h2>
 
                         <ul className="text-foreground-muted mb-4 ml-6 list-disc space-y-2">
-                            <li>Allowing to search matches by hero and player</li>
                             <li>
                                 A "no spoiler mode", so that match and series results are turned off with a toggle in
                                 the filters
@@ -112,7 +111,7 @@ function About() {
                         <p className="text-foreground-muted text-sm">
                             The features are listed in the order of intended implementation. If you think you would want
                             a feature more than the other, or want something totally different to be added to dotapro,
-                            then let us know in our discord!
+                            let us know!
                         </p>
                     </div>
                 </div>

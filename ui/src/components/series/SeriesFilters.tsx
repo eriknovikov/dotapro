@@ -1,21 +1,18 @@
-import type { Filters } from "../api/api"
+import type { Filters } from "@/api"
+import { Button, CustomSelect, CustomSelectItem, HeroSelector, LeagueSelector, PlayerSelector, TeamSelector } from ".."
+import { PAGINATION_LIMITS } from "@/constants"
 import { useNavigate } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Button } from "./ui"
-import { CustomSelect, CustomSelectItem } from "./ui/CustomSelect"
-import { LeagueSelector } from "./LeagueSelector"
-import { TeamSelector } from "./TeamSelector"
-import { PAGINATION_LIMITS } from "@/constants"
 
-interface FiltersSidebarProps {
+interface SeriesFiltersProps {
     filters: Filters
     isMobileOpen?: boolean
     onMobileClose?: () => void
     itemType?: "series" | "matches"
 }
 
-export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType = "series" }: FiltersSidebarProps) {
+export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType = "series" }: SeriesFiltersProps) {
     const navigate = useNavigate()
     const [hasSetMobileDefault, setHasSetMobileDefault] = useState(false)
 
@@ -48,6 +45,20 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
         })
     }
 
+    const handleHeroChange = (heroId: number | undefined) => {
+        navigate({
+            to: ".",
+            search: { ...filters, hero: heroId, c: undefined },
+        })
+    }
+
+    const handlePlayerChange = (playerId: number | undefined) => {
+        navigate({
+            to: ".",
+            search: { ...filters, player: playerId, c: undefined },
+        })
+    }
+
     const handleSortChange = (sort: string) => {
         navigate({
             to: ".",
@@ -63,9 +74,21 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
     }
 
     const handleClear = () => {
+        const clearFilters: Record<string, undefined> = {
+            league: undefined,
+            team: undefined,
+            sort: undefined,
+            limit: undefined,
+            c: undefined,
+        }
+        // Only clear hero and player filters for matches
+        if (itemType === "matches") {
+            clearFilters.hero = undefined
+            clearFilters.player = undefined
+        }
         navigate({
             to: ".",
-            search: { league: undefined, team: undefined, sort: undefined, limit: undefined, c: undefined },
+            search: clearFilters,
         })
     }
 
@@ -146,6 +169,37 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
                             />
                         </div>
 
+                        {/* Hero Filter - Only for matches */}
+                        {itemType === "matches" && (
+                            <div>
+                                <label htmlFor="hero-select" className="text-foreground mb-2 block text-sm font-medium">
+                                    Hero
+                                </label>
+                                <HeroSelector
+                                    id="hero-select"
+                                    onSelect={handleHeroChange}
+                                    initialValue={filters.hero}
+                                    aria-label="Hero filter"
+                                />
+                            </div>
+                        )}
+
+                        {/* Player Filter - Only for matches */}
+                        {itemType === "matches" && (
+                            <div>
+                                <label htmlFor="player-select" className="text-foreground mb-2 block text-sm font-medium">
+                                    Player
+                                </label>
+                                <PlayerSelector
+                                    id="player-select"
+                                    onSelect={handlePlayerChange}
+                                    initialValue={filters.player}
+                                    aria-label="Player filter"
+                                    inputClassName="text-sm"
+                                />
+                            </div>
+                        )}
+
                         {/* Sort By Filter */}
                         <div>
                             <label htmlFor="sort-by" className="text-foreground mb-2 block text-sm font-medium">
@@ -159,12 +213,8 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
                                 className="text-sm"
                                 placeholder="Newest"
                             >
-                                <CustomSelectItem value="newest">
-                                    Newest
-                                </CustomSelectItem>
-                                <CustomSelectItem value="oldest">
-                                    Oldest
-                                </CustomSelectItem>
+                                <CustomSelectItem value="newest">Newest</CustomSelectItem>
+                                <CustomSelectItem value="oldest">Oldest</CustomSelectItem>
                             </CustomSelect>
                         </div>
 
@@ -182,10 +232,7 @@ export function FiltersSidebar({ filters, isMobileOpen, onMobileClose, itemType 
                                 placeholder={window.innerWidth < 1024 ? "10" : "20"}
                             >
                                 {PAGINATION_LIMITS.map(limit => (
-                                    <CustomSelectItem
-                                        key={limit}
-                                        value={limit.toString()}
-                                    >
+                                    <CustomSelectItem key={limit} value={limit.toString()}>
                                         {limit}
                                     </CustomSelectItem>
                                 ))}

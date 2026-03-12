@@ -46,9 +46,21 @@ export interface PopularTeam {
     logo_url?: string
 }
 
+export interface PopularPlayer {
+    id: number
+    name: string
+}
+
+export interface PopularHero {
+    id: number
+    name: string
+}
+
 export interface PopularData {
     popular_leagues: PopularLeague[]
     popular_teams: PopularTeam[]
+    popular_players: PopularPlayer[]
+    popular_heroes: PopularHero[]
 }
 
 // ============================================================================
