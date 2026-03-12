@@ -23,15 +23,17 @@ func (b *QueryBuilder) GetIds(lastFetchedMatchID int64, limit int) string {
 		SELECT m.match_id
 		FROM matches m
 		LEFT JOIN leagues l ON m.leagueid = l.leagueid
+		LEFT JOIN teams rt ON m.radiant_team_id = rt.team_id
+		LEFT JOIN teams dt ON m.dire_team_id = dt.team_id
 		WHERE l.tier IN ('%s', '%s')
 			AND m.match_id > %d
 			AND m.series_id != 0
 			AND m.radiant_team_id IS NOT NULL
 			AND m.dire_team_id IS NOT NULL
-			AND m.radiant_team_name IS NOT NULL
-			AND m.radiant_team_name != ''
-			AND m.dire_team_name IS NOT NULL
-			AND m.dire_team_name != ''
+			AND rt.name IS NOT NULL
+			AND rt.name != ''
+			AND dt.name IS NOT NULL
+			AND dt.name != ''
 		ORDER BY m.match_id ASC
 		LIMIT %d;
 	`, TierPremium, TierProfessional, lastFetchedMatchID, limit)
