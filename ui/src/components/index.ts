@@ -6,14 +6,13 @@ export { EmptyState } from "./EmptyState"
 export { ErrorBoundary, withErrorBoundary } from "./ErrorBoundary"
 export { ErrorState } from "./ErrorState"
 export { Footer } from "./Footer"
-export { DiscordIcon, Github } from "./Icons"
 export { HeroSelector } from "./HeroSelector"
 export { LeagueSelector } from "./LeagueSelector"
 export { Navbar } from "./Navbar"
 export { PlayerSelector } from "./PlayerSelector"
 export { PlayersTable } from "./PlayersTable"
 export { SEO } from "./SEO"
-export { Skeleton, SeriesCardSkeleton } from "./Skeleton"
+export { SeriesCardSkeleton, Skeleton } from "./Skeleton"
 export { Spinner } from "./Spinner"
 export { TeamSelector } from "./TeamSelector"
 
@@ -36,7 +35,6 @@ export {
     SelectItem,
     SelectTrigger,
     SelectValue,
-    Skeleton as UISkeleton,
     Table,
     TableBody,
     TableCell,
@@ -44,13 +42,14 @@ export {
     TableHeader,
     TableRow,
     Tabs,
+    TabsContent,
     TabsList,
     TabsTrigger,
-    TabsContent,
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
+    Skeleton as UISkeleton,
 } from "./ui"
 
 export { CustomSelect, CustomSelectItem } from "./ui/CustomSelect"
@@ -59,13 +58,7 @@ export { CustomSelect, CustomSelectItem } from "./ui/CustomSelect"
 // Series Components
 // ============================================================================
 
-export {
-    GameTabContent,
-    SeriesCard,
-    SeriesFilters,
-    SeriesHeader,
-    SeriesList,
-} from "./series"
+export { GameTabContent, SeriesCard, SeriesFilters, SeriesHeader, SeriesList } from "./series"
 
 export { HeroTooltipContent } from "./series/HeroTooltipContent"
 export { ItemTooltipContent } from "./series/ItemTooltipContent"

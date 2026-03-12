@@ -111,7 +111,7 @@ function About() {
                         <p className="text-foreground-muted text-sm">
                             The features are listed in the order of intended implementation. If you think you would want
                             a feature more than the other, or want something totally different to be added to dotapro,
-                            then let us know in our discord!
+                            let us know!
                         </p>
                     </div>
                 </div>
