@@ -37,6 +37,8 @@
         }
     ],
     "popular_leagues": [
+        { "id": 19422, "name": "ESL One Birmingham 2026" },
+        { "id": 19090, "name": "ESL One Birmingham 2026 Qualifiers" },
         { "id": 19435, "name": "PGL Wallachia 2026 Season 7" },
         {
             "id": 19269,
