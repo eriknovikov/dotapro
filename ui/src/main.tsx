@@ -6,6 +6,7 @@ import "./index.css"
 import { queryClient } from "./lib/query-client"
 import { routeTree } from "./routeTree.gen"
 
+/* simple comment to check CICD */
 const router = createRouter({
     routeTree,
     context: {
