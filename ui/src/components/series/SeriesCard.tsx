@@ -9,7 +9,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
         ref={ref}
         className={cn(
-            "bg-background-card/80 text-card-foreground relative overflow-hidden rounded-xl shadow-xl backdrop-blur-sm",
+            "bg-background-card/80 text-card-foreground relative overflow-hidden rounded-xl shadow-xl backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-2xl",
             className,
         )}
         {...props}
@@ -24,11 +24,24 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 )
 CardContent.displayName = "CardContent"
 
-export function SeriesCard({ series }: { series: Series }) {
+export function SeriesCard({
+    series,
+    style,
+    className,
+}: {
+    series: Series
+    style?: React.CSSProperties
+    className?: string
+}) {
     const navigate = useNavigate()
 
     return (
-        <Card role="article" aria-label={`Match: ${series.team_a.name} vs ${series.team_b.name}`}>
+        <Card
+            role="article"
+            aria-label={`Match: ${series.team_a.name} vs ${series.team_b.name}`}
+            style={style}
+            className={className}
+        >
             <CardContent className="flex flex-1 flex-col p-4">
                 {/* Teams and Score */}
                 <div className="border-border mb-3 flex flex-col gap-1 border-b pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -39,7 +52,7 @@ export function SeriesCard({ series }: { series: Series }) {
                                 <img
                                     src={series.team_a.logo_url}
                                     alt={`${series.team_a.name} logo`}
-                                    className="h-6 w-auto max-w-8 shrink-0 rounded select-none sm:h-7 sm:max-w-11"
+                                    className="h-6 w-auto max-w-8 shrink-0 rounded transition-all duration-300 select-none hover:brightness-125 hover:saturate-150 sm:h-7 sm:max-w-11"
                                 />
                             )}
                             <span className="text-foreground sm:text-md font-shantell truncate text-center text-sm font-bold sm:text-left">
@@ -68,7 +81,7 @@ export function SeriesCard({ series }: { series: Series }) {
                                 <img
                                     src={series.team_b.logo_url}
                                     alt={`${series.team_b.name} logo`}
-                                    className="h-6 w-auto max-w-8 shrink-0 rounded select-none sm:h-7 sm:max-w-11"
+                                    className="h-6 w-auto max-w-8 shrink-0 rounded transition-all duration-300 select-none hover:brightness-125 hover:saturate-150 sm:h-7 sm:max-w-11"
                                 />
                             )}
                             <span className="text-foreground sm:text-md font-shantell truncate text-center text-sm font-bold sm:text-right">

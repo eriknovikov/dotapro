@@ -37,6 +37,11 @@
         }
     ],
     "popular_leagues": [
+        { "id": 19255, "name": "Premier Series" },
+        {
+            "id": 17381,
+            "name": "European Pro League 2025-2026 Season"
+        },
         { "id": 19422, "name": "ESL One Birmingham 2026" },
         { "id": 19090, "name": "ESL One Birmingham 2026 Qualifiers" },
         { "id": 19435, "name": "PGL Wallachia 2026 Season 7" },
@@ -47,26 +52,6 @@
         {
             "id": 18324,
             "name": "The International 2025"
-        },
-        {
-            "id": 19201,
-            "name": "Dota 2 Space League"
-        },
-        {
-            "id": 18959,
-            "name": "Destiny League"
-        },
-        {
-            "id": 19176,
-            "name": "SIVVIT League"
-        },
-        {
-            "id": 18865,
-            "name": "EPL World Series: Southeast Asia 2025-2026 Season"
-        },
-        {
-            "id": 18941,
-            "name": "EPL Championship 2025-2026"
         }
     ],
     "popular_players": [

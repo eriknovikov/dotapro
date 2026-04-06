@@ -62,8 +62,17 @@ export function SeriesList({ series, isLoading, error, pagination, limit }: Seri
     return (
         <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(450px,1fr))] sm:gap-6">
-                {series.map(s => (
-                    <SeriesCard key={s.series_id} series={s} />
+                {series.map((s, index) => (
+                    <SeriesCard
+                        key={s.series_id}
+                        series={s}
+                        style={
+                            {
+                                animationDelay: `${Math.min(index, 10) * 50}ms`,
+                            } as React.CSSProperties
+                        }
+                        className="card-entrance"
+                    />
                 ))}
             </div>
 

@@ -1,5 +1,15 @@
 import { getSeriesById, type SeriesDetail } from "@/api"
-import { ErrorState, GameTabContent, SEO, SeriesHeader, Spinner, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components"
+import {
+    ErrorState,
+    GameTabContent,
+    SEO,
+    SeriesHeader,
+    Spinner,
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useParams } from "@tanstack/react-router"
 

@@ -9,7 +9,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
         ref={ref}
         className={cn(
-            "bg-background-card/80 text-card-foreground relative min-w-67.5 rounded-xl shadow-xl backdrop-blur-sm",
+            "bg-background-card/80 text-card-foreground relative min-w-67.5 rounded-xl shadow-xl backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-2xl",
             className,
         )}
         {...props}
@@ -38,7 +38,15 @@ function HeroTooltipWrapper({ heroId }: { heroId: number }) {
     )
 }
 
-export function MatchCard({ match }: { match: MatchSummary }) {
+export function MatchCard({
+    match,
+    style,
+    className,
+}: {
+    match: MatchSummary
+    style?: React.CSSProperties
+    className?: string
+}) {
     const navigate = useNavigate()
 
     // Extract heroes from hero arrays
@@ -46,7 +54,12 @@ export function MatchCard({ match }: { match: MatchSummary }) {
     const direHeroes = match.dire_heroes.slice(0, 5)
 
     return (
-        <Card role="article" aria-label={`Match: ${match.radiant_team.name} vs ${match.dire_team.name}`}>
+        <Card
+            role="article"
+            aria-label={`Match: ${match.radiant_team.name} vs ${match.dire_team.name}`}
+            style={style}
+            className={className}
+        >
             <CardContent className="flex flex-1 flex-col items-center p-4">
                 {/* Teams and Heroes - Vertical Layout */}
                 <div className="mb-3 flex flex-col items-center pb-3">
@@ -56,7 +69,7 @@ export function MatchCard({ match }: { match: MatchSummary }) {
                             <img
                                 src={match.radiant_team.logo_url}
                                 alt={`${match.radiant_team.name} logo`}
-                                className="h-8 w-auto max-w-10 shrink-0 rounded select-none"
+                                className="h-8 w-auto max-w-10 shrink-0 rounded transition-all duration-300 select-none hover:brightness-125 hover:saturate-150"
                             />
                         )}
                         <span className="text-foreground font-shantell text-lg font-bold">
@@ -93,7 +106,7 @@ export function MatchCard({ match }: { match: MatchSummary }) {
                             <img
                                 src={match.dire_team.logo_url}
                                 alt={`${match.dire_team.name} logo`}
-                                className="h-8 w-auto max-w-10 shrink-0 rounded select-none"
+                                className="h-8 w-auto max-w-10 shrink-0 rounded transition-all duration-300 select-none hover:brightness-125 hover:saturate-150"
                             />
                         )}
                         <span className="text-foreground font-shantell text-lg font-bold">{match.dire_team.name}</span>

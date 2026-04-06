@@ -1,5 +1,7 @@
 import { SEO } from "@/components"
+import { Card, CardContent } from "@/components/ui/card"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { BarChart3, Calendar, Gamepad2, Monitor } from "lucide-react"
 
 export const Route = createFileRoute("/guide")({
     component: Guide,
@@ -12,49 +14,103 @@ function Guide() {
                 title="Guide"
                 description="Learn how to get the most out of dotapro's professional Dota 2 analytics."
             />
-            <div className="mx-auto flex max-w-4xl flex-col gap-10 py-6">
-                <div className="p-10 shadow-md shadow-gray-900">
-                    <h2 className="text-foreground mb-6 text-2xl font-bold">How to get the most out of dotapro</h2>
-                    <div className="text-foreground-muted space-y-4 leading-relaxed">
-                        <p>
-                            If you want to get just the recent series, go to the <Link to="/series">series page</Link>.
-                            Here you can search the series by league and team. You could find data like "the latest
-                            series from The International 2025", or "from Team Liquid". Or even mixing them up -
-                            "getting the latest series from Team Liquid in The International 2025". Most of the time you
-                            will be searching for the series from a specific League like{" "}
-                            <Link to="/series" search={{ league: 19435 }} className="text-blue-200">
-                                PGL Wallachia 2026 Season 7
-                            </Link>
-                            , unless you are hunting for a specific team, like{" "}
-                            <Link to="/series" search={{ team: 8291895 }} className="text-blue-200">
-                                Tundra
-                            </Link>
-                            .
-                        </p>
-                        <p className="">
-                            Alternatively, you may want to get the recent{" "}
-                            <Link to="/matches" className="text-blue-200">
-                                matches
-                            </Link>{" "}
-                            instead. Here, you can search for the matches directly, using the same filters plus
-                            searching by hero or player.
-                        </p>
-                        <p>
-                            It is advised using the platform on desktop, though it has been designed to be responsive in
-                            mobile and tablets in case you don't have access to your PC or laptop.
-                        </p>
-                    </div>
-                </div>
-                <div className="p-10 shadow-md shadow-gray-900">
-                    <h2 className="text-foreground mb-4 text-2xl font-bold">Want a new feature?</h2>
-                    <p className="text-foreground-muted leading-relaxed">
-                        Take a look at the{" "}
-                        <Link to="/about" hash="features-to-add" className="text-blue-200">
-                            features to add section
-                        </Link>
-                        .
+            <div className="mx-4 min-h-[calc(100vh-4rem)] max-w-4xl space-y-8 py-6 sm:mx-auto">
+                {/* Hero Section */}
+                <div className="space-y-4 py-8 text-center">
+                    <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+                        Welcome to dotapro
+                    </h1>
+                    <p className="text-muted-foreground mx-auto max-w-2xl text-base sm:text-lg md:text-lg lg:text-xl">
+                        Your focused gateway to professional Dota 2 analytics. No noise, no public match clutter—just
+                        the insights that matter from the pro scene.
                     </p>
                 </div>
+
+                {/* Feature Cards */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    <Card className="border-border/50">
+                        <CardContent className="pt-6">
+                            <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
+                                <Calendar className="text-primary h-6 w-6" />
+                            </div>
+                            <h3 className="text-foreground mb-2 text-xl font-semibold">Explore Series</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                Find recent series filtered by league, team, or both. Looking for{" "}
+                                <Link to="/series" search={{ league: 19435 }} className="text-blue-500 hover:underline">
+                                    PGL Wallachia 2026 Season 7
+                                </Link>{" "}
+                                or want to see what{" "}
+                                <Link to="/series" search={{ team: 8291895 }} className="text-blue-500 hover:underline">
+                                    Tundra
+                                </Link>{" "}
+                                has been playing? It's all here.
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-border/50">
+                        <CardContent className="pt-6">
+                            <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
+                                <Gamepad2 className="text-primary h-6 w-6" />
+                            </div>
+                            <h3 className="text-foreground mb-2 text-xl font-semibold">Match Details</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                Dive into individual matches with advanced filtering. Search by{" "}
+                                <Link to="/matches" className="text-blue-500 hover:underline">
+                                    hero
+                                </Link>
+                                ,{" "}
+                                <Link to="/matches" className="text-blue-500 hover:underline">
+                                    player
+                                </Link>
+                                , or any combination of filters to find exactly what you're looking for.
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Getting Started Section */}
+                <Card className="border-border/50">
+                    <CardContent className="pt-6">
+                        <div className="bg-primary/10 mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
+                            <BarChart3 className="text-primary h-6 w-6" />
+                        </div>
+                        <h3 className="text-foreground mb-2 text-xl font-semibold">Analytics That Matter</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                            Unlike traditional platforms that drown you in public match data, dotapro focuses
+                            exclusively on professional Dota 2. Every stat, every filter is designed to help you
+                            understand the pro scene—whether you're a casual fan, a caster preparing for a broadcast, or
+                            a pro player scouting opponents.
+                        </p>
+                    </CardContent>
+                </Card>
+
+                {/* Tips Section */}
+                <div className="border-border/50 bg-card/50 rounded-lg border p-6">
+                    <div className="mb-4 flex items-center gap-3">
+                        <Monitor className="text-muted-foreground h-5 w-5" />
+                        <h3 className="text-foreground text-lg font-semibold">Pro Tip</h3>
+                    </div>
+                    <p className="text-muted-foreground leading-relaxed">
+                        While dotapro is responsive across devices, the best experience is on desktop. Save it as a
+                        bookmark and make it part of your pre-game prep routine.
+                    </p>
+                </div>
+
+                {/* Feature Requests */}
+                <Card className="border-border/50 from-primary/5 bg-gradient-to-br to-transparent">
+                    <CardContent className="pt-6">
+                        <h3 className="text-foreground mb-3 text-xl font-semibold">Have an idea?</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                            dotapro is actively developed. Check out the{" "}
+                            <Link to="/about" hash="features-to-add" className="text-blue-500 hover:underline">
+                                planned features
+                            </Link>{" "}
+                            and let us know what you'd like to see next. Your feedback shapes the future of the
+                            platform.
+                        </p>
+                    </CardContent>
+                </Card>
             </div>
         </>
     )

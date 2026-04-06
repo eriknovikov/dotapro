@@ -3,6 +3,7 @@ import type { MatchFilters } from "@/types"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import {
+    ActiveFiltersBar,
     HeroSelector,
     LeagueSelector,
     PlayerSelector,
@@ -47,8 +48,16 @@ export function MatchFilters() {
         })
     }
 
+    // Handler for removing individual filter
+    const handleRemoveFilter = (key: "league" | "team" | "hero" | "player" | "limit") => {
+        updateFilters({ [key]: undefined })
+    }
+
     return (
         <div className="bg-background-accent mb-6 rounded-lg p-4">
+            {/* Active Filters Bar */}
+            <ActiveFiltersBar filters={search} onRemove={handleRemoveFilter} />
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <LeagueSelector initialValue={search.league} onSelect={league => updateFilters({ league })} />
 

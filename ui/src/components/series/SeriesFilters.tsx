@@ -1,5 +1,14 @@
 import type { Filters } from "@/api"
-import { Button, CustomSelect, CustomSelectItem, HeroSelector, LeagueSelector, PlayerSelector, TeamSelector } from ".."
+import {
+    ActiveFiltersBar,
+    Button,
+    CustomSelect,
+    CustomSelectItem,
+    HeroSelector,
+    LeagueSelector,
+    PlayerSelector,
+    TeamSelector,
+} from ".."
 import { PAGINATION_LIMITS } from "@/constants"
 import { useNavigate } from "@tanstack/react-router"
 import { Funnel } from "lucide-react"
@@ -73,22 +82,12 @@ export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType =
         })
     }
 
-    const handleClear = () => {
-        const clearFilters: Record<string, undefined> = {
-            league: undefined,
-            team: undefined,
-            sort: undefined,
-            limit: undefined,
-            c: undefined,
-        }
-        // Only clear hero and player filters for matches
-        if (itemType === "matches") {
-            clearFilters.hero = undefined
-            clearFilters.player = undefined
-        }
+    const handleRemoveFilter = (key: "league" | "team" | "hero" | "player" | "limit") => {
+        const newFilters = { ...filters }
+        delete newFilters[key]
         navigate({
             to: ".",
-            search: clearFilters,
+            search: newFilters,
         })
     }
 
@@ -140,6 +139,9 @@ export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType =
                         <h2 className="text-foreground text-lg font-semibold">Filters</h2>
                     </div>
 
+                    {/* Active Filters Bar */}
+                    <ActiveFiltersBar filters={filters} onRemove={handleRemoveFilter} />
+
                     <div className="space-y-12">
                         {/* League Filter */}
                         <div>
@@ -187,7 +189,10 @@ export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType =
                         {/* Player Filter - Only for matches */}
                         {itemType === "matches" && (
                             <div>
-                                <label htmlFor="player-select" className="text-foreground mb-2 block text-sm font-medium">
+                                <label
+                                    htmlFor="player-select"
+                                    className="text-foreground mb-2 block text-sm font-medium"
+                                >
                                     Player
                                 </label>
                                 <PlayerSelector
@@ -241,15 +246,6 @@ export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType =
 
                         {/* Action Buttons */}
                         <div className="flex justify-end gap-1">
-                            <Button
-                                onClick={handleClear}
-                                variant="outline"
-                                size="sm"
-                                className="text-sm"
-                                aria-label="Reset defaults"
-                            >
-                                Reset defaults
-                            </Button>
                             <Button
                                 onClick={onMobileClose}
                                 variant="primary"

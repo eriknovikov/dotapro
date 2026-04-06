@@ -96,7 +96,7 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                                 className="h-8 w-auto shrink-0 rounded-lg object-contain"
                             />
                         )}
-                        <span className="font-shantell truncate text-center text-base font-bold">
+                        <span className="font-shantell text-center text-lg font-bold sm:text-xl">
                             {radiant_team.name}
                         </span>
                     </div>
@@ -117,7 +117,7 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                                 className="h-8 w-auto shrink-0 rounded-lg object-contain"
                             />
                         )}
-                        <span className="font-shantell truncate text-center text-base font-bold">{dire_team.name}</span>
+                        <span className="font-shantell text-center text-lg font-bold sm:text-xl">{dire_team.name}</span>
                     </div>
                 </div>
 
@@ -133,15 +133,15 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                 {/* Teams and VS Icon */}
                 <div className="flex flex-row items-center gap-25">
                     {/* Radiant Team */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex min-w-0 items-center gap-1">
                         {radiant_team.logo_url && (
                             <img
                                 src={radiant_team.logo_url}
                                 alt={`${radiant_team.name} logo`}
-                                className="h-16 w-auto rounded-lg object-contain md:h-24"
+                                className="h-16 w-auto shrink-0 rounded-lg object-contain md:h-24 lg:h-20"
                             />
                         )}
-                        <span className="font-shantell text-xl font-bold md:text-3xl">{radiant_team.name}</span>
+                        <span className="font-shantell min-w-0 text-xl font-bold md:text-3xl">{radiant_team.name}</span>
                     </div>
 
                     {/* VS Icon */}
@@ -150,13 +150,13 @@ function MatchHeader({ match, router }: { match: MatchDetail; router: ReturnType
                     </div>
 
                     {/* Dire Team */}
-                    <div className="flex items-center gap-1">
-                        <span className="font-shantell text-xl font-bold md:text-3xl">{dire_team.name}</span>
+                    <div className="flex min-w-0 items-center gap-1">
+                        <span className="font-shantell min-w-0 text-xl font-bold md:text-3xl">{dire_team.name}</span>
                         {dire_team.logo_url && (
                             <img
                                 src={dire_team.logo_url}
                                 alt={`${dire_team.name} logo`}
-                                className="h-16 w-auto rounded-lg object-contain md:h-24"
+                                className="h-16 w-auto shrink-0 rounded-lg object-contain md:h-24 lg:h-20"
                             />
                         )}
                     </div>

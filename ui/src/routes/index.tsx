@@ -33,11 +33,11 @@ function Index() {
                                 </Button>
                                 <Button
                                     asChild
-                                    variant="outline"
+                                    variant="cool-outline"
                                     size="sm"
                                     className="px-6 text-sm sm:px-6 sm:text-sm md:px-6 md:text-sm lg:px-8 lg:text-base"
                                 >
-                                    <Link to="/about">About dotapro</Link>
+                                    <Link to="/matches">View Matches</Link>
                                 </Button>
                             </div>
                         </div>
@@ -45,9 +45,12 @@ function Index() {
                 </div>
 
                 {/* Hero Image with Linear-style 3D effect - Full width outside container */}
-                <div className="sm:perspective:[2000px] flex w-full items-center justify-center overflow-hidden px-2 py-1 perspective-[2000px] sm:py-2 md:py-8 lg:py-12">
-                    <div className="relative w-full transform-[rotateX(-18deg)_rotateY(7deg)_rotateZ(-0.75deg)] transition-shadow duration-300 ease-in-out hover:shadow-[0_0_0_1px_rgba(0,0,0,.06),0_16px_24px_rgba(0,0,0,.08),0_40px_60px_rgba(0,0,0,.06),0_80px_100px_rgba(0,0,0,.06),0_160px_200px_rgba(0,0,0,.04),0_400px_320px_rgba(0,0,0,.04)] sm:w-auto sm:transform-[rotateX(-25deg)_rotateY(10deg)_rotateZ(-1deg)]">
-                        {/* Ambient Glow (Light Bleed) */}
+                <div className="sm:perspective:[2000px] bg-gradient-mesh relative flex w-full items-center justify-center overflow-hidden px-2 py-1 perspective-[2000px] sm:py-2 md:py-8 lg:py-12">
+                    {/* Scanline effect overlay */}
+                    <div className="scanline-effect pointer-events-none absolute inset-0 z-10" aria-hidden="true" />
+
+                    <div className="hero-float relative w-full transform-[rotateX(-18deg)_rotateY(7deg)_rotateZ(-0.75deg)] transition-shadow duration-300 ease-in-out hover:shadow-[0_0_0_1px_rgba(0,0,0,.06),0_16px_24px_rgba(0,0,0,.08),0_40px_60px_rgba(0,0,0,.06),0_80px_100px_rgba(0,0,0,.06),0_160px_200px_rgba(0,0,0,.04),0_400px_320px_rgba(0,0,0,.04)] sm:w-auto sm:transform-[rotateX(-25deg)_rotateY(10deg)_rotateZ(-1deg)]">
+                        {/* Ambient Glow (Light Bleed) - with Radiant gold tint */}
                         <div
                             className="bg-primary-500/10 absolute -inset-2 opacity-30 blur-3xl sm:-inset-4"
                             aria-hidden="true"

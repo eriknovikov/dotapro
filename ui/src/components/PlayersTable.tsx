@@ -5,8 +5,12 @@ import { Crown, Trophy } from "lucide-react"
 import { lazy, Suspense } from "react"
 
 // Lazy load tooltip components to reduce initial bundle size
-const HeroTooltipContent = lazy(() => import("./series/HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })))
-const ItemTooltipContent = lazy(() => import("./series/ItemTooltipContent").then(m => ({ default: m.ItemTooltipContent })))
+const HeroTooltipContent = lazy(() =>
+    import("./series/HeroTooltipContent").then(m => ({ default: m.HeroTooltipContent })),
+)
+const ItemTooltipContent = lazy(() =>
+    import("./series/ItemTooltipContent").then(m => ({ default: m.ItemTooltipContent })),
+)
 
 // Wrapper components to handle Suspense inside tooltip content
 function HeroTooltipWrapper({ heroId }: { heroId: number }) {

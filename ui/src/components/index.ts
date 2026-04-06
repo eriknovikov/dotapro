@@ -2,6 +2,7 @@
 // Main Components
 // ============================================================================
 
+export { ActiveFiltersBar } from "./ActiveFiltersBar"
 export { EmptyState } from "./EmptyState"
 export { ErrorBoundary, withErrorBoundary } from "./ErrorBoundary"
 export { ErrorState } from "./ErrorState"
@@ -12,7 +13,7 @@ export { Navbar } from "./Navbar"
 export { PlayerSelector } from "./PlayerSelector"
 export { PlayersTable } from "./PlayersTable"
 export { SEO } from "./SEO"
-export { SeriesCardSkeleton, Skeleton } from "./Skeleton"
+export { MatchCardSkeleton, SeriesCardSkeleton, Skeleton } from "./Skeleton"
 export { Spinner } from "./Spinner"
 export { TeamSelector } from "./TeamSelector"
 
