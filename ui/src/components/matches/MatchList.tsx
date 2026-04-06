@@ -1,6 +1,6 @@
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router"
 import type { Pagination, MatchSummary, MatchFilters } from "@/types"
-import { Button, EmptyState, ErrorState, Skeleton } from ".."
+import { Button, EmptyState, ErrorState, MatchCardSkeleton } from ".."
 import { MatchCard } from "./MatchCard"
 
 interface MatchListProps {
@@ -53,8 +53,17 @@ export function MatchList({ matches, isLoading, error, pagination, limit }: Matc
     return (
         <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(270px,1fr))] sm:gap-6">
-                {matches.map(match => (
-                    <MatchCard key={match.match_id} match={match} />
+                {matches.map((match, index) => (
+                    <MatchCard
+                        key={match.match_id}
+                        match={match}
+                        style={
+                            {
+                                animationDelay: `${Math.min(index, 10) * 50}ms`,
+                            } as React.CSSProperties
+                        }
+                        className="card-entrance"
+                    />
                 ))}
             </div>
 
@@ -80,12 +89,7 @@ function MatchListSkeleton({ count = 9 }: { count?: number }) {
         <div className="w-full px-2 md:px-12">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(270px,1fr))] sm:gap-6">
                 {Array.from({ length: count }).map((_, i) => (
-                    <div key={i} className="bg-background-card/80 min-w-67.5 rounded-xl p-4 shadow-xl">
-                        <Skeleton className="mb-2 h-6 w-3/4" />
-                        <Skeleton className="mb-4 h-4 w-1/2" />
-                        <Skeleton className="mb-1 h-4 w-full" />
-                        <Skeleton className="h-4 w-2/3" />
-                    </div>
+                    <MatchCardSkeleton key={i} />
                 ))}
             </div>
         </div>

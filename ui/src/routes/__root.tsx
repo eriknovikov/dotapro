@@ -8,7 +8,7 @@ const RootLayout = () => {
         <ErrorBoundary>
             <div className="bg-background flex min-h-screen flex-col overflow-x-hidden">
                 <Navbar />
-                <div className="flex-1 pt-14 sm:pt-16">
+                <div className="page-enter flex-1 pt-14 sm:pt-16">
                     <Outlet />
                 </div>
                 <Footer />

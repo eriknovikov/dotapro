@@ -8,158 +8,182 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as GuideRouteImport } from "./routes/guide"
-import { Route as AboutRouteImport } from "./routes/about"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as SeriesIndexRouteImport } from "./routes/series/index"
-import { Route as MatchesIndexRouteImport } from "./routes/matches/index"
-import { Route as SeriesIdRouteImport } from "./routes/series/$id"
-import { Route as MatchesIdRouteImport } from "./routes/matches/$id"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as GuideRouteImport } from './routes/guide'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as SeriesIndexRouteImport } from './routes/series/index'
+import { Route as MatchesIndexRouteImport } from './routes/matches/index'
+import { Route as SeriesIdRouteImport } from './routes/series/$id'
+import { Route as MatchesIdRouteImport } from './routes/matches/$id'
 
 const GuideRoute = GuideRouteImport.update({
-    id: "/guide",
-    path: "/guide",
-    getParentRoute: () => rootRouteImport,
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
-    id: "/about",
-    path: "/about",
-    getParentRoute: () => rootRouteImport,
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SeriesIndexRoute = SeriesIndexRouteImport.update({
-    id: "/series/",
-    path: "/series/",
-    getParentRoute: () => rootRouteImport,
+  id: '/series/',
+  path: '/series/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MatchesIndexRoute = MatchesIndexRouteImport.update({
-    id: "/matches/",
-    path: "/matches/",
-    getParentRoute: () => rootRouteImport,
+  id: '/matches/',
+  path: '/matches/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SeriesIdRoute = SeriesIdRouteImport.update({
-    id: "/series/$id",
-    path: "/series/$id",
-    getParentRoute: () => rootRouteImport,
+  id: '/series/$id',
+  path: '/series/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MatchesIdRoute = MatchesIdRouteImport.update({
-    id: "/matches/$id",
-    path: "/matches/$id",
-    getParentRoute: () => rootRouteImport,
+  id: '/matches/$id',
+  path: '/matches/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-    "/": typeof IndexRoute
-    "/about": typeof AboutRoute
-    "/guide": typeof GuideRoute
-    "/matches/$id": typeof MatchesIdRoute
-    "/series/$id": typeof SeriesIdRoute
-    "/matches/": typeof MatchesIndexRoute
-    "/series/": typeof SeriesIndexRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/guide': typeof GuideRoute
+  '/matches/$id': typeof MatchesIdRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/matches/': typeof MatchesIndexRoute
+  '/series/': typeof SeriesIndexRoute
 }
 export interface FileRoutesByTo {
-    "/": typeof IndexRoute
-    "/about": typeof AboutRoute
-    "/guide": typeof GuideRoute
-    "/matches/$id": typeof MatchesIdRoute
-    "/series/$id": typeof SeriesIdRoute
-    "/matches": typeof MatchesIndexRoute
-    "/series": typeof SeriesIndexRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/guide': typeof GuideRoute
+  '/matches/$id': typeof MatchesIdRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/matches': typeof MatchesIndexRoute
+  '/series': typeof SeriesIndexRoute
 }
 export interface FileRoutesById {
-    __root__: typeof rootRouteImport
-    "/": typeof IndexRoute
-    "/about": typeof AboutRoute
-    "/guide": typeof GuideRoute
-    "/matches/$id": typeof MatchesIdRoute
-    "/series/$id": typeof SeriesIdRoute
-    "/matches/": typeof MatchesIndexRoute
-    "/series/": typeof SeriesIndexRoute
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/guide': typeof GuideRoute
+  '/matches/$id': typeof MatchesIdRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/matches/': typeof MatchesIndexRoute
+  '/series/': typeof SeriesIndexRoute
 }
 export interface FileRouteTypes {
-    fileRoutesByFullPath: FileRoutesByFullPath
-    fullPaths: "/" | "/about" | "/guide" | "/matches/$id" | "/series/$id" | "/matches/" | "/series/"
-    fileRoutesByTo: FileRoutesByTo
-    to: "/" | "/about" | "/guide" | "/matches/$id" | "/series/$id" | "/matches" | "/series"
-    id: "__root__" | "/" | "/about" | "/guide" | "/matches/$id" | "/series/$id" | "/matches/" | "/series/"
-    fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/guide'
+    | '/matches/$id'
+    | '/series/$id'
+    | '/matches/'
+    | '/series/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/about'
+    | '/guide'
+    | '/matches/$id'
+    | '/series/$id'
+    | '/matches'
+    | '/series'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/guide'
+    | '/matches/$id'
+    | '/series/$id'
+    | '/matches/'
+    | '/series/'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-    IndexRoute: typeof IndexRoute
-    AboutRoute: typeof AboutRoute
-    GuideRoute: typeof GuideRoute
-    MatchesIdRoute: typeof MatchesIdRoute
-    SeriesIdRoute: typeof SeriesIdRoute
-    MatchesIndexRoute: typeof MatchesIndexRoute
-    SeriesIndexRoute: typeof SeriesIndexRoute
+  IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  GuideRoute: typeof GuideRoute
+  MatchesIdRoute: typeof MatchesIdRoute
+  SeriesIdRoute: typeof SeriesIdRoute
+  MatchesIndexRoute: typeof MatchesIndexRoute
+  SeriesIndexRoute: typeof SeriesIndexRoute
 }
 
-declare module "@tanstack/react-router" {
-    interface FileRoutesByPath {
-        "/guide": {
-            id: "/guide"
-            path: "/guide"
-            fullPath: "/guide"
-            preLoaderRoute: typeof GuideRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        "/about": {
-            id: "/about"
-            path: "/about"
-            fullPath: "/about"
-            preLoaderRoute: typeof AboutRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        "/": {
-            id: "/"
-            path: "/"
-            fullPath: "/"
-            preLoaderRoute: typeof IndexRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        "/series/": {
-            id: "/series/"
-            path: "/series"
-            fullPath: "/series/"
-            preLoaderRoute: typeof SeriesIndexRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        "/matches/": {
-            id: "/matches/"
-            path: "/matches"
-            fullPath: "/matches/"
-            preLoaderRoute: typeof MatchesIndexRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        "/series/$id": {
-            id: "/series/$id"
-            path: "/series/$id"
-            fullPath: "/series/$id"
-            preLoaderRoute: typeof SeriesIdRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        "/matches/$id": {
-            id: "/matches/$id"
-            path: "/matches/$id"
-            fullPath: "/matches/$id"
-            preLoaderRoute: typeof MatchesIdRouteImport
-            parentRoute: typeof rootRouteImport
-        }
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/series/': {
+      id: '/series/'
+      path: '/series'
+      fullPath: '/series/'
+      preLoaderRoute: typeof SeriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches/': {
+      id: '/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof MatchesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/series/$id': {
+      id: '/series/$id'
+      path: '/series/$id'
+      fullPath: '/series/$id'
+      preLoaderRoute: typeof SeriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches/$id': {
+      id: '/matches/$id'
+      path: '/matches/$id'
+      fullPath: '/matches/$id'
+      preLoaderRoute: typeof MatchesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-    IndexRoute: IndexRoute,
-    AboutRoute: AboutRoute,
-    GuideRoute: GuideRoute,
-    MatchesIdRoute: MatchesIdRoute,
-    SeriesIdRoute: SeriesIdRoute,
-    MatchesIndexRoute: MatchesIndexRoute,
-    SeriesIndexRoute: SeriesIndexRoute,
+  IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  GuideRoute: GuideRoute,
+  MatchesIdRoute: MatchesIdRoute,
+  SeriesIdRoute: SeriesIdRoute,
+  MatchesIndexRoute: MatchesIndexRoute,
+  SeriesIndexRoute: SeriesIndexRoute,
 }
-export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

@@ -35,7 +35,9 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                                 className="h-8 w-auto shrink-0 rounded-lg object-contain"
                             />
                         )}
-                        <span className="font-shantell truncate text-center text-base font-bold">{team_a.name}</span>
+                        <span className="font-shantell truncate text-center text-lg font-bold sm:text-xl">
+                            {team_a.name}
+                        </span>
                         <span className="text-foreground-muted text-sm font-bold">({team_a_score})</span>
                     </div>
                 </div>
@@ -55,7 +57,9 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                                 className="h-8 w-auto shrink-0 rounded-lg object-contain"
                             />
                         )}
-                        <span className="font-shantell truncate text-center text-base font-bold">{team_b.name}</span>
+                        <span className="font-shantell truncate text-center text-lg font-bold sm:text-xl">
+                            {team_b.name}
+                        </span>
                         <span className="text-foreground-muted text-sm font-bold">({team_b_score})</span>
                     </div>
                 </div>
@@ -72,30 +76,30 @@ export function SeriesHeader({ series }: SeriesHeaderProps) {
                 {/* Teams and Score */}
                 <div className="flex flex-row items-center gap-25">
                     {/* Team A */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex min-w-0 items-center gap-1">
                         {team_a.logo_url && (
                             <img
                                 src={team_a.logo_url}
                                 alt={`${team_a.name} logo`}
-                                className="h-16 w-auto rounded-lg object-contain md:h-24"
+                                className="h-16 w-auto shrink-0 rounded-lg object-contain md:h-24 lg:h-20"
                             />
                         )}
-                        <span className="font-shantell text-xl font-bold md:text-3xl">{team_a.name}</span>
+                        <span className="font-shantell min-w-0 text-xl font-bold md:text-3xl">{team_a.name}</span>
                     </div>
 
                     {/* Score */}
-                    <div className="font-teko text-foreground text-4xl font-bold md:text-5xl">
+                    <div className="font-teko text-foreground shrink-0 text-4xl font-bold md:text-5xl">
                         {team_a_score} - {team_b_score}
                     </div>
 
                     {/* Team B */}
-                    <div className="flex items-center gap-1">
-                        <span className="font-shantell text-xl font-bold md:text-3xl">{team_b.name}</span>
+                    <div className="flex min-w-0 items-center gap-1">
+                        <span className="font-shantell min-w-0 text-xl font-bold md:text-3xl">{team_b.name}</span>
                         {team_b.logo_url && (
                             <img
                                 src={team_b.logo_url}
                                 alt={`${team_b.name} logo`}
-                                className="h-16 w-auto rounded-lg object-contain md:h-24"
+                                className="h-16 w-auto shrink-0 rounded-lg object-contain md:h-24 lg:h-20"
                             />
                         )}
                     </div>
