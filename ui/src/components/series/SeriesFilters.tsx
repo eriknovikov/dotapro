@@ -187,7 +187,10 @@ export function SeriesFilters({ filters, isMobileOpen, onMobileClose, itemType =
                         {/* Player Filter - Only for matches */}
                         {itemType === "matches" && (
                             <div>
-                                <label htmlFor="player-select" className="text-foreground mb-2 block text-sm font-medium">
+                                <label
+                                    htmlFor="player-select"
+                                    className="text-foreground mb-2 block text-sm font-medium"
+                                >
                                     Player
                                 </label>
                                 <PlayerSelector

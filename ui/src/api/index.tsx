@@ -19,8 +19,8 @@ import type {
 
 // Player search result type
 export type PlayerSearchResult = {
-	player_id: number
-	name: string
+    player_id: number
+    name: string
 }
 
 // Re-export types for backward compatibility

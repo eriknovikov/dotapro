@@ -33,11 +33,11 @@ function Index() {
                                 </Button>
                                 <Button
                                     asChild
-                                    variant="outline"
+                                    variant="cool-outline"
                                     size="sm"
                                     className="px-6 text-sm sm:px-6 sm:text-sm md:px-6 md:text-sm lg:px-8 lg:text-base"
                                 >
-                                    <Link to="/about">About dotapro</Link>
+                                    <Link to="/matches">View Matches</Link>
                                 </Button>
                             </div>
                         </div>
